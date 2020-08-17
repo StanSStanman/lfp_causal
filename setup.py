@@ -12,7 +12,7 @@ setup(
     packages=find_packages(),
     author=AUTHOR,
     maintainer=MAINTEINER,
-    description="Pipeline for meg causal analysis",
+    description="Pipeline for lfp causal analysis",
     license='BSD 3',
     install_requires=['numpy',
                       'scipy',
