@@ -3,7 +3,8 @@ create_raw_old.py
 *.sh
 *.txt
 *.idea
-*.idea/*
+#*.idea/*
 *__pycache__/
 *.egg-info
 *.ipynb_checkpoints
+.idea/inspectionProfiles
