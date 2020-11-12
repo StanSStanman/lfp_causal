@@ -2,9 +2,8 @@ lfp_causal/config/db_coords.json
 create_raw_old.py
 *.sh
 *.txt
-*.idea
-#*.idea/*
+.idea
+*.idea/*
 *__pycache__/
 *.egg-info
 *.ipynb_checkpoints
-.idea/inspectionProfiles
