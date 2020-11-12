@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
-from lfp_causal.smr2mne import smr_to_raw
+from lfp_causal.old.smr2mne import smr_to_raw
 
 # fname = 'D:\\Databases\\db_lfp\\lfp_causal\\freddie\\easy\\spike2\\fneu1098.xlsx'
 def events_finder(events, fname):
-    items = ['cue_onset', 'cue_offset', 'trigger_onset', 'trigger_offset', 'movement_onset',
-             'reward_onset', 'reward_delivery', 'movement_offset']
+    items = ['cue_onset', 'cue_offset', 'trigger_onset', 'trigger_offset',
+             'movement_onset',  'reward_onset', 'reward_delivery', 'movement_offset']
     cue = np.intersect1d(events['cue L']['times'], events['cue R']['times'])
     cues = np.array([])
     for c1 in cue:
@@ -14,9 +14,12 @@ def events_finder(events, fname):
                 cues = np.hstack((cues, np.array([c1, c2])))
     cue = cues
     cue = np.reshape(cue, (int(len(cue)/2), 2))
-    assert np.all((cue[:,1]-cue[:,0])>0.499) and np.all((cue[:,1]-cue[:,0])<0.501), 'not all cues are lasting around 0.5s'
+    assert np.all((cue[:, 1]-cue[:, 0]) > 0.499) \
+           and np.all((cue[:, 1]-cue[:, 0]) < 0.501), \
+           'not all cues are lasting around 0.5s'
 
-    trigger = np.intersect1d(events['trig L']['times'], events['trig R']['times'])
+    trigger = np.intersect1d(events['trig L']['times'],
+                             events['trig R']['times'])
     try:
         trigger = np.reshape(trigger, (int(len(trigger)/2), 2))
         cue - trigger
@@ -61,8 +64,9 @@ def events_finder(events, fname):
     # assert np.all(trigger[:, 1] - trigger[:, 0] <= 1)
     trigger_onset = trigger[:, 0]
     trigger_offset = trigger[:, 1]
-    assert np.all((trigger_onset - cue_offset) > (1 - 0.01)) and np.all((trigger_onset - cue_offset) < (1 + 0.01)), \
-        'the distance between cues and trigger is incorrect'
+    assert np.all((trigger_onset - cue_offset) > (1 - 0.01)) \
+           and np.all((trigger_onset - cue_offset) < (1 + 0.01)),\
+           'the distance between cues and trigger is incorrect'
 
     reward = np.intersect1d(events['bar']['times'], trigger)
     reward_onset = np.intersect1d(reward, trigger_offset)
@@ -77,14 +81,21 @@ def events_finder(events, fname):
     _, i_rd, _ = np.intersect1d(reward_onset, _rd, return_indices=True)
     reward_delivery = np.zeros(len(reward_onset))
     np.put(reward_delivery, i_rd, 1)
-    assert len(reward_onset) == len(reward_delivery), 'the numbers of rewards and theyr corresponding times are not the same'
+    assert len(reward_onset) == len(reward_delivery), \
+        'the numbers of rewards and their corresponding times are not the same'
 
     bar = events['bar']['times']
     bar = np.unique(bar)
     bar = np.delete(bar, np.where(bar < cue_onset[0])[0])
     bar = np.delete(bar, np.where(np.isin(bar, np.intersect1d(bar, cue.flatten())))[0])
     # bar = np.delete(bar, np.where(np.isin(bar, np.intersect1d(bar, trigger.flatten())))[0])
-    bar = np.delete(bar, np.where(np.isin(np.around(bar, decimals=1), np.intersect1d(np.around(bar, decimals=1), np.around(trigger.flatten(), decimals=1))))[0])
+    bar = np.delete(bar,
+                    np.where(
+                        np.isin(
+                            np.around(bar, decimals=1),
+                            np.intersect1d(np.around(bar, decimals=1),
+                                           np.around(trigger.flatten(),
+                                                     decimals=1))))[0])
 
     movement_onset = np.array([])
     for x, y in zip(trigger[:, 0], trigger[:, 1]):
@@ -104,7 +115,8 @@ def events_finder(events, fname):
         if len(trigger_offset) < len(movement_offset):
             movement_offset = np.delete(movement_offset, -1)
 
-    all_events = [cue_onset, cue_offset, trigger_onset, trigger_offset, movement_onset,
+    all_events = [cue_onset, cue_offset, trigger_onset, trigger_offset,
+                  movement_onset,
                   reward_onset, reward_delivery, movement_offset]
 
     if len(reward_delivery) != len(trigger_offset):

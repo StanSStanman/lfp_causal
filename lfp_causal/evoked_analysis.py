@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import mne
 import numpy as np
 from scipy.stats import zscore
-from lfp_causal.controls import session_name, check_area
+from lfp_causal.old.controls import session_name, check_area
 from lfp_causal.directories import epochs_dir
 
 

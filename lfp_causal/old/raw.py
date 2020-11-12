@@ -1,8 +1,8 @@
 import numpy as np
 import mne
-from lfp_causal.read_infos import trial_info, read_matfile
+from lfp_causal.old.read_infos import read_matfile
 from lfp_causal.directories import raw_dir
-from lfp_causal.controls import session_name
+from lfp_causal.old.controls import session_name
 
 def create_rawfiles(subject, condition, session):
     ''' Create and save the raw files

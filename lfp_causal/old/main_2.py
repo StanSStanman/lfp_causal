@@ -1,17 +1,5 @@
-from lfp_causal.base_structure import create_folders, save_info
-from lfp_causal.read_infos import info_labels, files_info, trial_info
-from lfp_causal.raw import create_rawfiles, plot_rawdata
-from lfp_causal.epochs import create_epochs, plot_epochs
-from lfp_causal.preprocessing import preprocessing, area_preprocessing
-from lfp_causal.frequences_analysis import plot_psd, plot_tfr
-from lfp_causal.evoked_analysis import plot_area_evoked, plot_zscore_evoked
-from lfp_causal.directories import (directory,
-                                    xls_fname,
-                                    rawmat_dir,
-                                    info_dir,
-                                    neu_dir,
-                                    beh_dir,
-                                    raw_dir)
+from lfp_causal.old.read_infos import files_info
+from lfp_causal.old.epochs import plot_epochs
 
 subject = ['freddie']
 condition = ['easy']

@@ -2,7 +2,7 @@ import warnings
 import logging
 import pandas as pd
 from lfp_causal.directories import *
-from lfp_causal.read_infos import trial_info
+from lfp_causal.old.read_infos import trial_info
 
 def session_name(session):
     ''' Correct the session name in input

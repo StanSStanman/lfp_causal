@@ -1,14 +1,13 @@
-import matplotlib
 # matplotlib.use('Agg')
 import numpy as np
 from scipy.stats import zscore
 import mne
 import os
 import matplotlib.pyplot as plt
-from lfp_causal.controls import session_name, check_area
-from lfp_causal.directories import plot_dir, raw_dir, prep_dir
-from lfp_causal.read_infos import read_matfile
-from lfp_causal.evoked_analysis import collect_evoked
+from lfp_causal.old.controls import session_name, check_area
+from lfp_causal.directories import plot_dir, raw_dir
+from lfp_causal.old.read_infos import read_matfile
+
 
 def preprocessing(subject, condition, session):
     trial_num = session_name(session)

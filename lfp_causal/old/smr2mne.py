@@ -5,7 +5,7 @@ import numpy as np
 
 
 def read_smr(fname):
-    reader = neo.io.Spike2IO(filename=fname)
+    reader = neo.io.Spike2IO(filename=fname, try_signal_grouping=False)
     data = reader.read(lazy=False)[0]
     return data
 
@@ -74,11 +74,15 @@ if __name__ == '__main__':
     # smr_to_raw('D:\\Databases\\db_lfp\\lfp_causal\\freddie\\easy\\spike2\\fneu1028.smr')
     import os
     files = []
-    for file in os.listdir('D:\\Databases\\db_lfp\\lfp_causal\\freddie\\easy\\spike2'):
+    for file in os.listdir('/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/'
+                           'freddie/easy/smr'):
         if file.endswith('.smr'):
-            fname = os.path.join('D:\\Databases\\db_lfp\\lfp_causal\\freddie\\easy\\spike2', file)
+            fname = os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
+                                 'lfp_causal/freddie/easy/smr', file)
             smr = smr_to_raw(fname)
             raw = smr[0][0]
             file = file.replace('fneu', '')
             file = file.replace('.smr', '_raw.fif')
-            raw.save( os.path.join('D:\\Databases\\db_lfp\\lfp_causal\\freddie\\easy\\raw_spike2', file), overwrite=True)
+            raw.save(os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
+                                  'lfp_causal/freddie/easy/raw', file),
+                     overwrite=True)

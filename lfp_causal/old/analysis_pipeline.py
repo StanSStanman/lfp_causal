@@ -1,12 +1,8 @@
 import logging
 import mne
-from scipy.stats import zscore
-import numpy as np
 from lfp_causal.directories import *
-from lfp_causal.controls import quality_check, check_area
-from lfp_causal.read_infos import files_info
-from lfp_causal.raw import create_rawfiles
-from lfp_causal.epochs import create_epochs
+from lfp_causal.old.controls import quality_check, check_area
+from lfp_causal.old.read_infos import files_info
 from lfp_causal.frequences_analysis import time_frequency_analysis
 
 subject = 'freddie'
