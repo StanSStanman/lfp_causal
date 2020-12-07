@@ -10,7 +10,8 @@ def epo_to_evo(epochs):
     return evoked
 
 
-def plot_evoked(evoked, fig=None, color=None, label=None, show=True):
+def plot_evoked(evoked, fig=None, color=None, label=None,
+                vh_lines=True, show=True):
     import mplcursors
 
     if isinstance(evoked, str):
@@ -34,8 +35,9 @@ def plot_evoked(evoked, fig=None, color=None, label=None, show=True):
         raise ValueError('Fig must be a figure containing one axes')
 
     ax.plot(times, data, color=color, label=label)
-    ax.axvline(0, linestyle='--', color='k', linewidth=.8)
-    ax.axhline(0, linestyle='-', color='k', linewidth=.8)
+    if vh_lines == True:
+        ax.axvline(0, linestyle='--', color='k', linewidth=.8)
+        ax.axhline(0, linestyle='-', color='k', linewidth=.8)
 
     if show:
         fig.show()
@@ -65,6 +67,7 @@ if __name__ == '__main__':
         # figures = []
         fig, ax = plt.subplots(1, 1)
         for file in fid['file']:
+            # file = '0539'
             fname_epo = os.path.join(epo_dir,
                                      '{0}_{1}_epo.fif'.format(file, event))
 

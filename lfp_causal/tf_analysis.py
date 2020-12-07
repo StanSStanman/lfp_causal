@@ -6,8 +6,8 @@ from lfp_causal.epochs import reject_bad_epochs
 # import cmasher as cmr
 
 
-def epochs_tf_analysis(epochs, picks=None, freqs=None, n_cycles=None,
-                       avg=True, baseline=None, show=True):
+def epochs_tf_analysis(epochs, picks=None, t_win=(-.5, .5), freqs=None,
+                       n_cycles=None, avg=True, baseline=None, show=True):
     if isinstance(epochs, str):
         epochs = mne.read_epochs(epochs, preload=True)
     if picks is not None:
@@ -21,14 +21,14 @@ def epochs_tf_analysis(epochs, picks=None, freqs=None, n_cycles=None,
 
             power, itc = time_freq_analysis(ch_epo, freqs, n_cycles, avg)
 
-            fig = plot_tf(power, itc, t_window=(-.7, 2.), baseline=baseline,
+            fig = plot_tf(power, itc, t_window=t_win, baseline=baseline,
                           show=show)
 
     return power, itc, fig
 
 
-def evoked_tf_analysis(evoked, freqs=None, n_cycles=None,
-                       baseline=None, show=True):
+def evoked_tf_analysis(evoked, t_win=(-.5, .5), freqs=None,
+                       n_cycles=None, baseline=None, show=True):
     if isinstance(evoked, str):
         evoked = mne.read_evokeds(evoked, preload=True)
     if freqs is None:
@@ -47,15 +47,15 @@ def evoked_tf_analysis(evoked, freqs=None, n_cycles=None,
                                           return_itc=False, n_jobs=-1,
                                           average=True)
 
-    fig = plot_tf(power, None, t_window=(-.7, 2.), baseline=baseline,
+    fig = plot_tf(power, None, t_window=t_win, baseline=baseline,
                   show=show)
 
     return power, fig
 
 
 def freqs_bins(fmin, fmax, mul=2):
-    freq_band = {'delta': (1, 5), 'theta': (5, 8), 'alpha': (8, 13),
-                 'beta': (13, 30), 'gamma': (30, 50), 'high gamma': (50, 120)}
+    freq_band = {'delta': (1, 6), 'theta': (5, 9), 'alpha': (8, 14),
+                 'beta': (13, 31), 'gamma': (30, 51), 'high gamma': (50, 120)}
     fmin, fmax = int(fmin), int(fmax)
     freqs = []
     for k in freq_band.keys():
@@ -95,14 +95,16 @@ def time_freq_analysis(epochs, freqs=None, n_cycles=None, avg=True):
         power, itc = mne.time_frequency.tfr_morlet(epochs, freqs=freqs,
                                                    n_cycles=n_cycles,
                                                    return_itc=True, n_jobs=-1,
-                                                   average=True)
+                                                   average=True,
+                                                   verbose='DEBUG')
         return power, itc
 
     elif not avg:
         power = mne.time_frequency.tfr_morlet(epochs, freqs=freqs,
                                               n_cycles=n_cycles,
                                               return_itc=False, n_jobs=-1,
-                                              average=False)
+                                              average=False,
+                                              verbose='DEBUG')
         return power, None
 
 
@@ -115,11 +117,13 @@ def plot_tf(power, itc, t_window=None, baseline=None, mode='logratio',
 
     if isinstance(power, mne.time_frequency.AverageTFR):
         pow_fig = power.plot(picks=None, baseline=baseline, mode=mode,
-                             tmin=tmin, tmax=tmax, cmap='RdBu_r', dB=False)
+                             tmin=tmin, tmax=tmax, cmap='RdBu_r', dB=False,
+                             show=show)
         itc_fig = None
         if itc is not None:
             itc_fig = itc.plot(picks=None, baseline=baseline, mode=mode,
-                               cmap='RdBu_r', tmin=tmin, tmax=tmax, dB=False)
+                               cmap='RdBu_r', tmin=tmin, tmax=tmax, dB=False,
+                               show=show)
 
         return pow_fig, itc_fig
 

@@ -55,6 +55,7 @@ def smr_to_raw(fname):
 
     for r in raws:
         fname = fname.replace('fneu', '')
+        fname = fname.replace('tneu', '')
         fname = fname.replace('.smr', '_raw.fif')
         fname = fname.replace('/smr/', '/raw/')
         r.save(fname, overwrite=True)
@@ -65,7 +66,7 @@ def smr_to_raw(fname):
 if __name__ == '__main__':
     import os
 
-    monkey = 'freddie'
+    monkey = 'teddy'
     condition = 'easy'
 
     smr_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \

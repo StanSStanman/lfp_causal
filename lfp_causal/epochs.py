@@ -44,6 +44,7 @@ def create_epochs(fname_raw, fname_eve, event, tmin, tmax, bline, fname_out,
     # raw.info['bads'] = ['spikes1', 'spikes2']
     if ch_drop == 'manual':
         raw.plot(scalings={'seeg': 0.5}, block=True)
+        raw.drop_channels(raw.info['bads'])
     elif isinstance(ch_drop, list):
         raw.drop_channels(ch_drop)
     else:
@@ -58,7 +59,7 @@ def create_epochs(fname_raw, fname_eve, event, tmin, tmax, bline, fname_out,
 
     epo = mne.Epochs(raw, eve_dict[event], eve_id, tmin, tmax, baseline=bline)
     epo.load_data()
-    epo.resample(1000., n_jobs=-1)
+    epo.resample(2000., n_jobs=-1)
     epo.save(fname_out, overwrite=True)
 
     return epo
@@ -190,9 +191,9 @@ def auto_drop_chans(fname, session):
 if __name__ == '__main__':
     import os
 
-    monkey = 'freddie'
+    monkey = 'teddy'
     condition = 'easy'
-    event = 'cue_off'
+    event = 'trig_off'
 
     raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
               'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
@@ -205,7 +206,7 @@ if __name__ == '__main__':
 
     files = []
     for file in os.listdir(raw_dir):
-        file = '1398_raw.fif'
+        file = '0539_raw.fif'
         if file.endswith('.fif'):
             session = file.replace('_raw.fif', '')
             fname_raw = os.path.join(raw_dir, file)
@@ -214,13 +215,18 @@ if __name__ == '__main__':
                                      file.replace('raw',
                                                   '{0}_epo'.format(event)))
 
-            bad_ch = auto_drop_chans(rec_info, session)
+            # bad_ch = auto_drop_chans(rec_info, session)
+
+            # epo = create_epochs(fname_raw, fname_eve,
+            #                     event, -1., 2.,
+            #                     None, fname_epo,
+            #                     ch_drop=bad_ch)
 
             epo = create_epochs(fname_raw, fname_eve,
-                                event, -1., 2.,
+                                event, -2., 1.5,
                                 None, fname_epo,
-                                ch_drop=bad_ch)
+                                ch_drop='manual')
 
-            visualize_epochs(epo, block=True)
+            visualize_epochs(fname_epo, block=True)
             # visualize_epochs(fname_epo)
             # visualize_epochs(fname_epo, ['LFP2'])

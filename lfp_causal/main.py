@@ -16,9 +16,9 @@ if __name__ == '__main__':
     condition = 'easy'
     event = 'trig_on'
 
-    freqs = (15, 70)
+    freqs = (1, 120)
 
-    show = False
+    show = True
     if show is False:
         import matplotlib
         matplotlib.use('Agg')
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             bad_ch = auto_drop_chans(rec_info, session)
 
             epo = create_epochs(fname_raw, fname_eve,
-                                event, -2., 1.5,
+                                event, -2.5, 1.5,
                                 None, fname_epo,
                                 ch_drop=bad_ch)
             # create_epochs(fname_raw, fname_eve,
@@ -67,29 +67,33 @@ if __name__ == '__main__':
             # epo = convolfil(epo, 100, 'hann')
 
             epo.save(epo.filename, overwrite=True)
-            epo = mne.read_epochs(fname_epo)
+            # epo = mne.read_epochs(fname_epo)
+            #
+            # epo_plot = visualize_epochs(fname_epo, show=show)
+            # epo_plot.savefig(os.path.join(fig_dir, session, 'epochs'), dpi=300)
+            #
+            # _, _, (ep_pow, ep_itc) = epochs_tf_analysis(fname_epo,
+            #                                             t_win=(-.7, 2.),
+            #                                             freqs=freqs,
+            #                                             baseline=(.2, .7),
+            #                                             avg=True,
+            #                                             show=show)
+            # ep_pow.savefig(os.path.join(fig_dir, session, 'epo_pow'), dpi=300)
+            # ep_itc.savefig(os.path.join(fig_dir, session, 'epo_itc'), dpi=300)
+            #
+            # evo = epo.average()
+            # evo_plot = evo.plot(show=show)
+            # evo_plot.savefig(os.path.join(fig_dir, session, 'evoked'), dpi=300)
+            #
+            # _, (ev_pow, _) = evoked_tf_analysis(evo, freqs=freqs,
+            #                                     t_win=(-.7, 2.),
+            #                                     baseline=(.2, .7),
+            #                                     show=show)
+            # ev_pow.savefig(os.path.join(fig_dir, session, 'evo_tfr'), dpi=300)
+            #
+            # plt.close('all')
 
-            epo_plot = visualize_epochs(fname_epo, show=show)
-            epo_plot.savefig(os.path.join(fig_dir, session, 'epochs'), dpi=300)
-
-            _, _, (ep_pow, ep_itc) = epochs_tf_analysis(fname_epo,
-                                                        freqs=freqs,
-                                                        baseline=(.2, .7),
-                                                        avg=True,
-                                                        show=show)
-            ep_pow.savefig(os.path.join(fig_dir, session, 'epo_pow'), dpi=300)
-            ep_itc.savefig(os.path.join(fig_dir, session, 'epo_itc'), dpi=300)
-
-            evo = epo.average()
-            evo_plot = evo.plot(show=show)
-            evo_plot.savefig(os.path.join(fig_dir, session, 'evoked'), dpi=300)
-
-            _, (ev_pow, _) = evoked_tf_analysis(evo, freqs=freqs,
-                                                baseline=(.2, .7),
-                                                show=show)
-            ev_pow.savefig(os.path.join(fig_dir, session, 'evo_tfr'), dpi=300)
-
-            plt.close('all')
+            ##################################################################
 
             # visualize_epochs(fname_epo, ['LFP1'])
             # visualize_epochs(fname_epo, ['LFP2'])

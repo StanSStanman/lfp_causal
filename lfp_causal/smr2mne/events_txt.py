@@ -231,20 +231,21 @@ def create_event_matrix(csv_fname, raw_fname, eve_dir):
 if __name__ == '__main__':
     import os
 
-    monkey = 'freddie'
+    monkey = 'teddy'
     condition = 'easy'
+    label = 'tneu'
 
     files = []
     for file in os.listdir('/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/'
                            '{0}/{1}/smr'.format(monkey, condition)):
-        file = 'fneu1255.smr'
+        file = 'tneu0539.smr'
         if file.endswith('.smr'):
             fname_in = os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
                                     'lfp_causal/'
                                     '{0}/{1}/smr'.format(monkey, condition),
                                     file)
 
-            file_out = file.replace('.smr', '.csv')
+            file_out = file.replace(label, '').replace('.smr', '.csv')
             fname_out = os.path.join('/media/jerry/TOSHIBA EXT/data/'
                                      'db_behaviour/lfp_causal/'
                                      '{0}/{1}/'.format(monkey, condition),
@@ -253,12 +254,12 @@ if __name__ == '__main__':
             fname_txt = os.path.join('/media/jerry/TOSHIBA EXT/data/'
                                      'db_behaviour/lfp_causal/'
                                      '{0}/{1}/'.format(monkey, condition),
-                                     'info', file_out.replace('.csv', '.txt'))
+                                     'info', file.replace('.smr', '.txt'))
 
             find_events_txt(fname_in, fname_out, fname_txt)
             print(file, 'done')
 
-            file_raw = file_out.replace('fneu', '')
+            file_raw = file_out.replace(label, '')
             file_raw = file_raw.replace('.csv', '_raw.fif')
             fname_raw = os.path.join('/media/jerry/TOSHIBA EXT/data/'
                                      'db_lfp/lfp_causal/'

@@ -61,3 +61,9 @@ def read_sector(fname, sector):
     sect_fid = sect_fid.astype(str)
 
     return sect_fid
+
+def read_session(fname, session):
+    xls = read_xls(fname)
+    ses_info = xls[xls['file'].astype(str) == str(session)]
+
+    return ses_info

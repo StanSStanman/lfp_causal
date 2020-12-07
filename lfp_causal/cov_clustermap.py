@@ -21,7 +21,8 @@ def evoked_covariance(evokeds, sessions, labels, cmap='plasma'):
     for l, p in zip(set(labels), palette):
         colors[np.array(labels) == l] = p
 
-    fig = sns.clustermap(df_cov, row_colors=colors, col_colors=colors,
+    fig = sns.clustermap(df_cov,  method='centroid', metric='euclidean',
+                         row_colors=colors, col_colors=colors,
                          cmap=cmap, cbar_pos=(.1, .2, .03, .5),
                          xticklabels=True, yticklabels=True,
                          center=0.)
@@ -55,7 +56,7 @@ if __name__ == '__main__':
 
             if os.path.exists(fname_epo):
                 evo = epo_to_evo(fname_epo)
-                evo.crop(-.1, 1)
+                evo.crop(-.5, .5)
                 data = evo.data
 
                 if isinstance(data_m, list):
