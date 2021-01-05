@@ -1,5 +1,6 @@
 import neo
 import mne
+import pandas as pd
 
 
 def read_smr(fname):
@@ -36,7 +37,6 @@ def read_sfreq(fname):
 
 def read_bad_epochs(monkey, condition, session):
     import numpy as np
-    import pandas as pd
     import os.path as op
     csv = pd.read_csv(op.join('/media/jerry/TOSHIBA EXT/data/db_behaviour/',
                               'lfp_causal/{0}/{1}/'.format(monkey, condition),
@@ -47,23 +47,23 @@ def read_bad_epochs(monkey, condition, session):
     return bads
 
 
-def read_xls(fname):
-    import pandas as pd
-
-    xls = pd.read_excel(fname, dtype='str')
-
-    return xls
+# def read_xls(fname):
+#
+#     xls = pd.read_excel(fname, dtype='str')
+#
+#     return xls
 
 
 def read_sector(fname, sector):
-    xls = read_xls(fname)
+    xls = pd.read_excel(fname, dtype={'file': str, 'sector': str})
     sect_fid = xls[['file', 'sector']][xls['sector'] == sector]
-    sect_fid = sect_fid.astype(str)
+    # sect_fid = sect_fid.astype(str)
 
     return sect_fid
 
 def read_session(fname, session):
-    xls = read_xls(fname)
-    ses_info = xls[xls['file'].astype(str) == str(session)]
+    xls = pd.read_excel(fname, dtype={'file': str})
+    # ses_info = xls[xls['file'].astype(str) == str(session)]
+    ses_info = xls[xls['file'] == str(session)]
 
     return ses_info

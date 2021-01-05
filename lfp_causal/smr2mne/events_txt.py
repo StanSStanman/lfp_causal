@@ -35,8 +35,8 @@ def find_events_txt(fname_in, fname_out, fname_txt):
     cont_time = np.array(txt_info['TM']).astype(float)
     next_cue = np.array(txt_info['I-I-Es']).astype(float)
     button = np.array(txt_info['N-conta']).astype(float)
-    cue_cue_dist = cue_delay + cue_length + trig_delay + \
-                   react_time + cont_time + np.roll(next_cue, -1)
+    cue_cue_dist = (cue_delay + cue_length + trig_delay + \
+                   react_time + cont_time + np.roll(next_cue, -1))[:-1]
 
     code_events = np.array(txt_info['code']).astype(int)
 
@@ -68,35 +68,48 @@ def find_events_txt(fname_in, fname_out, fname_txt):
 
         # Find if there is some lacking trial in txt or smr file
         missing_trials = []
-        while len(cue_cue_dist) != len(cue_onset):
-            if len(cue_cue_dist) > len(cue_onset):
-                c_on = np.diff(cue_onset).round(3) * 1e3
+        c_on = np.diff(cue_onset).round(3) * 1e3
+        while len(cue_cue_dist) != len(c_on):
+            if len(cue_cue_dist) > len(c_on):
+                # c_on = np.diff(cue_onset).round(3) * 1e3
                 for i, ccd in enumerate(cue_cue_dist):
                     if not -1. <= ccd - c_on[i] <= 1.:
                         cue_cue_dist = np.delete(cue_cue_dist, i)
                         missing_trials.append(i)
                         break
-            elif len(cue_onset) > len(cue_cue_dist):
-                c_on = np.diff(cue_onset).round(3) * 1e3
+                    if i == len(c_on) - 1:
+                        if np.allclose(cue_cue_dist[:len(c_on)], c_on, atol=1.):
+                            missing_trials += list(range(len(c_on), len(cue_cue_dist)))
+                            cue_cue_dist = np.delete(cue_cue_dist, list(range(len(c_on), len(cue_cue_dist))))
+                        break
+            elif len(c_on) > len(cue_cue_dist):
                 for i, ccd in enumerate(cue_cue_dist):
                     if not -1. <= ccd - c_on[i] <= 1.:
                         cue_onset = np.delete(cue_onset, i + 1)
                         cue_offset = np.delete(cue_offset, i + 1)
+                        c_on = np.diff(cue_onset).round(3) * 1e3
+                        break
+                    if i == len(cue_cue_dist) - 1:
+                        if np.allclose(cue_cue_dist, c_on[:len(cue_cue_dist)], atol=1.):
+                            cue_onset = cue_onset[:len(cue_cue_dist) + 1]
+                            cue_offset = cue_offset[:len(cue_cue_dist) + 1]
+                            c_on = np.diff(cue_onset).round(3) * 1e3
                         break
 
         # Cleaning all the other txt's vectors from missing trials
-        cue_delay = np.delete(cue_delay, np.array(missing_trials))
-        cue_length = np.delete(cue_length, np.array(missing_trials))
-        trig_delay = np.delete(trig_delay, np.array(missing_trials))
-        react_time = np.delete(react_time, np.array(missing_trials))
-        cont_time = np.delete(cont_time, np.array(missing_trials))
-        next_cue = np.delete(next_cue, np.array(missing_trials))
-        code_events = np.delete(code_events, np.array(missing_trials))
-        button = np.delete(button, np.array(missing_trials))
+        if len(missing_trials) > 0:
+            cue_delay = np.delete(cue_delay, np.array(missing_trials))
+            cue_length = np.delete(cue_length, np.array(missing_trials))
+            trig_delay = np.delete(trig_delay, np.array(missing_trials))
+            react_time = np.delete(react_time, np.array(missing_trials))
+            cont_time = np.delete(cont_time, np.array(missing_trials))
+            next_cue = np.delete(next_cue, np.array(missing_trials))
+            code_events = np.delete(code_events, np.array(missing_trials))
+            button = np.delete(button, np.array(missing_trials))
 
         c_on = np.diff(cue_onset).round(3) * 1e3
-        if not np.all(-1. <= (cue_cue_dist[:-1] - c_on)) \
-               and np.all((cue_cue_dist[:-1] - c_on) <= 1.):
+        if not np.all(-1. <= (cue_cue_dist - c_on)) \
+               and np.all((cue_cue_dist - c_on) <= 1.):
             warnings.warn('No correspondence between cue onset distance'
                           ' in text and smr file')
         # assert np.all(-1. <= (cue_cue_dist[:-1] - c_on)) \
@@ -166,8 +179,16 @@ def find_events_txt(fname_in, fname_out, fname_txt):
         data = np.vstack((cue_onset, cue_offset, trigger_onset, movement_onset,
                           trigger_offset, reward, button)).T
 
+        # Removing trials with no movement or button pression
+        # (codes: 5400, 5500, 5510)
+        no_movement = np.where(np.isnan(movement_onset))[0]
+        no_button = np.where(np.isnan(button))[0]
+        bad_trials = np.unique(np.hstack((no_movement, no_button)))
+        data = np.delete(data, bad_trials, axis=0)
+        print('Trials', list(bad_trials), 'removed because of NaNs')
+
         time_events = xr.DataArray(data=data,
-                                   coords=[range(cue_onset.shape[0]), items],
+                                   coords=[range(data.shape[0]), items],
                                    dims=['trials', 'events'])
         time_events.to_pandas().to_csv(fname_out)
         print(fname_out)
@@ -231,14 +252,15 @@ def create_event_matrix(csv_fname, raw_fname, eve_dir):
 if __name__ == '__main__':
     import os
 
-    monkey = 'teddy'
-    condition = 'easy'
-    label = 'tneu'
+    monkey = 'freddie'
+    condition = 'hard'
+    label = 'fneu'
 
     files = []
     for file in os.listdir('/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/'
                            '{0}/{1}/smr'.format(monkey, condition)):
-        file = 'tneu0539.smr'
+
+        # file = 'fneu1194.smr'
         if file.endswith('.smr'):
             fname_in = os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
                                     'lfp_causal/'

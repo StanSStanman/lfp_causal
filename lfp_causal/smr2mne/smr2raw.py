@@ -49,7 +49,7 @@ def smr_to_raw(fname):
 
         if raw.info['sfreq'] == 16667.0:
             print('Resampling at 12500.0 Hz...')
-            raw.resample(12500, n_jobs=1)
+            raw.resample(12500, n_jobs=-1)
 
         raws.append(raw)
 
@@ -66,8 +66,8 @@ def smr_to_raw(fname):
 if __name__ == '__main__':
     import os
 
-    monkey = 'teddy'
-    condition = 'easy'
+    monkey = 'freddie'
+    condition = 'hard'
 
     smr_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
               '{0}/{1}/smr'.format(monkey, condition)

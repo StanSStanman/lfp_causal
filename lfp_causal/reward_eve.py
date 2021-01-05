@@ -214,7 +214,7 @@ def comparative_rew_plot(epochs, sessions, freqs=None, crop=None):
     plt.show(fig)
 
 
-def rew_t_test(epochs, sessions, crop=None, freqs=None):
+def raw_t_test(epochs, sessions, crop=None, freqs=None):
 
     all_p_evo = []
     all_n_evo = []
@@ -293,6 +293,98 @@ def rew_t_test(epochs, sessions, crop=None, freqs=None):
 
 
     plt.show()
+    return
+
+
+def tfr_t_test(epochs, sessions, crop=None, freqs=None):
+
+    all_p_evo = []
+    all_n_evo = []
+    for epo, ses in zip(epochs, sessions):
+        if isinstance(epo, str):
+            epo = mne.read_epochs(epo, preload=True)
+
+        if crop is not None:
+            assert isinstance(crop, tuple), \
+                AssertionError('frequencies should be expressed as a '
+                               'tuple(tmin, tmax)')
+            epo.crop(crop[0], crop[1])
+
+        if freqs is not None:
+            assert isinstance(freqs, tuple), \
+                AssertionError('frequencies should be expressed as a '
+                               'tuple(fmin, fmax)')
+            epo.filter(freqs[0], freqs[1])
+
+        eve = mne.read_events(op.join(eve_dir, '{0}_eve.fif'.format(ses)))
+        eve = eve[eve[:, -1] == 20]
+
+        _b = []
+        for i, d in enumerate(epo.drop_log):
+            if d != ():
+                _b.append(i)
+        eve = np.delete(eve, _b, 0)
+
+        # if 'mov_on' in epo.filename:
+        monkey = epo.filename.split('/')[-4]
+        condition = epo.filename.split('/')[-3]
+        csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \
+                  'lfp_causal/{0}/{1}/t_events'.format(monkey, condition)
+        csv = pd.read_csv(op.join(csv_dir, '{0}.csv'.format(ses)))
+        movements = csv['mov_on'].values
+        movements = np.delete(movements, _b)
+        eve = eve[np.isfinite(movements), :]
+        if 'mov_on' not in epo.filename:
+            epo = epo[np.isfinite(movements)]
+
+        p_evo = epo.copy()[eve[:, 1] == 1]
+        n_evo = epo.copy()[eve[:, 1] == 0]
+
+        p_tfr, _, _ = epochs_tf_analysis(p_evo, t_win=crop, freqs=freqs,
+                                         avg=False, show=False,
+                                         baseline=(-2., -1.7))
+        n_tfr, _, _ = epochs_tf_analysis(n_evo, t_win=crop, freqs=freqs,
+                                         avg=False, show=False,
+                                         baseline=(-2., -1.7))
+
+        # p_evo = epo.copy()[eve[:, 1] == 1].average()
+        # n_evo = epo.copy()[eve[:, 1] == 0].average()
+        # pr_trials += len(epo.copy()[eve[:, 1] == 1])
+        # nr_trials += len(epo.copy()[eve[:, 1] == 0])
+
+        if type(all_p_evo) == list:
+            all_p_evo = p_tfr.data.squeeze().mean(1)
+            all_n_evo = n_tfr.data.squeeze().mean(1)
+        else:
+            all_p_evo = np.vstack((all_p_evo, p_tfr.data.squeeze().mean(1)))
+            all_n_evo = np.vstack((all_n_evo, n_tfr.data.squeeze().mean(1)))
+
+        plt.close('all')
+
+    all_p_evo = np.array(all_p_evo)
+    all_n_evo = np.array(all_n_evo)
+    times = p_tfr.times
+    t_stat, t_vals = ttest_ind(all_p_evo, all_n_evo, axis=0, equal_var=False)
+
+    t_all_p = all_p_evo.mean(0).copy()
+    t_all_p[t_vals >= 0.05] = np.nan
+    t_all_n = all_n_evo.mean(0).copy()
+    t_all_n[t_vals >= 0.05] = np.nan
+
+    hbar = t_all_p.copy()
+    hbar[np.isfinite(hbar)] = t_all_p[np.isfinite(t_all_p)].min() - 0.005
+
+    fig, ax = plt.subplots()
+    ax.plot(times, all_p_evo.mean(0), color='g', linewidth=2.)
+    ax.plot(times, all_n_evo.mean(0), color='r', linewidth=2.)
+    ax.plot(times, t_all_p, color='g', linewidth=5., alpha=0.7)
+    ax.plot(times, t_all_n, color='r', linewidth=5., alpha=0.7)
+    ax.axvline(x=0., ymin=0, ymax=1, color='k', linestyle='--')
+    ax.plot(times, hbar, 'k')
+
+
+    plt.show()
+
 
 
 if __name__ == '__main__':
@@ -301,11 +393,11 @@ if __name__ == '__main__':
 
     monkey = 'freddie'
     condition = 'easy'
-    event = 'trig_on'
+    event = 'trig_off'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
-    sectors = ['motor striatum']
-    sectors = ['associative striatum']
-    sectors = ['limbic striatum']
+    # sectors = ['motor striatum']
+    # sectors = ['associative striatum']
+    # sectors = ['limbic striatum']
 
     rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
                '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
@@ -337,4 +429,7 @@ if __name__ == '__main__':
     #
     # comparative_rew_plot(epo_fname, ses_n, freqs=(30, 120), crop=(-.5, 1.5))
 
-    rew_t_test(epo_fname, ses_n, freqs=(1, 100), crop=(-2., 1.5))
+    # rew_t_test(epo_fname, ses_n, freqs=(10, 30), crop=(-2., 1.5))
+    # raw_t_test(epo_fname, ses_n, freqs=(10, 30), crop=(-2, 1.5))
+
+    tfr_t_test(epo_fname, ses_n, freqs=(10, 30), crop=(-2, 1.5))
