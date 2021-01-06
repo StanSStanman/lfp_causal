@@ -53,6 +53,7 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         all_reg.append(reg)
 
         assert pow.shape[0] == reg.shape[0]
+        print(pow.shape[0], reg.shape[0])
 
         if cond is not None:
             if all_con is None:
@@ -114,7 +115,7 @@ if __name__ == '__main__':
     bad_epo = []
     # files = ['0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir):
+    for d in os.listdir(power_dir)[:10]:
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
@@ -131,14 +132,14 @@ if __name__ == '__main__':
             bad_epo.append(be)
 
     power, regr, cond = prepare_data(fn_pow_list, fn_reg_list, log_bads,
-                                     bad_epo, 'is_R|nC',
+                                     bad_epo, 'dP',
                                      cond=None, times=times,
-                                     freqs=freqs, avg_freq=True)
+                                     freqs=freqs, avg_freq=False)
 
     t_points = np.arange(times[0], times[1] + t_res, t_res)
     ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=t_points)
 
-    wf = WfMi(mi_type='cd', inference='ffx')
+    wf = WfMi(mi_type='cc', inference='ffx')
     mi, pval = wf.fit(ds_ephy, n_perm=10)
 
     import matplotlib.pyplot as plt

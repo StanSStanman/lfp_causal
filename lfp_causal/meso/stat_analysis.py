@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
     #            '{0}/{1}/regressors'.format(monkey, condition)
     # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-    #              '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
+    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     bad_epo = []
     # files = ['0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir):
+    for d in os.listdir(power_dir)[:5]:
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
