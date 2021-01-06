@@ -37,9 +37,12 @@ def get_log_bad_epo(epoch):
     return _b
 
 
-def get_ch_bad_epo(monkey, condition, session):
-    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-                    '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+def get_ch_bad_epo(monkey, condition, session, fname_info=None):
+    if fname_info is None:
+        fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                        '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    assert isinstance(fname_info, str)
+
     xls = pd.read_excel(fname_info,
                         dtype={'file': str, 'good_channel': int,
                                'bad_LFP1': list, 'bad_LFP2': list})

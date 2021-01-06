@@ -43,7 +43,7 @@ if __name__ == '__main__':
     regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
                '{0}/{1}/regressors'.format(monkey, condition)
     fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-                 '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
+                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -100,7 +100,8 @@ if __name__ == '__main__':
             lb = get_log_bad_epo(fname_epo)
             log_bads.append(lb)
 
-            be = get_ch_bad_epo(monkey, condition, d)
+            be = get_ch_bad_epo(monkey, condition, d,
+                                fname_info=fname_info)
             bad_epo.append(be)
 
     mi_results = {}
