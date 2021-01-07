@@ -29,6 +29,7 @@ def get_log_bad_epo(epoch):
         dl = mne.read_epochs(epoch, preload=False).drop_log
     elif isinstance(epoch, mne.Epochs):
         dl = epoch.drop_log
+    print(dl)
     _b = []
     for i, d in enumerate(dl):
         if d != ():
