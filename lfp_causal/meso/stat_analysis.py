@@ -34,7 +34,9 @@ if __name__ == '__main__':
     n_power = '{0}_pow_5_70.nc'.format(event)
     t_res = 0.0005
     times = [(-1., 1.3)]
-    freqs = [(8, 15), (15, 30), (25, 50), (40, 70)]
+    freqs = [(5, 70)]
+    # freqs = [(8, 15), (15, 30), (25, 50), (40, 70)]
+    avg_frq = False
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -111,7 +113,7 @@ if __name__ == '__main__':
         for r, c, m, i in zip(regressors, conditionals, mi_type, inference):
             wf, mi, pvals = compute_stats_meso(fn_pow_list, fn_reg_list, rois,
                                                log_bads, bad_epo,
-                                               r, c, m, i, t_pt, f, True)
+                                               r, c, m, i, t_pt, f, avg_frq)
 
             mi_results[r] = mi
             pv_results[r] = pvals
@@ -133,6 +135,6 @@ if __name__ == '__main__':
         # ds_pv = xr.Dataset(pv_results)
         #
         # ds_mi.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-        #                 '{0}_{1}/mi_results.nc').format(f[0], f[1])
+        #                 '{0}_{1}/mi_results.nc'.format(f[0], f[1]))
         # ds_pv.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-        #                 '{0}_{1}/pv_results.nc').format(f[0], f[1])
+        #                 '{0}_{1}/pv_results.nc'.format(f[0], f[1]))
