@@ -125,9 +125,9 @@ if __name__ == '__main__':
         ds_pv = xr.Dataset(pv_results)
 
         ds_mi.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                        '{0}_{1}/mi_results.nc').format(f[0], f[1])
+                        '{0}_{1}/mi_results.nc'.format(f[0], f[1]))
         ds_pv.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                        '{0}_{1}/pv_results.nc').format(f[0], f[1])
+                        '{0}_{1}/pv_results.nc'.format(f[0], f[1]))
 
         # os.makedirs('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
         #             '{0}_{1}/'.format(f[0], f[1]),
