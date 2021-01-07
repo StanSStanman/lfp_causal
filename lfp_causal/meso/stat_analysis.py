@@ -104,6 +104,8 @@ if __name__ == '__main__':
                                 fname_info=fname_info)
             bad_epo.append(be)
 
+            print(fn_pow_list, fn_reg_list)
+
     mi_results = {}
     pv_results = {}
     for t, f in product(times, freqs):
