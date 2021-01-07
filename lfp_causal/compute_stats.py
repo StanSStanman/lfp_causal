@@ -45,7 +45,10 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         all_pow.append(pow)
 
         xls = pd.read_excel(r, index_col=0)
+        print(xls)
         reg = xls[reg_name].values
+        print(reg)
+
         if len(lb) != 0:
             reg = np.delete(reg, lb)
         if len(eb) != 0:
