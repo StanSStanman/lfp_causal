@@ -87,7 +87,7 @@ if __name__ == '__main__':
     bad_epo = []
     # files = ['0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir)[:5]:
+    for d in os.listdir(power_dir):
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
