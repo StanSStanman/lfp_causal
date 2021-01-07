@@ -34,7 +34,7 @@ if __name__ == '__main__':
     n_power = '{0}_pow_5_70.nc'.format(event)
     t_res = 0.0005
     times = [(-1., 1.3)]
-    freqs = [(5, 70)]
+    freqs = [(8, 41), (40, 70)]
     # freqs = [(8, 15), (15, 30), (25, 50), (40, 70)]
     avg_frq = False
 
