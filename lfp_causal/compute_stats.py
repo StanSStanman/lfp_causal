@@ -48,12 +48,14 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         print(xls)
         reg = xls[reg_name].values
         print(reg)
+        print('SHAPES', pow.shape[0], reg.shape[0])
 
         if len(lb) != 0:
             reg = np.delete(reg, lb)
         if len(eb) != 0:
             reg = np.delete(reg, eb)
         all_reg.append(reg)
+        print('SHAPES', pow.shape[0], reg.shape[0])
 
         assert pow.shape[0] == reg.shape[0]
         print(pow.shape[0], reg.shape[0])
@@ -94,14 +96,23 @@ if __name__ == '__main__':
     times = (-1., 1.3)
     freqs = (15, 30)
 
-    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
                 '{0}/{1}/pow'.format(monkey, condition)
-    regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
                '{0}/{1}/regressors'.format(monkey, condition)
-    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-                 '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
+    fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
+                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+
+    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    # power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #             '{0}/{1}/pow'.format(monkey, condition)
+    # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    #            '{0}/{1}/regressors'.format(monkey, condition)
+    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #              '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
