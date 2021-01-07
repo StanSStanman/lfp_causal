@@ -28,7 +28,6 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                              'or tuple of values (fmin, fmax)')
 
     all_pow, all_reg, all_con = [], [], None
-    print(l_bad)
     for p, r, lb, eb in zip(powers, regresors, l_bad, e_bad):
         print('Opening', p)
         pow = xr.open_dataset(p)
@@ -46,22 +45,16 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         all_pow.append(pow)
 
         xls = pd.read_excel(r, index_col=0)
-        print(xls)
         reg = xls[reg_name].values
-        print(reg)
-        print('SHAPES', pow.shape[0], reg.shape[0])
 
         if len(lb) != 0:
-            print(lb)
             reg = np.delete(reg, lb)
         if len(eb) != 0:
-            print(eb)
             reg = np.delete(reg, eb)
         all_reg.append(reg)
-        print('SHAPES', pow.shape[0], reg.shape[0])
 
         assert pow.shape[0] == reg.shape[0]
-        print(pow.shape[0], reg.shape[0])
+        # print(pow.shape[0], reg.shape[0])
 
         if cond is not None:
             if all_con is None:

@@ -98,14 +98,11 @@ if __name__ == '__main__':
             rois.append(read_session(fname_info, d)['sector'].values)
 
             lb = get_log_bad_epo(fname_epo)
-            print(lb)
             log_bads.append(lb)
 
             be = get_ch_bad_epo(monkey, condition, d,
                                 fname_info=fname_info)
             bad_epo.append(be)
-
-    print(fn_pow_list, fn_reg_list)
 
     mi_results = {}
     pv_results = {}
