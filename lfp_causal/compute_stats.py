@@ -6,7 +6,7 @@ import pandas as pd
 from frites.dataset import DatasetEphy
 from frites.workflow import WfMi
 from lfp_causal.IO import read_session
-from lfp_causal.compute_bad_epochs import compute_bad_epo, get_ch_bad_epo, get_log_bad_epo
+from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 
 def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                  times=None, freqs=None, avg_freq=False):
