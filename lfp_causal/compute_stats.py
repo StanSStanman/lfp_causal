@@ -51,8 +51,10 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         print('SHAPES', pow.shape[0], reg.shape[0])
 
         if len(lb) != 0:
+            print(lb)
             reg = np.delete(reg, lb)
         if len(eb) != 0:
+            print(eb)
             reg = np.delete(reg, eb)
         all_reg.append(reg)
         print('SHAPES', pow.shape[0], reg.shape[0])
