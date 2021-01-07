@@ -32,7 +32,7 @@ def get_log_bad_epo(epoch):
     print(dl)
     _b = []
     for i, d in enumerate(dl):
-        if d != ():
+        if len(d) != 0:
             _b.append(i)
 
     return _b
