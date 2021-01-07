@@ -28,6 +28,7 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                              'or tuple of values (fmin, fmax)')
 
     all_pow, all_reg, all_con = [], [], None
+    print(l_bad)
     for p, r, lb, eb in zip(powers, regresors, l_bad, e_bad):
         print('Opening', p)
         pow = xr.open_dataset(p)
