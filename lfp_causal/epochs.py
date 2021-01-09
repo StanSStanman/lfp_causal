@@ -59,7 +59,7 @@ def create_epochs(fname_raw, fname_eve, event, tmin, tmax, bline, fname_out,
 
     epo = mne.Epochs(raw, eve_dict[event], eve_id, tmin, tmax, baseline=bline)
     epo.load_data()
-    epo.resample(2000., n_jobs=-1)
+    epo.resample(1000., n_jobs=-1)
     epo.save(fname_out, overwrite=True)
 
     return epo
@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
     files = []
     for file in os.listdir(raw_dir):
-        file = '0990_raw.fif'
+        # file = '0990_raw.fif'
         if file.endswith('.fif'):
             session = file.replace('_raw.fif', '')
             fname_raw = os.path.join(raw_dir, file)
