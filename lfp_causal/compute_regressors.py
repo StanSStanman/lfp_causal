@@ -3,7 +3,7 @@ import os
 import os.path as op
 import numpy as np
 from scipy import special, stats
-from lfp_causal.IO import read_xls
+# from lfp_causal.IO import read_xls
 
 
 def get_actions(fname):
@@ -22,12 +22,13 @@ def get_behaviour(monkey, condition, session, save_as=None):
     fname_csv = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
                 '{0}/{1}/t_events/{2}.csv'.format(monkey, condition, session)
     fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-                 '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
+                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     actions = get_actions(fname_csv)
     outcomes = get_outcomes(fname_csv)
 
-    infos = read_xls(fname_info.format(monkey, condition))
+    infos = pd.read_excel(fname_info.format(monkey, condition),
+                          dtype={'file': str, 'sector': str})
     correct_pos = infos[infos['file'] == session]['target_location'].values[0]
     if correct_pos == 'left':
         correct_pos = 104.
@@ -39,9 +40,10 @@ def get_behaviour(monkey, condition, session, save_as=None):
     data = dict()
     cols = ['Condition', 'Correct', 'Reward',
             'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
+            'RnR|C', 'RnR|nC',
             '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
             'learn_5t', 'learn_2t', 'early_late_cons',
-            'P(R|C)', 'P(R|nC)', 'P(R|Cho)',
+            'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
             'dP', 'log_dP', 'delta_dP',
             'surprise', 'surprise_bayes', 'rpe']
 
@@ -69,6 +71,9 @@ def get_behaviour(monkey, condition, session, save_as=None):
     data['is_nR|C'] = _is_nRC.astype(int)
     data['is_R|nC'] = _is_RnC.astype(int)
     data['is_nR|nC'] = _is_nRnC.astype(int)
+    # Group reward /no reward considering one action
+    data['RnR|C'] = reward_by_action(data['Reward'], data['Correct'], 1)
+    data['RnR|nC'] = reward_by_action(data['Reward'], data['Correct'], 0)
 
     # -------------------------------------------------------------------------
     # Number of win / lose
@@ -82,8 +87,8 @@ def get_behaviour(monkey, condition, session, save_as=None):
 
     # -------------------------------------------------------------------------
     data['learn_5t'] = learning_phases(correct_act, [5])
-    data['learn_2t'] = learning_phases(correct_act, [2])
-    data['early_late_cons'] = learning_phases(correct_act, [3, 6])
+    data['learn_2t'] = learning_phases(correct_act, [3])
+    data['early_late_cons'] = learning_phases(correct_act, [3, 7])
 
     # -------------------------------------------------------------------------
     # Compute P(O|A) and P(O|nA) (Mean of beta distribution)
@@ -96,6 +101,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
                       ((data['#R|nC'] + data['#nR|nC']) - 2)
     data['P(R|Cho)'] = beh_prob_cho(data['P(R|C)'], data['P(R|nC)'],
                                     data['Correct'])
+    data['P(R|A)'] = prob_rew_act(actions, data['Reward'])
 
     # -------------------------------------------------------------------------
     # Contingency
@@ -125,6 +131,30 @@ def get_behaviour(monkey, condition, session, save_as=None):
 
 ###############################################################################
 ###############################################################################
+def reward_by_action(reward, action, act_value):
+    """Take only the action related reward values
+
+    The other values will be nans
+
+    Parameters
+    ----------
+    reward : array_like
+        Vector array of the reward values
+    action : array_like
+        Vector array of the action values
+    act_value: int
+        Value of the considered action (0 = nC, 1 = C)
+
+    Returns
+    -------
+    _r : array_like
+        Vector array of action related reward values
+    """
+    _r = reward.copy()
+    _r[action != act_value] = np.nan
+    return _r
+
+
 def bincumsum(x, prior=1.1):
     """Cumulative sum for entries of 0 and 1.
 
@@ -170,6 +200,20 @@ def learning_phases(correct_actions, nt=[5]):
                                        repetitions <= t)] = i
     repetitions[repetitions > nt[-1]] = len(nt)
     return repetitions
+
+
+def prob_rew_act(actions, rewards):
+    unique, indices = np.unique(actions, return_inverse=True)
+    probs = np.zeros_like(rewards, dtype=float)
+    for i, u in enumerate(unique):
+        is_r = rewards[actions == u]
+        is_nr = 1 - is_r
+        _r, _nr = bincumsum(is_r), bincumsum(is_nr)
+        p = (_r - 1) / ((_r + _nr) - 2)
+        probs[indices == i] = p
+    # probs = np.hstack(tuple(probs))
+    # probs = probs[indices]
+    return probs
 
 
 def beh_prob_cho(p_oa, p_ona, actions):
@@ -334,13 +378,15 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
 
-    csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/{0}/{1}/t_events'.format(monkey, condition)
+    csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+              '{0}/{1}/t_events'.format(monkey, condition)
 
     for file in os.listdir(csv_dir):
-        # file = '1080.csv'
+        # file = '0877.csv'
         if file.endswith('.csv'):
             session = file.replace('.csv', '')
-            beh_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/{0}/{1}/regressors'.format(monkey, condition)
+            beh_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \
+                      'lfp_causal/{0}/{1}/regressors'.format(monkey, condition)
             os.makedirs(beh_dir, exist_ok=True)
             fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
             print('Processing session %s' % session)
