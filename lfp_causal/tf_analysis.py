@@ -55,7 +55,7 @@ def evoked_tf_analysis(evoked, t_win=(-.5, .5), freqs=None,
 
 def freqs_bins(fmin, fmax, mul=2):
     freq_band = {'delta': (1, 6), 'theta': (5, 9), 'alpha': (8, 14),
-                 'beta': (13, 31), 'gamma': (30, 51), 'high gamma': (50, 120)}
+                 'beta': (13, 31), 'gamma': (30, 51), 'high gamma': (50, 121)}
     fmin, fmax = int(fmin), int(fmax)
     freqs = []
     for k in freq_band.keys():

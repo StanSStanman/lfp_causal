@@ -32,6 +32,13 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         print('Opening', p)
         pow = xr.open_dataset(p)
 
+        xls = pd.read_excel(r, index_col=0)
+        reg = xls[reg_name].values
+
+        nans, _nans = [], np.any(np.isnan(reg))
+        if _nans:
+            nans = np.isnan(reg)
+
         if isinstance(times, (tuple, list, np.ndarray)):
             pow = pow.loc[dict(times=slice(tmin, tmax))]
 
@@ -42,15 +49,17 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
 
         if avg_freq:
             pow = pow.mean(2)
+        pow = np.delete(pow, nans, axis=0)
         all_pow.append(pow)
 
-        xls = pd.read_excel(r, index_col=0)
-        reg = xls[reg_name].values
+        # xls = pd.read_excel(r, index_col=0)
+        # reg = xls[reg_name].values
 
         if len(lb) != 0:
             reg = np.delete(reg, lb)
         if len(eb) != 0:
             reg = np.delete(reg, eb)
+        reg = np.delete(reg, nans, axis=0)
         all_reg.append(reg)
 
         assert pow.shape[0] == reg.shape[0]
@@ -67,9 +76,10 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                                  'name of the variable used to condition '
                                  'your analysis')
             if len(lb) != 0:
-                reg = np.delete(reg, lb)
+                con = np.delete(con, lb)
             if len(eb) != 0:
-                reg = np.delete(reg, eb)
+                con = np.delete(con, eb)
+            con = np.delete(con, nans, axis=0)
             all_con.append(con)
 
             assert pow.shape[0] == con.shape[0]
@@ -88,33 +98,34 @@ if __name__ == '__main__':
     condition = 'easy'
     event = 'trig_off'
     n_power = '{0}_pow_5_70.nc'.format(event)
-    t_res = 0.0005
+    t_res = 0.001
     times = (-1., 1.3)
     freqs = (15, 30)
 
-    epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-                '{0}/{1}/pow'.format(monkey, condition)
-    regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
-               '{0}/{1}/regressors'.format(monkey, condition)
-    fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
-    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    # epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    # power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
     #             '{0}/{1}/pow'.format(monkey, condition)
-    # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    # regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
     #            '{0}/{1}/regressors'.format(monkey, condition)
-    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-    #              '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
+    # fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
+    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+
+    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                '{0}/{1}/pow'.format(monkey, condition)
+    regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+               '{0}/{1}/regressors'.format(monkey, condition)
+    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                 '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
+                  'RnR|C', 'RnR|nC',
                   '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
                   'learn_5t', 'learn_2t', 'early_late_cons',
-                  'P(R|C)', 'P(R|nC)', 'P(R|Cho)',
+                  'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
                   'dP', 'log_dP', 'delta_dP',
                   'surprise', 'surprise_bayes', 'rpe']
 

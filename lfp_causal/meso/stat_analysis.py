@@ -32,7 +32,7 @@ if __name__ == '__main__':
     condition = 'easy'
     event = 'trig_off'
     n_power = '{0}_pow_5_70.nc'.format(event)
-    t_res = 0.0005
+    t_res = 0.001
     times = [(-1., 1.3)]
     # freqs = [(8, 41), (40, 70)]
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70)]
@@ -58,25 +58,28 @@ if __name__ == '__main__':
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
+                  'RnR|C', 'RnR|nC',
                   '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
                   'learn_5t', 'learn_2t', 'early_late_cons',
-                  'P(R|C)', 'P(R|nC)', 'P(R|Cho)',
+                  'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
                   'dP', 'log_dP', 'delta_dP',
                   'surprise', 'surprise_bayes', 'rpe']
 
     conditionals = [None, None,
                     None, None, None, None,
+                    None, None,
                     None, None, None, None, None, None,
                     None, None, None,
-                    None, None, None,
+                    None, None, None, None,
                     None, None, None,
                     None, None, None, ]
 
     mi_type = ['cd', 'cd',
                'cd', 'cd', 'cd', 'cd',
+               'cd', 'cd',
                'cc', 'cc', 'cc', 'cc', 'cc', 'cc',
                'cd', 'cd', 'cd',
-               'cc', 'cc', 'cc',
+               'cc', 'cc', 'cc', 'cc',
                'cc', 'cc', 'cc',
                'cc', 'cc', 'cc', ]
 

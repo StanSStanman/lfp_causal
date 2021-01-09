@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # sectors = ['limbic striatum']
 
     rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-               '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
+               '{0}/{1}/files_info.xlsx'.format(monkey, condition)
     epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
     eve_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
@@ -104,4 +104,4 @@ if __name__ == '__main__':
                                          '{0}_{1}_epo.fif'.format(file, event))
                 if op.exists(fname_epo):
                     compute_power(fname_epo, file, event,
-                                  freqs=(5, 70), crop=(-2, 1.5))
+                                  freqs=(5, 120), crop=(-2, 1.5))
