@@ -31,12 +31,12 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
-    n_power = '{0}_pow_5_70.nc'.format(event)
+    n_power = '{0}_pow_5_120.nc'.format(event)
     t_res = 0.001
     times = [(-1., 1.3)]
     # freqs = [(8, 41), (40, 70)]
-    freqs = [(8, 15), (15, 30), (25, 45), (40, 70)]
-    avg_frq = False
+    freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    avg_frq = True
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -63,7 +63,10 @@ if __name__ == '__main__':
                   'learn_5t', 'learn_2t', 'early_late_cons',
                   'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
                   'dP', 'log_dP', 'delta_dP',
-                  'surprise', 'surprise_bayes', 'rpe']
+                  'surprise', 'surprise_bayes', 'rpe',
+                  'q_pcorr', 'q_pincorr', 'q_dP',
+                  'q_entropy', 'q_rpe', 'q_absrpe',
+                  'q_shann_surp', 'q_bayes_surp']
 
     conditionals = [None, None,
                     None, None, None, None,
@@ -72,7 +75,10 @@ if __name__ == '__main__':
                     None, None, None,
                     None, None, None, None,
                     None, None, None,
-                    None, None, None, ]
+                    None, None, None,
+                    None, None, None,
+                    None, None, None,
+                    None, None]
 
     mi_type = ['cd', 'cd',
                'cd', 'cd', 'cd', 'cd',
@@ -81,7 +87,10 @@ if __name__ == '__main__':
                'cd', 'cd', 'cd',
                'cc', 'cc', 'cc', 'cc',
                'cc', 'cc', 'cc',
-               'cc', 'cc', 'cc', ]
+               'cc', 'cc', 'cc',
+               'cc', 'cc', 'cc',
+               'cc', 'cc', 'cc',
+               'cc', 'cc']
 
     inference = ['ffx' for r in regressors]
 

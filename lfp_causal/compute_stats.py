@@ -35,9 +35,18 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         xls = pd.read_excel(r, index_col=0)
         reg = xls[reg_name].values
 
-        nans, _nans = [], np.any(np.isnan(reg))
+        if len(lb) != 0:
+            reg = np.delete(reg, lb)
+        if len(eb) != 0:
+            reg = np.delete(reg, eb)
+
+        if np.sum(np.isfinite(reg)) < 2 or np.any(np.isinf(reg)):
+            print('Skipped', p)
+            continue
+
+        nans, _nans = range(len(reg)), np.any(np.isnan(reg))
         if _nans:
-            nans = np.isnan(reg)
+            nans = np.isfinite(reg)
 
         if isinstance(times, (tuple, list, np.ndarray)):
             pow = pow.loc[dict(times=slice(tmin, tmax))]
@@ -46,20 +55,18 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
             pow = pow.loc[dict(freqs=slice(fmin, fmax))]
 
         pow = pow.to_array().values.transpose(1, 0, 2, 3)
+        pow = pow[nans, :, :, :]
 
         if avg_freq:
             pow = pow.mean(2)
-        pow = np.delete(pow, nans, axis=0)
+        # pow = np.delete(pow, nans, axis=0)
         all_pow.append(pow)
 
         # xls = pd.read_excel(r, index_col=0)
         # reg = xls[reg_name].values
 
-        if len(lb) != 0:
-            reg = np.delete(reg, lb)
-        if len(eb) != 0:
-            reg = np.delete(reg, eb)
-        reg = np.delete(reg, nans, axis=0)
+        # reg = np.delete(reg, nans, axis=0)
+        reg = reg[nans]
         all_reg.append(reg)
 
         assert pow.shape[0] == reg.shape[0]
@@ -79,7 +86,8 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                 con = np.delete(con, lb)
             if len(eb) != 0:
                 con = np.delete(con, eb)
-            con = np.delete(con, nans, axis=0)
+            # con = np.delete(con, nans, axis=0)
+            con = con[nans]
             all_con.append(con)
 
             assert pow.shape[0] == con.shape[0]
@@ -97,7 +105,7 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
-    n_power = '{0}_pow_5_70.nc'.format(event)
+    n_power = '{0}_pow_5_120.nc'.format(event)
     t_res = 0.001
     times = (-1., 1.3)
     freqs = (15, 30)
@@ -120,23 +128,25 @@ if __name__ == '__main__':
     fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
                  '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
 
-    regressors = ['Correct', 'Reward',
-                  'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
-                  'RnR|C', 'RnR|nC',
-                  '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
-                  'learn_5t', 'learn_2t', 'early_late_cons',
-                  'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
-                  'dP', 'log_dP', 'delta_dP',
-                  'surprise', 'surprise_bayes', 'rpe']
+    regressors = ['learn_5t', 'RnR|nC', 'q_dP', 'q_shann_surp']
+
+    # regressors = ['Correct', 'Reward',
+    #               'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
+    #               'RnR|C', 'RnR|nC',
+    #               '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
+    #               'learn_5t', 'learn_2t', 'early_late_cons',
+    #               'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
+    #               'dP', 'log_dP', 'delta_dP',
+    #               'surprise', 'surprise_bayes', 'rpe']
 
     fn_pow_list = []
     fn_reg_list = []
     rois = []
     log_bads = []
     bad_epo = []
-    # files = ['0822', '1043', '1191']
+    # files = ['0814', '0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir)[:10]:
+    for d in os.listdir(power_dir):
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
@@ -153,20 +163,20 @@ if __name__ == '__main__':
             bad_epo.append(be)
 
     power, regr, cond = prepare_data(fn_pow_list, fn_reg_list, log_bads,
-                                     bad_epo, 'dP',
+                                     bad_epo, 'Reward',
                                      cond=None, times=times,
-                                     freqs=freqs, avg_freq=False)
+                                     freqs=freqs, avg_freq=True)
 
     t_points = np.arange(times[0], times[1] + t_res, t_res)
     ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=t_points)
 
-    wf = WfMi(mi_type='cc', inference='ffx')
-    mi, pval = wf.fit(ds_ephy, n_perm=10)
+    wf = WfMi(mi_type='cd', inference='ffx')
+    mi, pval = wf.fit(ds_ephy, n_perm=1000)
 
     import matplotlib.pyplot as plt
     for r in range(mi.shape[1]):
         plt.plot(mi[:, r])
         sig = mi[:, r]
-        sig[pval[:, r] < 0.05] = np.nan
+        sig[pval[:, r] > 0.05] = np.nan
         plt.plot(sig, color='r', linewidth=2.5)
     plt.show()
