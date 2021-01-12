@@ -3,7 +3,7 @@ import os
 import os.path as op
 import numpy as np
 from scipy import special, stats
-from lfp_causal.qlearning_new import fit_qlearning
+from lfp_causal.qlearning import fit_qlearning
 # from lfp_causal.IO import read_xls
 
 
