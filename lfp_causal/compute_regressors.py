@@ -3,6 +3,7 @@ import os
 import os.path as op
 import numpy as np
 from scipy import special, stats
+from lfp_causal.qlearning_new import fit_qlearning
 # from lfp_causal.IO import read_xls
 
 
@@ -45,7 +46,10 @@ def get_behaviour(monkey, condition, session, save_as=None):
             'learn_5t', 'learn_2t', 'early_late_cons',
             'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
             'dP', 'log_dP', 'delta_dP',
-            'surprise', 'surprise_bayes', 'rpe']
+            'surprise', 'surprise_bayes', 'rpe',
+            'q_pcorr', 'q_pincorr', 'q_dP',
+            'q_entropy', 'q_rpe', 'q_absrpe',
+            'q_shann_surp', 'q_bayes_surp']
 
     # -------------------------------------------------------------------------
     if condition == 'easy':
@@ -117,6 +121,19 @@ def get_behaviour(monkey, condition, session, save_as=None):
     data['surprise_bayes'] = beh_bayes_surprise(data['#R'], data['#nR'])
 
     data['rpe'] = np.diff(np.r_[0.5, data['P(R|C)']])
+
+    # -------------------------------------------------------------------------
+    # Q learning model values
+    model = fit_qlearning(np.zeros_like(actions), actions, outcomes)
+
+    data['q_pcorr'] = model['p_correct']
+    data['q_pincorr'] = model['p_incorrect']
+    data['q_dP'] = model['dP']
+    data['q_entropy'] = model['H']
+    data['q_rpe'] = model['rpe']
+    data['q_absrpe'] = model['absrpe']
+    data['q_shann_surp'] = model['shann_surp']
+    data['q_bayes_surp'] = model['bayes_surprise']
 
     # -------------------------------------------------------------------------
     df = pd.DataFrame(data, columns=cols)

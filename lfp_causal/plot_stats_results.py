@@ -41,6 +41,7 @@ if __name__ == '__main__':
                   'P(R|C)', 'P(R|nC)', 'P(R|Cho)',
                   'dP', 'log_dP', 'delta_dP',
                   'surprise', 'surprise_bayes', 'rpe']
+    regressors = ['Reward']
 
     for f in freqs:
         plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
