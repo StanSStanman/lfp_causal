@@ -46,23 +46,23 @@ if __name__ == '__main__':
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     avg_frq = True
 
-    # epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
-    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-    #             '{0}/{1}/pow'.format(monkey, condition)
-    # regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
-    #            '{0}/{1}/regressors'.format(monkey, condition)
-    # fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
-    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
                 '{0}/{1}/pow'.format(monkey, condition)
-    regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
                '{0}/{1}/regressors'.format(monkey, condition)
-    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
                  '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+
+    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    # power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #             '{0}/{1}/pow'.format(monkey, condition)
+    # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    #            '{0}/{1}/regressors'.format(monkey, condition)
+    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -100,9 +100,9 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc']
 
-    regressors = ['RnR|C']
-    conditionals = [None]
-    mi_type = ['cd']
+    # regressors = ['RnR|C']
+    # conditionals = [None]
+    # mi_type = ['cd']
 
     inference = ['ffx' for r in regressors]
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     bad_epo = []
     # files = ['0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir)[:10]:
+    for d in os.listdir(power_dir):
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
@@ -143,26 +143,26 @@ if __name__ == '__main__':
             pv_results[r] = pvals
 
         if avg_frq:
-            # os.makedirs('/scratch/rbasanisi/data/stats/lfp_causal/'
-            #             '{0}_{1}/'.format(f[0], f[1]), exist_ok=True)
-            # ds_mi = xr.Dataset(mi_results)
-            # ds_pv = xr.Dataset(pv_results)
-            #
-            # ds_mi.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-            #                 '{0}_{1}/mi_results.nc'.format(f[0], f[1]))
-            # ds_pv.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-            #                 '{0}_{1}/pv_results.nc'.format(f[0], f[1]))
-
-            os.makedirs('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-                        '{0}_{1}/'.format(f[0], f[1]),
-                        exist_ok=True)
+            os.makedirs('/scratch/rbasanisi/data/stats/lfp_causal/'
+                        '{0}_{1}/'.format(f[0], f[1]), exist_ok=True)
             ds_mi = xr.Dataset(mi_results)
             ds_pv = xr.Dataset(pv_results)
 
-            ds_mi.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
+            ds_mi.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
                             '{0}_{1}/mi_results.nc'.format(f[0], f[1]))
-            ds_pv.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
+            ds_pv.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
                             '{0}_{1}/pv_results.nc'.format(f[0], f[1]))
+
+            # os.makedirs('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
+            #             '{0}_{1}/'.format(f[0], f[1]),
+            #             exist_ok=True)
+            # ds_mi = xr.Dataset(mi_results)
+            # ds_pv = xr.Dataset(pv_results)
+            #
+            # ds_mi.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
+            #                 '{0}_{1}/mi_results.nc'.format(f[0], f[1]))
+            # ds_pv.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
+            #                 '{0}_{1}/pv_results.nc'.format(f[0], f[1]))
 
         elif not avg_frq:
             os.makedirs('/scratch/rbasanisi/data/stats/lfp_causal/'
