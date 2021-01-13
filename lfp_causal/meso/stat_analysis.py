@@ -44,7 +44,7 @@ if __name__ == '__main__':
     times = [(-1, 1.3)]
     # freqs = [(8, 41), (40, 70)]
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
-    avg_frq = True
+    avg_frq = False
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # conditionals = [None]
     # mi_type = ['cd']
 
-    inference = ['rfx' for r in regressors]
+    inference = ['ffx' for r in regressors]
 
     fn_pow_list = []
     fn_reg_list = []
