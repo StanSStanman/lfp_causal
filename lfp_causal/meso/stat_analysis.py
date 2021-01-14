@@ -2,6 +2,7 @@ import os
 import os.path as op
 import numpy as np
 import xarray as xr
+from scipy.signal import resample as spr
 from frites.dataset import DatasetEphy
 from frites.workflow import WfMi
 from itertools import product
@@ -12,12 +13,13 @@ from lfp_causal.compute_stats import prepare_data
 
 def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                        regressor, conditional, mi_type, inference,
-                       times=None, freqs=None, avg_freq=True):
+                       times=None, freqs=None, avg_freq=True, resample=None):
 
     power, regr, cond = prepare_data(fname_pow, fname_reg, log_bads,
                                      bad_epo, regressor,
                                      cond=conditional, times=times,
-                                     freqs=freqs, avg_freq=avg_freq)
+                                     freqs=freqs, avg_freq=avg_freq,
+                                     resample=resample)
 
     if mi_type == 'cc':
         regr = [r.astype('float64') for r in regr]
@@ -26,6 +28,9 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     elif mi_type == 'ccd':
         regr = [r.astype('float64') for r in regr]
         cond = [c.astype('int64') for c in cond]
+
+    if resample is not None:
+        _, times = spr(x=np.ones_like(times), num=resample, t=times)
 
     ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=times)
 
@@ -42,27 +47,28 @@ if __name__ == '__main__':
     n_power = '{0}_pow_5_120.nc'.format(event)
     t_res = 0.001
     times = [(-1, 1.3)]
-    freqs = [(40, 70), (60, 120)]
+    freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     avg_frq = False
+    resample = 200
 
-    epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-                '{0}/{1}/pow'.format(monkey, condition)
-    regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
-               '{0}/{1}/regressors'.format(monkey, condition)
-    fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
-    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    # epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    # power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
     #             '{0}/{1}/pow'.format(monkey, condition)
-    # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    # regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
     #            '{0}/{1}/regressors'.format(monkey, condition)
-    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    # fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
     #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+
+    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                '{0}/{1}/pow'.format(monkey, condition)
+    regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+               '{0}/{1}/regressors'.format(monkey, condition)
+    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -171,9 +177,9 @@ if __name__ == '__main__':
             ds_pv = xr.Dataset(pv_results)
 
             ds_mi.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}_tf/mi_results.nc'.format(f[0], f[1]))
+                            '{0}_{1}_tf/mi_results_200.nc'.format(f[0], f[1]))
             ds_pv.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}_tf/pv_results.nc'.format(f[0], f[1]))
+                            '{0}_{1}_tf/pv_results_200.nc'.format(f[0], f[1]))
 
             # os.makedirs('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
             #             '{0}_{1}_tf/'.format(f[0], f[1]),

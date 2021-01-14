@@ -3,13 +3,14 @@ import os.path as op
 import numpy as np
 import xarray as xr
 import pandas as pd
+from scipy.signal import resample as spr
 from frites.dataset import DatasetEphy
 from frites.workflow import WfMi
 from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 
 def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
-                 times=None, freqs=None, avg_freq=False):
+                 times=None, freqs=None, avg_freq=False, resample=None):
     if times is not None:
         if isinstance(times, tuple):
             tmin, tmax = times
@@ -61,6 +62,9 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
             pow = pow.mean(2)
         # pow = np.delete(pow, nans, axis=0)
         all_pow.append(pow)
+
+        if resample is not None:
+            pow = spr(x=pow, num=resample, axis=-1)
 
         # xls = pd.read_excel(r, index_col=0)
         # reg = xls[reg_name].values
@@ -144,9 +148,9 @@ if __name__ == '__main__':
     rois = []
     log_bads = []
     bad_epo = []
-    # files = ['0814', '0822', '1043', '1191']
-    # for d in files:
-    for d in os.listdir(power_dir):
+    files = ['0814', '0822', '1043', '1191']
+    for d in files:
+    # for d in os.listdir(power_dir):
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
@@ -165,7 +169,7 @@ if __name__ == '__main__':
     power, regr, cond = prepare_data(fn_pow_list, fn_reg_list, log_bads,
                                      bad_epo, 'Reward',
                                      cond=None, times=times,
-                                     freqs=freqs, avg_freq=True)
+                                     freqs=freqs, avg_freq=False)
 
     t_points = np.arange(times[0], times[1] + t_res, t_res)
     ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=t_points)
