@@ -42,8 +42,8 @@ if __name__ == '__main__':
     n_power = '{0}_pow_5_120.nc'.format(event)
     t_res = 0.001
     times = [(-1, 1.3)]
-    # freqs = [(8, 41), (40, 70)]
-    freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    freqs = [(40, 70), (60, 120)]
+    # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     avg_frq = False
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
