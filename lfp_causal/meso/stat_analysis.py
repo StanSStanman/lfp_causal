@@ -30,7 +30,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=times)
 
     wf = WfMi(mi_type=mi_type, inference=inference)
-    mi, pval = wf.fit(ds_ephy, n_perm=1000)
+    mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=10)
 
     return wf, mi, pval
 
