@@ -52,23 +52,23 @@ if __name__ == '__main__':
     avg_frq = False
     resample = 200
 
-    # epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
-    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-    #             '{0}/{1}/pow'.format(monkey, condition)
-    # regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
-    #            '{0}/{1}/regressors'.format(monkey, condition)
-    # fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
-    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
                 '{0}/{1}/pow'.format(monkey, condition)
-    regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
                '{0}/{1}/regressors'.format(monkey, condition)
-    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
                  '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+
+    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    # power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #             '{0}/{1}/pow'.format(monkey, condition)
+    # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    #            '{0}/{1}/regressors'.format(monkey, condition)
+    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
