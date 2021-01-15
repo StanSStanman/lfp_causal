@@ -10,7 +10,14 @@ from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 
 def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
-                 times=None, freqs=None, avg_freq=False, resample=None):
+                 times=None, freqs=None, avg_freq=False,
+                 t_rsmpl=None, f_rsmpl=None):
+
+    if avg_freq is True and f_rsmpl is not None:
+        print('The mean values between frequecies will be taken, '
+              'f_rsmpl will be considered automatically as None')
+        f_rsmpl = None
+
     if times is not None:
         if isinstance(times, tuple):
             tmin, tmax = times
@@ -51,20 +58,30 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
 
         if isinstance(times, (tuple, list, np.ndarray)):
             pow = pow.loc[dict(times=slice(tmin, tmax))]
+        all_times = pow.times.values
 
         if isinstance(freqs, tuple):
             pow = pow.loc[dict(freqs=slice(fmin, fmax))]
+        all_freqs = pow.freqs.values
 
         pow = pow.to_array().values.transpose(1, 0, 2, 3)
         pow = pow[nans, :, :, :]
 
         if avg_freq:
             pow = pow.mean(2)
-        # pow = np.delete(pow, nans, axis=0)
-        all_pow.append(pow)
+        else:
+            if f_rsmpl is not None:
+                assert pow.shape[2] > f_rsmpl, \
+                    ValueError('The number of resampled frequencies should be '
+                               'lower than the number of actual frequencies')
+                spacing = int(round(pow.shape[2] / f_rsmpl))
+                pow = pow[:, :, ::spacing, :]
+                all_freqs = all_freqs[::spacing]
 
-        if resample is not None:
-            pow = spr(x=pow, num=resample, axis=-1)
+        if t_rsmpl is not None:
+            pow, all_times = spr(x=pow, num=t_rsmpl, t=all_times, axis=-1)
+
+        all_pow.append(pow)
 
         # xls = pd.read_excel(r, index_col=0)
         # reg = xls[reg_name].values
@@ -101,7 +118,7 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
     # if all_con is not None:
     #     all_con = np.hstack(tuple(all_con))
 
-    return all_pow, all_reg, all_con
+    return all_pow, all_reg, all_con, all_times, all_freqs
 
 
 if __name__ == '__main__':
@@ -112,7 +129,7 @@ if __name__ == '__main__':
     n_power = '{0}_pow_5_120.nc'.format(event)
     t_res = 0.001
     times = (-1., 1.3)
-    freqs = (15, 30)
+    freqs = (5, 120)
 
     # epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -166,13 +183,15 @@ if __name__ == '__main__':
             be = get_ch_bad_epo(monkey, condition, d)
             bad_epo.append(be)
 
-    power, regr, cond = prepare_data(fn_pow_list, fn_reg_list, log_bads,
-                                     bad_epo, 'Reward',
-                                     cond=None, times=times,
-                                     freqs=freqs, avg_freq=False)
+    power, regr, cond, tpoints, vfreqs = prepare_data(fn_pow_list, fn_reg_list,
+                                                      log_bads, bad_epo,
+                                                      'Reward', cond=None,
+                                                      times=times, freqs=freqs,
+                                                      avg_freq=False,
+                                                      t_rsmpl=1000, f_rsmpl=50)
 
-    t_points = np.arange(times[0], times[1] + t_res, t_res)
-    ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=t_points)
+    # t_points = np.arange(times[0], times[1] + t_res, t_res)
+    ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=tpoints)
 
     wf = WfMi(mi_type='cd', inference='ffx')
     mi, pval = wf.fit(ds_ephy, n_perm=1000)

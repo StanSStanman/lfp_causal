@@ -13,13 +13,15 @@ from lfp_causal.compute_stats import prepare_data
 
 def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                        regressor, conditional, mi_type, inference,
-                       times=None, freqs=None, avg_freq=True, resample=None):
+                       times=None, freqs=None, avg_freq=True,
+                       t_resample=None, f_resample=None):
 
-    power, regr, cond = prepare_data(fname_pow, fname_reg, log_bads,
-                                     bad_epo, regressor,
-                                     cond=conditional, times=times,
-                                     freqs=freqs, avg_freq=avg_freq,
-                                     resample=resample)
+    power, regr, cond,\
+        times, freqs = prepare_data(fname_pow, fname_reg, log_bads,
+                                    bad_epo, regressor,
+                                    cond=conditional, times=times,
+                                    freqs=freqs, avg_freq=avg_freq,
+                                    t_rsmpl=t_resample, f_rsmpl=f_resample)
 
     if mi_type == 'cc':
         regr = [r.astype('float64') for r in regr]
@@ -29,13 +31,13 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
         regr = [r.astype('float64') for r in regr]
         cond = [c.astype('int64') for c in cond]
 
-    if resample is not None:
-        _, times = spr(x=np.ones_like(times), num=resample, t=times)
-
     ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=times)
 
     wf = WfMi(mi_type=mi_type, inference=inference)
-    mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=15)
+    mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
+
+    mi.assign_coords({'times': times, 'freqs': freqs})
+    pval.assign_coords({'times': times, 'freqs': freqs})
 
     return wf, mi, pval
 
@@ -45,12 +47,13 @@ if __name__ == '__main__':
     condition = 'easy'
     event = 'trig_off'
     n_power = '{0}_pow_5_120.nc'.format(event)
-    t_res = 0.001
+    # t_res = 0.001
     times = [(-1, 1.3)]
     freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     avg_frq = False
-    resample = 200
+    t_resample = 1000
+    f_resample = 80
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -139,11 +142,12 @@ if __name__ == '__main__':
     mi_results = {}
     pv_results = {}
     for t, f in product(times, freqs):
-        t_pt = np.arange(t[0], t[1] + t_res, t_res).round(5)
+        # t_pt = np.arange(t[0], t[1] + t_res, t_res).round(5)
         for r, c, m, i in zip(regressors, conditionals, mi_type, inference):
             wf, mi, pvals = compute_stats_meso(fn_pow_list, fn_reg_list, rois,
                                                log_bads, bad_epo,
-                                               r, c, m, i, t_pt, f, avg_frq)
+                                               r, c, m, i, t, f, avg_frq,
+                                               t_resample, f_resample)
 
             mi_results[r] = mi
             pv_results[r] = pvals
