@@ -113,7 +113,7 @@ if __name__ == '__main__':
     # conditionals = [None]
     # mi_type = ['cd']
 
-    inference = ['ffx' for r in regressors]
+    inference = ['rfx' for r in regressors]
 
     fn_pow_list = []
     fn_reg_list = []

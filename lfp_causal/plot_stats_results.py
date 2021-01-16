@@ -68,7 +68,7 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
 if __name__ == '__main__':
     stats_dir = '/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/{0}_{1}_tf'
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
-    freqs = [(15, 30)]
+    freqs = [(5, 120)]
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
                   'RnR|C', 'RnR|nC',
