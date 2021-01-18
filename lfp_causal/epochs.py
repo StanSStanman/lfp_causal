@@ -194,7 +194,7 @@ if __name__ == '__main__':
     import os
 
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
 
     raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
@@ -219,17 +219,17 @@ if __name__ == '__main__':
 
             bad_ch = auto_drop_chans(rec_info, session)
 
-            # epo = create_epochs(fname_raw, fname_eve,
-            #                     event, -2.5, 1.5,
-            #                     None, fname_epo,
-            #                     ch_drop=bad_ch)
+            epo = create_epochs(fname_raw, fname_eve,
+                                event, -2.5, 1.5,
+                                None, fname_epo,
+                                ch_drop=bad_ch)
 
             # epo = create_epochs(fname_raw, fname_eve,
             #                     event, -2., 2.,
             #                     None, fname_epo,
             #                     ch_drop='manual')
 
-            bad_epochs = get_ch_bad_epo(monkey, condition, session)
-            visualize_epochs(fname_epo, bads=bad_epochs, block=True)
+            # bad_epochs = get_ch_bad_epo(monkey, condition, session)
+            # visualize_epochs(fname_epo, bads=bad_epochs, block=True)
             # visualize_epochs(fname_epo)
             # visualize_epochs(fname_epo, ['LFP2'])

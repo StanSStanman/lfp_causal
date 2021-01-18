@@ -50,7 +50,7 @@ def fit_qlearning(states, actions, rewards):
             # Output best fitting regressors
             best_regs = regs
 
-            print(regs['log_likelihood'])
+            # print(regs['log_likelihood'])
 
     return best_regs
 

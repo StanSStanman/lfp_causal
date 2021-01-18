@@ -31,5 +31,5 @@ def data_flow(data, regr, rois, cond=None, mi_type='cc'):
     return _data, _regr, _cond, u_rois
 
 
-def mi_flow():
-def stat_flow():
+# def mi_flow():
+# def stat_flow():

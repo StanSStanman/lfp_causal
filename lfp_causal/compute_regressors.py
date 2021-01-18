@@ -393,7 +393,7 @@ def pdf(a, b, n_pts=1000):
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
 
     csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
               '{0}/{1}/t_events'.format(monkey, condition)

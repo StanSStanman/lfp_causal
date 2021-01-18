@@ -75,7 +75,7 @@ def compute_power(epoch, session, event, crop=None, freqs=None):
 if __name__ == '__main__':
 
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            # file = '1314'
+            # file = '1280'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                          '{0}_{1}_epo.fif'.format(file, event))
