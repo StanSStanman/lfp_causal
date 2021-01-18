@@ -48,12 +48,12 @@ if __name__ == '__main__':
     event = 'trig_off'
     n_power = '{0}_pow_5_120.nc'.format(event)
     # t_res = 0.001
-    times = [(-1, 1.3)]
-    freqs = [(5, 120)]
-    # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
-    avg_frq = False
-    t_resample = 1000
-    f_resample = 80
+    times = [(0., 1.)]
+    # freqs = [(5, 120)]
+    freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    avg_frq = True
+    t_resample = None # 1000
+    f_resample = None # 80
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -113,16 +113,21 @@ if __name__ == '__main__':
     # conditionals = [None]
     # mi_type = ['cd']
 
-    inference = ['rfx' for r in regressors]
+    inference = ['ffx' for r in regressors]
 
     fn_pow_list = []
     fn_reg_list = []
     rois = []
     log_bads = []
     bad_epo = []
+    rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] + \
+                ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
+                 '1142', '1143', '1144']
     # files = ['0822', '1043', '1191']
     # for d in files:
     for d in os.listdir(power_dir):
+        if d in rej_files:
+            continue
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
@@ -181,9 +186,9 @@ if __name__ == '__main__':
             ds_pv = xr.Dataset(pv_results)
 
             ds_mi.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}_tf/mi_results_200.nc'.format(f[0], f[1]))
+                            '{0}_{1}_tf/mi_results.nc'.format(f[0], f[1]))
             ds_pv.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}_tf/pv_results_200.nc'.format(f[0], f[1]))
+                            '{0}_{1}_tf/pv_results.nc'.format(f[0], f[1]))
 
             # os.makedirs('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
             #             '{0}_{1}_tf/'.format(f[0], f[1]),

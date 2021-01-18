@@ -1,6 +1,7 @@
 import numpy as np
 import mne
 import pandas as pd
+from lfp_causal.compute_bad_epochs import get_ch_bad_epo
 
 
 def create_epochs(fname_raw, fname_eve, event, tmin, tmax, bline, fname_out,
@@ -74,13 +75,16 @@ def visualize_epochs_mne(epo_fname):
     return fig
 
 
-def visualize_epochs(epochs, picks=None, block=True, show=True):
+def visualize_epochs(epochs, bads=None, picks=None, block=True, show=True):
     import matplotlib.pyplot as plt
     from lfp_causal.visu import DraggableColorbar
     from scipy.stats import sem
 
     if isinstance(epochs, str):
         epochs = mne.read_epochs(epochs, preload=True)
+    if bads is not None:
+        epochs.drop(bads)
+
     data = epochs.get_data(picks=picks)
     data = data.mean(1)
 
@@ -200,7 +204,7 @@ if __name__ == '__main__':
     epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
     rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-               '{0}/{1}/recording_info.xlsx'.format(monkey, condition)
+               '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     files = []
     for file in os.listdir(raw_dir):
@@ -215,16 +219,17 @@ if __name__ == '__main__':
 
             bad_ch = auto_drop_chans(rec_info, session)
 
-            epo = create_epochs(fname_raw, fname_eve,
-                                event, -2.5, 1.5,
-                                None, fname_epo,
-                                ch_drop=bad_ch)
+            # epo = create_epochs(fname_raw, fname_eve,
+            #                     event, -2.5, 1.5,
+            #                     None, fname_epo,
+            #                     ch_drop=bad_ch)
 
             # epo = create_epochs(fname_raw, fname_eve,
             #                     event, -2., 2.,
             #                     None, fname_epo,
             #                     ch_drop='manual')
 
-            # visualize_epochs(fname_epo, block=True)
+            bad_epochs = get_ch_bad_epo(monkey, condition, session)
+            visualize_epochs(fname_epo, bads=bad_epochs, block=True)
             # visualize_epochs(fname_epo)
             # visualize_epochs(fname_epo, ['LFP2'])
