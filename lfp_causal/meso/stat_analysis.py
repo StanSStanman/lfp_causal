@@ -36,8 +36,9 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     wf = WfMi(mi_type=mi_type, inference=inference)
     mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
 
-    mi.assign_coords({'times': times, 'freqs': freqs})
-    pval.assign_coords({'times': times, 'freqs': freqs})
+    if not avg_freq:
+        mi.assign_coords({'times': times, 'freqs': freqs})
+        pval.assign_coords({'times': times, 'freqs': freqs})
 
     return wf, mi, pval
 
