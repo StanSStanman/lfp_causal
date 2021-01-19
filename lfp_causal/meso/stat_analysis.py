@@ -49,7 +49,7 @@ if __name__ == '__main__':
     event = 'trig_off'
     n_power = '{0}_pow_5_120.nc'.format(event)
     # t_res = 0.001
-    times = [(-1., 1.3)]
+    times = [(-1.5, 1.3)]
     # freqs = [(5, 120)]
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     avg_frq = True
@@ -121,9 +121,9 @@ if __name__ == '__main__':
     rois = []
     log_bads = []
     bad_epo = []
-    rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] + \
-                ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
-                 '1142', '1143', '1144']
+    rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] #+ \
+                # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
+                #  '1142', '1143', '1144']
     # files = ['0822', '1043', '1191']
     # for d in files:
     for d in os.listdir(power_dir):
@@ -159,45 +159,39 @@ if __name__ == '__main__':
             pv_results[r] = pvals
 
         if avg_frq:
-            os.makedirs('/scratch/rbasanisi/data/stats/lfp_causal/'
-                        '{0}_{1}/'.format(f[0], f[1]), exist_ok=True)
+            save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
+                               monkey, condition, event,
+                               '{0}_{1}'.format(f[0], f[1]))
+
+            # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
+            #                    'lfp_causal/',
+            #                    monkey, condition, event,
+            #                    '{0}_{1}'.format(f[0], f[1]))
+
+            os.makedirs(save_dir, exist_ok=True)
             ds_mi = xr.Dataset(mi_results)
             ds_pv = xr.Dataset(pv_results)
 
-            ds_mi.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}/mi_results.nc'.format(f[0], f[1]))
-            ds_pv.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}/pv_results.nc'.format(f[0], f[1]))
-
-            # os.makedirs('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-            #             '{0}_{1}/'.format(f[0], f[1]),
-            #             exist_ok=True)
-            # ds_mi = xr.Dataset(mi_results)
-            # ds_pv = xr.Dataset(pv_results)
-            #
-            # ds_mi.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-            #                 '{0}_{1}/mi_results.nc'.format(f[0], f[1]))
-            # ds_pv.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-            #                 '{0}_{1}/pv_results.nc'.format(f[0], f[1]))
+            ds_mi.to_netcdf(op.join(save_dir,
+                                    'mi_results.nc'.format(f[0], f[1])))
+            ds_pv.to_netcdf(op.join(save_dir,
+                                    'pv_results.nc'.format(f[0], f[1])))
 
         elif not avg_frq:
-            os.makedirs('/scratch/rbasanisi/data/stats/lfp_causal/'
-                        '{0}_{1}_tf/'.format(f[0], f[1]), exist_ok=True)
+            save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
+                               monkey, condition, event,
+                               '{0}_{1}_tf'.format(f[0], f[1]))
+
+            # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
+            #                    'lfp_causal/',
+            #                    monkey, condition, event,
+            #                    '{0}_{1}_tf'.format(f[0], f[1]))
+
+            os.makedirs(save_dir, exist_ok=True)
             ds_mi = xr.Dataset(mi_results)
             ds_pv = xr.Dataset(pv_results)
 
-            ds_mi.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}_tf/mi_results.nc'.format(f[0], f[1]))
-            ds_pv.to_netcdf('/scratch/rbasanisi/data/stats/lfp_causal/'
-                            '{0}_{1}_tf/pv_results.nc'.format(f[0], f[1]))
-
-            # os.makedirs('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-            #             '{0}_{1}_tf/'.format(f[0], f[1]),
-            #             exist_ok=True)
-            # ds_mi = xr.Dataset(mi_results)
-            # ds_pv = xr.Dataset(pv_results)
-            #
-            # ds_mi.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-            #                 '{0}_{1}_tf/mi_results.nc'.format(f[0], f[1]))
-            # ds_pv.to_netcdf('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/'
-            #                 '{0}_{1}_tf/pv_results.nc'.format(f[0], f[1]))
+            ds_mi.to_netcdf(op.join(save_dir,
+                                    'mi_results.nc'.format(f[0], f[1])))
+            ds_pv.to_netcdf(op.join(save_dir,
+                                    'pv_results.nc'.format(f[0], f[1])))
