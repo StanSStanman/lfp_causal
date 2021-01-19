@@ -7,7 +7,7 @@ from itertools import product
 ###############################################################################
 
 
-def fit_qlearning(states, actions, rewards):
+def fit_qlearning(states, actions, rewards, uniq_s, uniq_a):
     """Fit Q-learning model to behavioral data using a grid-search
 
 
@@ -37,7 +37,8 @@ def fit_qlearning(states, actions, rewards):
     # Grid search
     for a, b, q in product(alpha, beta, q0):
         # Run Q-learning
-        regs = qlearning(states, actions, rewards, alpha=a, beta=b, q0=q)
+        regs = qlearning(states, actions, rewards, uniq_s, uniq_a,
+                         alpha=a, beta=b, q0=q)
 
         # Store maximum log-likelohood
         if regs['log_likelihood'] > log_likelihood:
@@ -50,11 +51,11 @@ def fit_qlearning(states, actions, rewards):
             # Output best fitting regressors
             best_regs = regs
 
-            # print(regs['log_likelihood'])
+    print('Model fitted at', best_regs['log_likelihood'])
 
     return best_regs
 
-def qlearning(s, a, r, alpha=0.5, beta=1.0, q0=0.5):
+def qlearning(s, a, r, uni_s, uni_a, alpha=0.5, beta=1.0, q0=0.5):
     """Q-learning model
 
     Parameters
@@ -78,8 +79,10 @@ def qlearning(s, a, r, alpha=0.5, beta=1.0, q0=0.5):
     """
 
     # Number of stims, actions and trials
-    n_s, n_a, n_t = len(np.unique(s)), len(np.unique(a)), s.shape[0]
-    _s, _a = np.unique(s), np.unique(a)
+    # n_s, n_a, n_t = len(np.unique(s)), len(np.unique(a)), s.shape[0]
+    n_s, n_a, n_t = len(uni_s), len(uni_a), s.shape[0]
+    # _s, _a = np.unique(s), np.unique(a)
+    _s, _a = uni_s, uni_a
     i_s, i_a = np.array(range(n_s)), np.array(range(n_a))
 
     # Init vars

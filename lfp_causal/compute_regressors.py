@@ -124,7 +124,8 @@ def get_behaviour(monkey, condition, session, save_as=None):
 
     # -------------------------------------------------------------------------
     # Q learning model values
-    model = fit_qlearning(np.zeros_like(actions), actions, outcomes)
+    model = fit_qlearning(np.zeros_like(actions), actions, outcomes,
+                          [0], [102, 103, 104])
 
     data['q_pcorr'] = model['p_correct']
     data['q_pincorr'] = model['p_incorrect']
@@ -395,11 +396,13 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'hard'
 
+    print('Calculating regressors for %s, %s' % (monkey, condition))
+
     csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
               '{0}/{1}/t_events'.format(monkey, condition)
 
     for file in os.listdir(csv_dir):
-        # file = '0877.csv'
+        # file = '0814.csv'
         if file.endswith('.csv'):
             session = file.replace('.csv', '')
             beh_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \

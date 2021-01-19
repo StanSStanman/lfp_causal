@@ -31,7 +31,6 @@ def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
         plt.show()
 
 
-
 def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
     assert isinstance(stats_dir, str)
     assert isinstance(regressors, list), \
