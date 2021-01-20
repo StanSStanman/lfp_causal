@@ -45,7 +45,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
     n_power = '{0}_pow_5_120.nc'.format(event)
     # t_res = 0.001
