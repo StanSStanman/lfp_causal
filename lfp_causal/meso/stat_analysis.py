@@ -34,7 +34,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=times)
 
     wf = WfMi(mi_type=mi_type, inference=inference)
-    mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
+    mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=20)
 
     if not avg_freq:
         mi.assign_coords({'freqs': freqs})
@@ -45,16 +45,16 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_off'
     n_power = '{0}_pow_5_120.nc'.format(event)
     # t_res = 0.001
     times = [(-1.5, 1.3)]
-    # freqs = [(5, 120)]
-    freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
-    avg_frq = True
-    t_resample = None #600
-    f_resample = None #80
+    freqs = [(5, 120)]
+    # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    avg_frq = False
+    t_resample = 1400
+    f_resample = 80
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)

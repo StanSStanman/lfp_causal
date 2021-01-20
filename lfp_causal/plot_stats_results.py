@@ -64,10 +64,13 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
         plt.show()
 
 
-
-
 if __name__ == '__main__':
-    stats_dir = '/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/{0}_{1}'
+    monkey = 'freddie'
+    condition = 'easy'
+    event = 'trig_off'
+
+    stats_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/',
+                        monkey, condition, event, '{0}_{1}')
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     # freqs = [(5, 120)]
     regressors = ['Correct', 'Reward',
@@ -82,9 +85,14 @@ if __name__ == '__main__':
                   'q_entropy', 'q_rpe', 'q_absrpe',
                   'q_shann_surp', 'q_bayes_surp']
 
-    for f in freqs:
-        plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
-        # plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
+    # for f in freqs:
+    #     plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
+    #     # plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
+
+    for r in regressors:
+        for f in freqs:
+            plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
+            # plot_tf_stat_res(stats_dir.format(f[0], f[1]), [r])
 
     # regressors = ['early_late_cons']
     #
