@@ -47,7 +47,7 @@ def compute_roi_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
         ds_ephy = DatasetEphy(x=power, y=regr, roi=_frs, z=cond, times=t_pnt)
 
         wf = WfMi(mi_type=mi_type, inference=inference)
-        _mi, _pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=20)
+        _mi, _pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
 
         if not avg_freq:
             mi.assign_coords({'freqs': freq_b})
