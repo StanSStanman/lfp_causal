@@ -1,5 +1,6 @@
 import xarray as xr
 import numpy as np
+import os
 import os.path as op
 import matplotlib.pyplot as plt
 
@@ -13,6 +14,7 @@ def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
     mi = xr.open_dataset(op.join(stats_dir, 'mi_results.nc'))
     pv = xr.open_dataset(op.join(stats_dir, 'pv_results.nc'))
 
+    figures = []
     for r in regressors:
         times = mi.times.values
         labels = mi.roi.values
@@ -28,7 +30,9 @@ def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
             ax.plot(times, _p, color='C%i' % i, linewidth=2.5)
             ax.axvline(0, -1, 1, color='k', linestyle='--')
         plt.legend()
-        plt.show()
+        figures.append(fig)
+        # plt.show()
+    return figures
 
 
 def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
@@ -40,6 +44,7 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
     mi = xr.open_dataset(op.join(stats_dir, 'mi_results.nc'))
     pv = xr.open_dataset(op.join(stats_dir, 'pv_results.nc'))
 
+    figures = []
     for r in regressors:
         times = mi.times.values
         freqs = mi.freqs.values
@@ -61,7 +66,9 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
             # ax.plot(times, _p, color='C%i' % i, linewidth=2.5)
             ax.axvline(0, -1, 1, color='w', linestyle='--')
         # plt.colorbar()
+        figures.append()
         plt.show()
+    return figures
 
 
 if __name__ == '__main__':
@@ -71,6 +78,9 @@ if __name__ == '__main__':
 
     stats_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/',
                         monkey, condition, event, '{0}_{1}')
+    fig_dir = op.join('/media/jerry/TOSHIBA EXT/data/plots',
+                      monkey, condition, event)
+
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     # freqs = [(5, 120)]
     regressors = ['Correct', 'Reward',
@@ -91,8 +101,12 @@ if __name__ == '__main__':
 
     for r in regressors:
         for f in freqs:
-            plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
+            figs = plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
             # plot_tf_stat_res(stats_dir.format(f[0], f[1]), [r])
+            figdir = op.join(fig_dir, r.replace('|', '_'))
+            os.makedirs(figdir, exist_ok=True)
+            figname = op.join(figdir, '{0}_{1}'.format(f[0], f[1]))
+            plt.savefig(figname)
 
     # regressors = ['early_late_cons']
     #
