@@ -54,8 +54,8 @@ if __name__ == '__main__':
     # freqs = [(5, 120)]
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     avg_frq = True
-    t_resample = #1400
-    f_resample = #80
+    t_resample = None #1400
+    f_resample = None #80
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
