@@ -21,7 +21,8 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     bad_epo, regressor,
                                     cond=conditional, times=times,
                                     freqs=freqs, avg_freq=avg_freq,
-                                    t_rsmpl=t_resample, f_rsmpl=f_resample)
+                                    t_rsmpl=t_resample, f_rsmpl=f_resample,
+                                    norm='bline_zs', bline=(-1.8, -1.3))
 
     if mi_type == 'cc':
         regr = [r.astype('float64') for r in regr]
@@ -50,11 +51,11 @@ if __name__ == '__main__':
     n_power = '{0}_pow_5_120.nc'.format(event)
     # t_res = 0.001
     times = [(-1.5, 1.3)]
-    freqs = [(5, 120)]
-    # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
-    avg_frq = False
-    t_resample = 1400
-    f_resample = 80
+    # freqs = [(5, 120)]
+    freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    avg_frq = True
+    t_resample = #1400
+    f_resample = #80
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
               'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -160,7 +161,7 @@ if __name__ == '__main__':
 
         if avg_frq:
             save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
-                               monkey, condition, event,
+                               monkey, condition, event, 'bline_zs',
                                '{0}_{1}'.format(f[0], f[1]))
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'

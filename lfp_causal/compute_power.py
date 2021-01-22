@@ -72,6 +72,51 @@ def compute_power(epoch, session, event, crop=None, freqs=None):
     return
 
 
+def normalize_power(power, norm, bline=(-.2, 0.)):
+    data = np.array(power.to_array()).squeeze()
+    name = list(power.keys())[0]
+    trials = power.trials.values
+    freqs = power.freqs.values
+    times = power.times.values
+
+    if norm == 'log':
+        data = np.log(data)
+
+    if norm == 'log10':
+        data = np.log10(data)
+
+    if norm == 'relchange':
+        m = data.mean(2, keepdims=True)
+        data = (data - m) / m
+
+    if norm == 'db':
+        data = 10 * np.log10(data / data.mean(2, keepdims=True))
+
+    if norm == 'zscore':
+        data = (data - data.mean(2, keepdims=True) -
+                data.std(2, keepdims=True))
+
+    if norm == 'bline':
+        b = power.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = data / b.mean(2, keepdims=True)
+
+    elif norm == 'bline_log':
+        b = power.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = np.log(data) - np.log(b.mean(2, keepdims=True))
+
+    elif norm == 'bline_zs':
+        b = power.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = (data - b.mean(2, keepdims=True)) / b.std(2, keepdims=True)
+
+    power = xr.DataArray(data, coords=[trials, freqs, times],
+                         dims=['trials', 'freqs', 'times'],
+                         name=name).to_dataset()
+    return power
+
+
 if __name__ == '__main__':
 
     monkey = 'freddie'

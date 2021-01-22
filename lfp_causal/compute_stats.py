@@ -8,10 +8,11 @@ from frites.dataset import DatasetEphy
 from frites.workflow import WfMi
 from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
+from lfp_causal.compute_power import normalize_power
 
 def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                  times=None, freqs=None, avg_freq=False,
-                 t_rsmpl=None, f_rsmpl=None):
+                 t_rsmpl=None, f_rsmpl=None, norm=None, bline=None):
 
     if avg_freq is True and f_rsmpl is not None:
         print('The mean values between frequecies will be taken, '
@@ -55,6 +56,9 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         nans, _nans = range(len(reg)), np.any(np.isnan(reg))
         if _nans:
             nans = np.isfinite(reg)
+
+        if norm is not None:
+            pow = normalize_power(pow, norm, bline)
 
         if isinstance(times, (tuple, list, np.ndarray)):
             pow = pow.loc[dict(times=slice(tmin, tmax))]
