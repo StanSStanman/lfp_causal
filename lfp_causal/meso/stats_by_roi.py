@@ -64,7 +64,7 @@ def compute_roi_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
     n_power = '{0}_pow_5_120.nc'.format(event)
     # t_res = 0.001
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # freqs = [(5, 120)]
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     avg_frq = True
-    t_resample = None #1400
+    t_resample = None #551
     f_resample = None #80
 
     epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
             #                    'lfp_causal/',
-            #                    monkey, condition, event,
+            #                    monkey, condition, event, 'by_roi',
             #                    '{0}_{1}'.format(f[0], f[1]))
 
             os.makedirs(save_dir, exist_ok=True)
@@ -203,7 +203,7 @@ if __name__ == '__main__':
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
             #                    'lfp_causal/',
-            #                    monkey, condition, event,
+            #                    monkey, condition, event, 'by_roi',
             #                    '{0}_{1}_tf'.format(f[0], f[1]))
 
             os.makedirs(save_dir, exist_ok=True)

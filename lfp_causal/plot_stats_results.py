@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
+    plt.close('all')
     assert isinstance(stats_dir, str)
     assert isinstance(regressors, list), \
         AssertionError('regressors must be a list of str')
@@ -13,6 +14,9 @@ def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
 
     mi = xr.open_dataset(op.join(stats_dir, 'mi_results.nc'))
     pv = xr.open_dataset(op.join(stats_dir, 'pv_results.nc'))
+
+    mi = mi.sortby('roi')
+    pv = pv.sortby('roi')
 
     figures = []
     for r in regressors:
@@ -31,7 +35,7 @@ def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
             ax.axvline(0, -1, 1, color='k', linestyle='--')
         plt.legend()
         figures.append(fig)
-        # plt.show()
+        plt.show()
     return figures
 
 
@@ -66,18 +70,18 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
             # ax.plot(times, _p, color='C%i' % i, linewidth=2.5)
             ax.axvline(0, -1, 1, color='w', linestyle='--')
         # plt.colorbar()
-        figures.append()
+        figures.append(fig)
         plt.show()
     return figures
 
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
 
     stats_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/',
-                        monkey, condition, event, '{0}_{1}')
+                        monkey, condition, event, 'by_roi', '{0}_{1}')
     fig_dir = op.join('/media/jerry/TOSHIBA EXT/data/plots',
                       monkey, condition, event)
 
@@ -96,17 +100,17 @@ if __name__ == '__main__':
                   'q_shann_surp', 'q_bayes_surp']
 
     # for f in freqs:
-    #     plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
-    #     # plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
+    #     # plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
+    #     plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
 
     for r in regressors:
         for f in freqs:
             figs = plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
-            # plot_tf_stat_res(stats_dir.format(f[0], f[1]), [r])
-            figdir = op.join(fig_dir, r.replace('|', '_'))
-            os.makedirs(figdir, exist_ok=True)
-            figname = op.join(figdir, '{0}_{1}'.format(f[0], f[1]))
-            plt.savefig(figname)
+            # # plot_tf_stat_res(stats_dir.format(f[0], f[1]), [r])
+            # figdir = op.join(fig_dir, r.replace('|', '_'))
+            # os.makedirs(figdir, exist_ok=True)
+            # figname = op.join(figdir, '{0}_{1}'.format(f[0], f[1]))
+            # plt.savefig(figname)
 
     # regressors = ['early_late_cons']
     #
