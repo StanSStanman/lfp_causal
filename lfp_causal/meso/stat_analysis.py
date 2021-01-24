@@ -22,7 +22,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     cond=conditional, times=times,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
-                                    norm='log', bline=(-1.8, -1.3))
+                                    norm='relchange', bline=(-1.8, -1.3))
 
     if mi_type == 'cc':
         regr = [r.astype('float64') for r in regr]
@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
         if avg_frq:
             save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
-                               monkey, condition, event, 'log',
+                               monkey, condition, event, 'relchange',
                                '{0}_{1}'.format(f[0], f[1]))
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
