@@ -22,7 +22,8 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     cond=conditional, times=times,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
-                                    norm='relchange', bline=(-1.8, -1.3))
+                                    norm='fbline_tt_zs', bline=(-.55, -0.05),
+                                    fbl='cue_on_pow_5_120.nc')
 
     if mi_type == 'cc':
         regr = [r.astype('float64') for r in regr]
@@ -66,14 +67,14 @@ if __name__ == '__main__':
     fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
                  '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
-    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-    #             '{0}/{1}/pow'.format(monkey, condition)
-    # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
-    #            '{0}/{1}/regressors'.format(monkey, condition)
-    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                '{0}/{1}/pow'.format(monkey, condition)
+    regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+               '{0}/{1}/regressors'.format(monkey, condition)
+    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -125,9 +126,9 @@ if __name__ == '__main__':
     rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] #+ \
                 # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
                 #  '1142', '1143', '1144']
-    # files = ['0822', '1043', '1191']
-    # for d in files:
-    for d in os.listdir(power_dir):
+    files = ['0822', '1043', '1191']
+    for d in files:
+    # for d in os.listdir(power_dir):
         if d in rej_files:
             continue
         if op.isdir(op.join(power_dir, d)):

@@ -62,7 +62,7 @@ def compute_power(epoch, session, event, crop=None, freqs=None):
                          dims=['trials', 'freqs', 'times'],
                          name=session)
 
-    p_dir = epoch.filename.replace(epoch.filename.split('/')[-1], '')\
+    p_dir = epoch.filename.replace(epoch.filename.split('/')[-1], '') \
         .replace('epo', 'pow/{0}'.format(session))
     p_fname = op.join(p_dir, '{0}_pow_{1}.nc'.format(event, f_range))
     if not op.exists(p_dir):
@@ -72,7 +72,13 @@ def compute_power(epoch, session, event, crop=None, freqs=None):
     return
 
 
-def normalize_power(power, norm, bline=(-.2, 0.)):
+def normalize_power(power, norm, bline=(-.2, 0.), file=None):
+
+    if norm.startswith('fbline') and file is None:
+        raise ValueError('To use {0} as normalization, file must be a '
+                         'baseline filename'.format(norm))
+
+    # Data are in the shape (trials, freqs, times)
     data = np.array(power.to_array()).squeeze()
     name = list(power.keys())[0]
     trials = power.trials.values
@@ -80,23 +86,26 @@ def normalize_power(power, norm, bline=(-.2, 0.)):
     times = power.times.values
 
     if norm == 'log':
-        data = np.log(data)
+        # data = np.log(data)
+        np.log(data, out=data)
 
-    if norm == 'log10':
-        data = np.log10(data)
+    elif norm == 'log10':
+        # data = np.log10(data)
+        np.log10(data, out=data)
 
-    if norm == 'relchange':
+    elif norm == 'relchange':
         m = data.mean(2, keepdims=True)
-        data = (data - m) / m
+        # data = (data - m) / m
+        np.divide(np.subtract(data, m, out=data), m, out=data)
 
-    if norm == 'db':
+    elif norm == 'db':
         data = 10 * np.log10(data / data.mean(2, keepdims=True))
 
-    if norm == 'zscore':
-        data = (data - data.mean(2, keepdims=True) -
+    elif norm == 'zscore':
+        data = ((data - data.mean(2, keepdims=True)) /
                 data.std(2, keepdims=True))
 
-    if norm == 'bline':
+    elif norm == 'bline':
         b = power.loc[dict(times=slice(bline[0], bline[1]))]
         b = np.array(b.to_array()).squeeze()
         data = data / b.mean(2, keepdims=True)
@@ -111,6 +120,48 @@ def normalize_power(power, norm, bline=(-.2, 0.)):
         b = np.array(b.to_array()).squeeze()
         data = (data - b.mean(2, keepdims=True)) / b.std(2, keepdims=True)
 
+    elif norm == 'bline_tt':
+        b = power.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = data / b.mean(2, keepdims=True).mean(0, keepdims=True)
+
+    elif norm == 'bline_tt_log':
+        b = power.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = np.log(data) - \
+            np.log(b.mean(2, keepdims=True).mean(0, keepdims=True))
+
+    elif norm == 'bline_tt_zs':
+        b = power.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = (data - b.mean(2, keepdims=True).mean(0, keepdims=True)) / \
+            b.std(2, keepdims=True).mean(0, keepdims=True)
+
+    elif norm == 'fbline':
+        b = xr.load_dataset(file)
+        b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = data / b.mean(2, keepdims=True)
+
+    elif norm == 'fbline_zs':
+        b = xr.load_dataset(file)
+        b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = (data - b.mean(2, keepdims=True)) / b.std(2, keepdims=True)
+
+    elif norm == 'fbline_tt':
+        b = xr.load_dataset(file)
+        b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = data / b.mean(2, keepdims=True).mean(0, keepdims=True)
+
+    elif norm == 'fbline_tt_zs':
+        b = xr.load_dataset(file)
+        b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
+        data = (data - b.mean(2, keepdims=True).mean(0, keepdims=True)) / \
+            b.std(2, keepdims=True).mean(0, keepdims=True)
+
     power = xr.DataArray(data, coords=[trials, freqs, times],
                          dims=['trials', 'freqs', 'times'],
                          name=name).to_dataset()
@@ -121,7 +172,7 @@ if __name__ == '__main__':
 
     monkey = 'freddie'
     condition = 'hard'
-    event = 'trig_off'
+    event = 'cue_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -146,7 +197,7 @@ if __name__ == '__main__':
             # file = '1280'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
-                                         '{0}_{1}_epo.fif'.format(file, event))
+                                    '{0}_{1}_epo.fif'.format(file, event))
                 if op.exists(fname_epo):
                     compute_power(fname_epo, file, event,
-                                  freqs=(5, 120), crop=(-2, 1.5))
+                                  freqs=(5, 120), crop=(-.75, .15))

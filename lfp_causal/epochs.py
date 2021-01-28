@@ -195,7 +195,7 @@ if __name__ == '__main__':
 
     monkey = 'freddie'
     condition = 'hard'
-    event = 'trig_off'
+    event = 'cue_on'
 
     raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
               'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
@@ -208,7 +208,7 @@ if __name__ == '__main__':
 
     files = []
     for file in os.listdir(raw_dir):
-        # file = '0990_raw.fif'
+        # file = '0975_raw.fif'
         if file.endswith('.fif'):
             session = file.replace('_raw.fif', '')
             fname_raw = os.path.join(raw_dir, file)
@@ -220,7 +220,7 @@ if __name__ == '__main__':
             bad_ch = auto_drop_chans(rec_info, session)
 
             epo = create_epochs(fname_raw, fname_eve,
-                                event, -2.5, 1.5,
+                                event, -1, .3,
                                 None, fname_epo,
                                 ch_drop=bad_ch)
 

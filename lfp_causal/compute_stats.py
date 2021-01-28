@@ -12,7 +12,8 @@ from lfp_causal.compute_power import normalize_power
 
 def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                  times=None, freqs=None, avg_freq=False,
-                 t_rsmpl=None, f_rsmpl=None, norm=None, bline=None):
+                 t_rsmpl=None, f_rsmpl=None,
+                 norm=None, bline=None, fbl=None):
 
     if avg_freq is True and f_rsmpl is not None:
         print('The mean values between frequecies will be taken, '
@@ -41,6 +42,10 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         print('Opening', p)
         pow = xr.open_dataset(p)
 
+        if fbl is not None:
+            _fbl = p.split('/')[:-1] + [fbl]
+            fbl = '/' + op.join(*_fbl)
+
         xls = pd.read_excel(r, index_col=0)
         reg = xls[reg_name].values
 
@@ -58,7 +63,7 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
             nans = np.isfinite(reg)
 
         if norm is not None:
-            pow = normalize_power(pow, norm, bline)
+            pow = normalize_power(pow, norm, bline, fbl)
 
         if isinstance(times, (tuple, list, np.ndarray)):
             pow = pow.loc[dict(times=slice(tmin, tmax))]
