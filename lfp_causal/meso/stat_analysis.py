@@ -1,11 +1,10 @@
 import os
 import os.path as op
-import numpy as np
 import xarray as xr
-from scipy.signal import resample as spr
 from frites.dataset import DatasetEphy
 from frites.workflow import WfMi
 from itertools import product
+from research.get_dirs import get_dirs
 from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 from lfp_causal.compute_stats import prepare_data
@@ -46,6 +45,9 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
 
 if __name__ == '__main__':
+    from lfp_causal import MCH, PRJ
+    dirs = get_dirs(MCH, PRJ)
+
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
@@ -58,14 +60,20 @@ if __name__ == '__main__':
     t_resample = None #1400
     f_resample = None #80
 
-    epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-                '{0}/{1}/pow'.format(monkey, condition)
-    regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
-               '{0}/{1}/regressors'.format(monkey, condition)
-    fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    epo_dir = dirs['epo'].format(monkey, condition)
+    power_dir = dirs['pow'].format(monkey, condition)
+    regr_dir = dirs['reg'].format(monkey, condition)
+    fname_info = op.join(dirs['ep_cnds'].format(monkey, condition),
+                         'files_info.xlsx')
+
+    # epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    # power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
+    #             '{0}/{1}/pow'.format(monkey, condition)
+    # regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
+    #            '{0}/{1}/regressors'.format(monkey, condition)
+    # fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
+    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
 
     # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
@@ -160,8 +168,7 @@ if __name__ == '__main__':
             pv_results[r] = pvals
 
         if avg_frq:
-            save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
-                               monkey, condition, event, norm,
+            save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
                                '{0}_{1}'.format(f[0], f[1]))
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
@@ -170,8 +177,7 @@ if __name__ == '__main__':
             #                    '{0}_{1}'.format(f[0], f[1]))
 
         elif not avg_frq:
-            save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
-                               monkey, condition, event, norm,
+            save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
                                '{0}_{1}_tf'.format(f[0], f[1]))
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
