@@ -14,7 +14,7 @@ from lfp_causal.compute_stats import prepare_data
 def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                        regressor, conditional, mi_type, inference,
                        times=None, freqs=None, avg_freq=True,
-                       t_resample=None, f_resample=None):
+                       t_resample=None, f_resample=None, norm=None):
 
     power, regr, cond,\
         times, freqs = prepare_data(fname_pow, fname_reg, log_bads,
@@ -22,7 +22,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     cond=conditional, times=times,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
-                                    norm='fbline_tt_zs', bline=(-.55, -0.05),
+                                    norm=norm, bline=(-.55, -0.05),
                                     fbl='cue_on_pow_5_120.nc')
 
     if mi_type == 'cc':
@@ -49,8 +49,8 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
+    norm = 'fbline_tt_zs'
     n_power = '{0}_pow_5_120.nc'.format(event)
-    # t_res = 0.001
     times = [(-1.5, 1.3)]
     # freqs = [(5, 120)]
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
@@ -126,9 +126,9 @@ if __name__ == '__main__':
     rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] #+ \
                 # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
                 #  '1142', '1143', '1144']
-    files = ['0822', '1043', '1191']
-    for d in files:
-    # for d in os.listdir(power_dir):
+    # files = ['0822', '1043', '1191']
+    # for d in files:
+    for d in os.listdir(power_dir):
         if d in rej_files:
             continue
         if op.isdir(op.join(power_dir, d)):
@@ -150,50 +150,40 @@ if __name__ == '__main__':
     mi_results = {}
     pv_results = {}
     for t, f in product(times, freqs):
-        # t_pt = np.arange(t[0], t[1] + t_res, t_res).round(5)
         for r, c, m, i in zip(regressors, conditionals, mi_type, inference):
             wf, mi, pvals = compute_stats_meso(fn_pow_list, fn_reg_list, rois,
                                                log_bads, bad_epo,
                                                r, c, m, i, t, f, avg_frq,
-                                               t_resample, f_resample)
+                                               t_resample, f_resample, norm)
 
             mi_results[r] = mi
             pv_results[r] = pvals
 
         if avg_frq:
             save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
-                               monkey, condition, event, 'relchange',
+                               monkey, condition, event, norm,
                                '{0}_{1}'.format(f[0], f[1]))
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
             #                    'lfp_causal/',
-            #                    monkey, condition, event,
+            #                    monkey, condition, event, norm,
             #                    '{0}_{1}'.format(f[0], f[1]))
-
-            os.makedirs(save_dir, exist_ok=True)
-            ds_mi = xr.Dataset(mi_results)
-            ds_pv = xr.Dataset(pv_results)
-
-            ds_mi.to_netcdf(op.join(save_dir,
-                                    'mi_results.nc'.format(f[0], f[1])))
-            ds_pv.to_netcdf(op.join(save_dir,
-                                    'pv_results.nc'.format(f[0], f[1])))
 
         elif not avg_frq:
             save_dir = op.join('/scratch/rbasanisi/data/stats/lfp_causal/',
-                               monkey, condition, event,
+                               monkey, condition, event, norm,
                                '{0}_{1}_tf'.format(f[0], f[1]))
 
             # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
             #                    'lfp_causal/',
-            #                    monkey, condition, event,
+            #                    monkey, condition, event, norm,
             #                    '{0}_{1}_tf'.format(f[0], f[1]))
 
-            os.makedirs(save_dir, exist_ok=True)
-            ds_mi = xr.Dataset(mi_results)
-            ds_pv = xr.Dataset(pv_results)
+        os.makedirs(save_dir, exist_ok=True)
+        ds_mi = xr.Dataset(mi_results)
+        ds_pv = xr.Dataset(pv_results)
 
-            ds_mi.to_netcdf(op.join(save_dir,
-                                    'mi_results.nc'.format(f[0], f[1])))
-            ds_pv.to_netcdf(op.join(save_dir,
-                                    'pv_results.nc'.format(f[0], f[1])))
+        ds_mi.to_netcdf(op.join(save_dir,
+                                'mi_results.nc'.format(f[0], f[1])))
+        ds_pv.to_netcdf(op.join(save_dir,
+                                'pv_results.nc'.format(f[0], f[1])))
