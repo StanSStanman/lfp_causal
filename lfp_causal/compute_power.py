@@ -74,9 +74,13 @@ def compute_power(epoch, session, event, crop=None, freqs=None):
 
 def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 
-    if norm.startswith('fbline') and file is None:
-        raise ValueError('To use {0} as normalization, file must be a '
-                         'baseline filename'.format(norm))
+    if norm.startswith('fbline'):
+        if file is None:
+            raise ValueError('To use {0} as normalization, file must be a '
+                             'baseline filename'.format(norm))
+        b = xr.load_dataset(file)
+        b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        b = np.array(b.to_array()).squeeze()
 
     # Data are in the shape (trials, freqs, times)
     data = np.array(power.to_array()).squeeze()
@@ -138,27 +142,27 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
             b.std(2, keepdims=True).mean(0, keepdims=True)
 
     elif norm == 'fbline':
-        b = xr.load_dataset(file)
-        b = b.loc[dict(times=slice(bline[0], bline[1]))]
-        b = np.array(b.to_array()).squeeze()
+        # b = xr.load_dataset(file)
+        # b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        # b = np.array(b.to_array()).squeeze()
         data = data / b.mean(2, keepdims=True)
 
     elif norm == 'fbline_zs':
-        b = xr.load_dataset(file)
-        b = b.loc[dict(times=slice(bline[0], bline[1]))]
-        b = np.array(b.to_array()).squeeze()
+        # b = xr.load_dataset(file)
+        # b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        # b = np.array(b.to_array()).squeeze()
         data = (data - b.mean(2, keepdims=True)) / b.std(2, keepdims=True)
 
     elif norm == 'fbline_tt':
-        b = xr.load_dataset(file)
-        b = b.loc[dict(times=slice(bline[0], bline[1]))]
-        b = np.array(b.to_array()).squeeze()
+        # b = xr.load_dataset(file)
+        # b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        # b = np.array(b.to_array()).squeeze()
         data = data / b.mean(2, keepdims=True).mean(0, keepdims=True)
 
     elif norm == 'fbline_tt_zs':
-        b = xr.load_dataset(file)
-        b = b.loc[dict(times=slice(bline[0], bline[1]))]
-        b = np.array(b.to_array()).squeeze()
+        # b = xr.load_dataset(file)
+        # b = b.loc[dict(times=slice(bline[0], bline[1]))]
+        # b = np.array(b.to_array()).squeeze()
         data = (data - b.mean(2, keepdims=True).mean(0, keepdims=True)) / \
             b.std(2, keepdims=True).mean(0, keepdims=True)
 
@@ -194,7 +198,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            # file = '1280'
+            # file = '0854'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))

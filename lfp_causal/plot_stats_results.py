@@ -35,7 +35,7 @@ def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
             ax.axvline(0, -1, 1, color='k', linestyle='--')
         plt.legend()
         figures.append(fig)
-        # plt.show()
+        plt.show()
     return figures
 
 
@@ -79,11 +79,12 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
+    norm = 'fbline_tt_zs'
 
     stats_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/',
-                        monkey, condition, event, 'relchange', '{0}_{1}')
+                        monkey, condition, event, norm, '{0}_{1}')
     fig_dir = op.join('/media/jerry/TOSHIBA EXT/data/plots',
-                      monkey, condition, event, 'relchange')
+                      monkey, condition, event, norm)
 
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     # freqs = [(5, 120)]
@@ -107,10 +108,10 @@ if __name__ == '__main__':
         for f in freqs:
             figs = plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
             # plot_tf_stat_res(stats_dir.format(f[0], f[1]), [r])
-            figdir = op.join(fig_dir, r.replace('|', '_'))
-            os.makedirs(figdir, exist_ok=True)
-            figname = op.join(figdir, '{0}_{1}'.format(f[0], f[1]))
-            plt.savefig(figname)
+            # figdir = op.join(fig_dir, r.replace('|', '_'))
+            # os.makedirs(figdir, exist_ok=True)
+            # figname = op.join(figdir, '{0}_{1}'.format(f[0], f[1]))
+            # plt.savefig(figname)
 
     # regressors = ['early_late_cons']
     #

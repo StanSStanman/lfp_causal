@@ -87,7 +87,6 @@ def time_freq_analysis(epochs, freqs=None, n_cycles=None, avg=True):
     if not isinstance(freqs, np.ndarray):
         freqs = freqs_bins(fmin, fmax)
 
-        # freqs = np.logspace(*np.log10([fmin, fmax]), num=150)
     if n_cycles is None:
         n_cycles = freqs / 2.
 

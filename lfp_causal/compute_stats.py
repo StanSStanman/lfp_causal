@@ -44,7 +44,7 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
 
         if fbl is not None:
             _fbl = p.split('/')[:-1] + [fbl]
-            fbl = '/' + op.join(*_fbl)
+            _fbl = '/' + op.join(*_fbl)
 
         xls = pd.read_excel(r, index_col=0)
         reg = xls[reg_name].values
@@ -63,7 +63,7 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
             nans = np.isfinite(reg)
 
         if norm is not None:
-            pow = normalize_power(pow, norm, bline, fbl)
+            pow = normalize_power(pow, norm, bline, _fbl)
 
         if isinstance(times, (tuple, list, np.ndarray)):
             pow = pow.loc[dict(times=slice(tmin, tmax))]
@@ -174,9 +174,9 @@ if __name__ == '__main__':
     rois = []
     log_bads = []
     bad_epo = []
-    files = ['0814', '0822', '1043', '1191']
-    for d in files:
-    # for d in os.listdir(power_dir):
+    # files = ['0814', '0822', '1043', '1191']
+    # for d in files:
+    for d in os.listdir(power_dir):
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
             fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))

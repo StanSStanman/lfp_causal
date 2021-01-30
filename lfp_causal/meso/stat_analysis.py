@@ -8,6 +8,7 @@ from research.get_dirs import get_dirs
 from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 from lfp_causal.compute_stats import prepare_data
+os.system("taskset -p 0xff %d" % os.getpid())
 
 
 def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
@@ -66,24 +67,6 @@ if __name__ == '__main__':
     fname_info = op.join(dirs['ep_cnds'].format(monkey, condition),
                          'files_info.xlsx')
 
-    # epo_dir = '/scratch/rbasanisi/data/db_lfp/' \
-    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # power_dir = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-    #             '{0}/{1}/pow'.format(monkey, condition)
-    # regr_dir = '/scratch/rbasanisi/data/db_behaviour/lfp_causal/' \
-    #            '{0}/{1}/regressors'.format(monkey, condition)
-    # fname_info = '/scratch/rbasanisi/data/db_lfp/lfp_causal/' \
-    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
-    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # power_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-    #             '{0}/{1}/pow'.format(monkey, condition)
-    # regr_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
-    #            '{0}/{1}/regressors'.format(monkey, condition)
-    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
                   'RnR|C', 'RnR|nC',
@@ -131,10 +114,11 @@ if __name__ == '__main__':
     rois = []
     log_bads = []
     bad_epo = []
-    rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] #+ \
+    rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] + \
+                ['0944']
                 # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
                 #  '1142', '1143', '1144']
-    # files = ['0822', '1043', '1191']
+    # files = ['0832', '0822', '1043', '1191']
     # for d in files:
     for d in os.listdir(power_dir):
         if d in rej_files:
@@ -171,19 +155,9 @@ if __name__ == '__main__':
             save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
                                '{0}_{1}'.format(f[0], f[1]))
 
-            # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
-            #                    'lfp_causal/',
-            #                    monkey, condition, event, norm,
-            #                    '{0}_{1}'.format(f[0], f[1]))
-
         elif not avg_frq:
             save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
                                '{0}_{1}_tf'.format(f[0], f[1]))
-
-            # save_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/'
-            #                    'lfp_causal/',
-            #                    monkey, condition, event, norm,
-            #                    '{0}_{1}_tf'.format(f[0], f[1]))
 
         os.makedirs(save_dir, exist_ok=True)
         ds_mi = xr.Dataset(mi_results)
