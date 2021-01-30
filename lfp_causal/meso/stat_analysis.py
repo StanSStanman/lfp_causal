@@ -51,7 +51,7 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
-    norm = 'fbline_tt_zs'
+    norm = 'fbline_zs'
     n_power = '{0}_pow_5_120.nc'.format(event)
     times = [(-1.5, 1.3)]
     # freqs = [(5, 120)]
