@@ -203,75 +203,78 @@ def adjust_epochs_number(epo1, epo2):
                 e2d.append(i)
     epo2.drop(e2d)
 
+    if len(epo1) != len(epo2):
+        print('\nMANNAGGIA AL CAZZO STO STRONZO DEVE ROMPE I COGLIONI\n')
+
     epo2.save(epo2.filename, overwrite=True)
     return
 
 
 if __name__ == '__main__':
-    import os
-
-    monkey = 'freddie'
-    condition = 'easy'
-    event = 'cue_on'
-
-    raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
-    eve_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/eve'.format(monkey, condition)
-    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-               '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
-    files = []
-    for file in os.listdir(raw_dir):
-        # file = '1217_raw.fif'
-        if file.endswith('.fif'):
-            session = file.replace('_raw.fif', '')
-            fname_raw = os.path.join(raw_dir, file)
-            fname_eve = os.path.join(eve_dir, file.replace('raw', 'eve'))
-            fname_epo = os.path.join(epo_dir,
-                                     file.replace('raw',
-                                                  '{0}_epo'.format(event)))
-
-            bad_ch = auto_drop_chans(rec_info, session)
-
-            epo = create_epochs(fname_raw, fname_eve,
-                                event, -.8, .3,
-                                None, fname_epo,
-                                ch_drop=bad_ch)
-
-            # epo = create_epochs(fname_raw, fname_eve,
-            #                     event, -2., 2.,
-            #                     None, fname_epo,
-            #                     ch_drop='manual')
-
-            # bad_epochs = get_ch_bad_epo(monkey, condition, session)
-            # visualize_epochs(fname_epo, bads=bad_epochs, block=True)
-            # visualize_epochs(fname_epo)
-            # visualize_epochs(fname_epo, ['LFP2'])
+    # import os
+    #
+    # monkey = 'freddie'
+    # condition = 'easy'
+    # event = 'cue_on'
+    #
+    # raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
+    # eve_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/eve'.format(monkey, condition)
+    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    #
+    # files = []
+    # for file in os.listdir(raw_dir):
+    #     # file = '1217_raw.fif'
+    #     if file.endswith('.fif'):
+    #         session = file.replace('_raw.fif', '')
+    #         fname_raw = os.path.join(raw_dir, file)
+    #         fname_eve = os.path.join(eve_dir, file.replace('raw', 'eve'))
+    #         fname_epo = os.path.join(epo_dir,
+    #                                  file.replace('raw',
+    #                                               '{0}_epo'.format(event)))
+    #
+    #         bad_ch = auto_drop_chans(rec_info, session)
+    #
+    #         epo = create_epochs(fname_raw, fname_eve,
+    #                             event, -.8, .3,
+    #                             None, fname_epo,
+    #                             ch_drop=bad_ch)
+    #
+    #         # epo = create_epochs(fname_raw, fname_eve,
+    #         #                     event, -2.5, 1.5,
+    #         #                     None, fname_epo,
+    #         #                     ch_drop=bad_ch)
+    #
+    #         # bad_epochs = get_ch_bad_epo(monkey, condition, session)
+    #         # visualize_epochs(fname_epo, bads=bad_epochs, block=True)
+    #         # visualize_epochs(fname_epo)
+    #         # visualize_epochs(fname_epo, ['LFP2'])
 
 ###############################################################################
 # ADJUST NUMBER OF EPOCHS
 ###############################################################################
-    # import os
-    #
-    # monkey = 'freddie'
-    # condition = 'hard'
-    # event1 = 'trig_off'
-    # event2 = 'cue_on'
-    #
-    # raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-    #           'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
-    # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-    #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    # files = []
-    # for file in os.listdir(raw_dir):
-    #     # file = '0975_raw.fif'
-    #     if file.endswith('.fif'):
-    #         session = file.replace('_raw.fif', '')
-    #         fname_epo1 = os.path.join(epo_dir,
-    #                                  '{0}_{1}_epo.fif'.format(session, event1))
-    #         fname_epo2 = os.path.join(epo_dir,
-    #                                  '{0}_{1}_epo.fif'.format(session, event2))
-    #         adjust_epochs_number(fname_epo1, fname_epo2)
+    import os
+
+    monkey = 'freddie'
+    condition = 'easy'
+    event1 = 'trig_off'
+    event2 = 'cue_on'
+
+    raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+              'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
+    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    files = []
+    for file in os.listdir(raw_dir):
+        # file = '0975_raw.fif'
+        if file.endswith('.fif'):
+            session = file.replace('_raw.fif', '')
+            fname_epo1 = os.path.join(epo_dir,
+                                     '{0}_{1}_epo.fif'.format(session, event1))
+            fname_epo2 = os.path.join(epo_dir,
+                                     '{0}_{1}_epo.fif'.format(session, event2))
+            adjust_epochs_number(fname_epo1, fname_epo2)
