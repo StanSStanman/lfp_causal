@@ -25,24 +25,34 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     norm=norm, bline=(-.55, -0.05),
                                     fbl='cue_on_pow_5_120.nc')
 
-    if mi_type == 'cc':
-        regr = [r.astype('float64') for r in regr]
-    elif mi_type == 'cd':
-        regr = [r.astype('int64') for r in regr]
-    elif mi_type == 'ccd':
-        regr = [r.astype('float64') for r in regr]
-        cond = [c.astype('int64') for c in cond]
+    mi_results = {}
+    pv_results = {}
+    for _r, _c, _mt, _inf in zip(regressor, conditional, mi_type, inference):
+        if _mt == 'cc':
+            regr[_r] = [r.astype('float64') for r in regr[_r]]
+        elif _mt == 'cd':
+            regr[_r] = [r.astype('int64') for r in regr[_r]]
+        elif _mt == 'ccd':
+            regr[_r] = [r.astype('float64') for r in regr[_r]]
+            cond[_r] = [c.astype('int64') for c in cond[_r]]
 
-    ds_ephy = DatasetEphy(x=power, y=regr, roi=rois, z=cond, times=times)
+        ds_ephy = DatasetEphy(x=power, y=regr[_r], roi=rois,
+                              z=cond[_r], times=times)
 
-    wf = WfMi(mi_type=mi_type, inference=inference)
-    mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
+        wf = WfMi(mi_type=_mt, inference=_inf)
+        mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
 
-    if not avg_freq:
-        mi.assign_coords({'freqs': freqs})
-        pval.assign_coords({'freqs': freqs})
+        if not avg_freq:
+            mi.assign_coords({'freqs': freqs})
+            pval.assign_coords({'freqs': freqs})
 
-    return wf, mi, pval
+        mi_results[_r] = mi
+        pv_results[_r] = pval
+
+    ds_mi = xr.Dataset(mi_results)
+    ds_pv = xr.Dataset(pv_results)
+
+    return ds_mi, ds_pv # wf, mi, pval
 
 
 if __name__ == '__main__':
@@ -103,10 +113,6 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc']
 
-    # regressors = ['RnR|C']
-    # conditionals = [None]
-    # mi_type = ['cd']
-
     inference = ['ffx' for r in regressors]
 
     fn_pow_list = []
@@ -114,13 +120,13 @@ if __name__ == '__main__':
     rois = []
     log_bads = []
     bad_epo = []
-    rej_files = ['0845', '0847', '0873', '0939', '0945', '1038'] + \
+    rej_files = ['0845', '0847', '0873', '0939', '0945', '1038', '1217'] + \
                 ['0944']
                 # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
                 #  '1142', '1143', '1144']
     # files = ['0832', '0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir):
+    for d in os.listdir(power_dir)[:10]:
         if d in rej_files:
             continue
         if op.isdir(op.join(power_dir, d)):
@@ -142,14 +148,13 @@ if __name__ == '__main__':
     mi_results = {}
     pv_results = {}
     for t, f in product(times, freqs):
-        for r, c, m, i in zip(regressors, conditionals, mi_type, inference):
-            wf, mi, pvals = compute_stats_meso(fn_pow_list, fn_reg_list, rois,
-                                               log_bads, bad_epo,
-                                               r, c, m, i, t, f, avg_frq,
-                                               t_resample, f_resample, norm)
-
-            mi_results[r] = mi
-            pv_results[r] = pvals
+        ds_mi, ds_pv = compute_stats_meso(fn_pow_list, fn_reg_list, rois,
+                                          log_bads, bad_epo,
+                                          regressors, conditionals,
+                                          mi_type, inference,
+                                          t, f, avg_frq,
+                                          t_resample, f_resample,
+                                          norm)
 
         if avg_frq:
             save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
@@ -160,8 +165,6 @@ if __name__ == '__main__':
                                '{0}_{1}_tf'.format(f[0], f[1]))
 
         os.makedirs(save_dir, exist_ok=True)
-        ds_mi = xr.Dataset(mi_results)
-        ds_pv = xr.Dataset(pv_results)
 
         ds_mi.to_netcdf(op.join(save_dir,
                                 'mi_results.nc'.format(f[0], f[1])))

@@ -10,6 +10,126 @@ from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 from lfp_causal.compute_power import normalize_power
 
+# def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
+#                  times=None, freqs=None, avg_freq=False,
+#                  t_rsmpl=None, f_rsmpl=None,
+#                  norm=None, bline=None, fbl=None):
+#
+#     if avg_freq is True and f_rsmpl is not None:
+#         print('The mean values between frequecies will be taken, '
+#               'f_rsmpl will be considered automatically as None')
+#         f_rsmpl = None
+#
+#     if times is not None:
+#         if isinstance(times, tuple):
+#             tmin, tmax = times
+#         elif isinstance(times, (list, np.ndarray)):
+#             tmin, tmax = times[0], times[-1]
+#         else:
+#             raise ValueError('times must be NoneType '
+#                              'tuple of values (tmin, tmax),'
+#                              'list or numpy array')
+#
+#     if freqs is not None:
+#         if isinstance(freqs, tuple):
+#             fmin, fmax = freqs
+#         else:
+#             raise ValueError('freqs must be NoneType '
+#                              'or tuple of values (fmin, fmax)')
+#
+#     all_pow, all_reg, all_con = [], [], None
+#     for p, r, lb, eb in zip(powers, regresors, l_bad, e_bad):
+#         print('Opening', p)
+#         pow = xr.open_dataset(p)
+#
+#         if fbl is not None:
+#             _fbl = p.split('/')[:-1] + [fbl]
+#             _fbl = '/' + op.join(*_fbl)
+#
+#         xls = pd.read_excel(r, index_col=0)
+#         reg = xls[reg_name].values
+#
+#         if len(lb) != 0:
+#             reg = np.delete(reg, lb)
+#         if len(eb) != 0:
+#             reg = np.delete(reg, eb)
+#
+#         if np.sum(np.isfinite(reg)) < 2 or np.any(np.isinf(reg)):
+#             print('Skipped', p)
+#             continue
+#
+#         nans, _nans = range(len(reg)), np.any(np.isnan(reg))
+#         if _nans:
+#             nans = np.isfinite(reg)
+#
+#         if norm is not None:
+#             pow = normalize_power(pow, norm, bline, _fbl)
+#
+#         if isinstance(times, (tuple, list, np.ndarray)):
+#             pow = pow.loc[dict(times=slice(tmin, tmax))]
+#         all_times = pow.times.values
+#
+#         if isinstance(freqs, tuple):
+#             pow = pow.loc[dict(freqs=slice(fmin, fmax))]
+#         all_freqs = pow.freqs.values
+#
+#         pow = pow.to_array().values.transpose(1, 0, 2, 3)
+#         pow = pow[nans, :, :, :]
+#
+#         if avg_freq:
+#             pow = pow.mean(2)
+#         else:
+#             if f_rsmpl is not None:
+#                 assert pow.shape[2] > f_rsmpl, \
+#                     ValueError('The number of resampled frequencies should be '
+#                                'lower than the number of actual frequencies')
+#                 spacing = int(round(pow.shape[2] / f_rsmpl))
+#                 pow = pow[:, :, ::spacing, :]
+#                 all_freqs = all_freqs[::spacing]
+#
+#         if t_rsmpl is not None:
+#             pow, all_times = spr(x=pow, num=t_rsmpl, t=all_times, axis=-1)
+#
+#         all_pow.append(pow)
+#
+#         # xls = pd.read_excel(r, index_col=0)
+#         # reg = xls[reg_name].values
+#
+#         # reg = np.delete(reg, nans, axis=0)
+#         reg = reg[nans]
+#         all_reg.append(reg)
+#
+#         assert pow.shape[0] == reg.shape[0]
+#         # print(pow.shape[0], reg.shape[0])
+#
+#         if cond is not None:
+#             if all_con is None:
+#                 all_con = []
+#
+#             if isinstance(cond, str):
+#                 con = xls[cond].values
+#             else:
+#                 raise ValueError('cond must be NoneType or a str with the '
+#                                  'name of the variable used to condition '
+#                                  'your analysis')
+#             if len(lb) != 0:
+#                 con = np.delete(con, lb)
+#             if len(eb) != 0:
+#                 con = np.delete(con, eb)
+#             # con = np.delete(con, nans, axis=0)
+#             con = con[nans]
+#             all_con.append(con)
+#
+#             assert pow.shape[0] == con.shape[0]
+#
+#     # all_pow = np.concatenate(all_pow, axis=0)
+#     # all_reg = np.hstack(tuple(all_reg))
+#     # if all_con is not None:
+#     #     all_con = np.hstack(tuple(all_con))
+#
+#     return all_pow, all_reg, all_con, all_times, all_freqs
+
+
 def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                  times=None, freqs=None, avg_freq=False,
                  t_rsmpl=None, f_rsmpl=None,
@@ -37,30 +157,15 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
             raise ValueError('freqs must be NoneType '
                              'or tuple of values (fmin, fmax)')
 
-    all_pow, all_reg, all_con = [], [], None
-    for p, r, lb, eb in zip(powers, regresors, l_bad, e_bad):
+    all_pow = []
+    for p in powers:
+    # for p, r, lb, eb in zip(powers, regresors, l_bad, e_bad):
         print('Opening', p)
         pow = xr.open_dataset(p)
 
         if fbl is not None:
             _fbl = p.split('/')[:-1] + [fbl]
             _fbl = '/' + op.join(*_fbl)
-
-        xls = pd.read_excel(r, index_col=0)
-        reg = xls[reg_name].values
-
-        if len(lb) != 0:
-            reg = np.delete(reg, lb)
-        if len(eb) != 0:
-            reg = np.delete(reg, eb)
-
-        if np.sum(np.isfinite(reg)) < 2 or np.any(np.isinf(reg)):
-            print('Skipped', p)
-            continue
-
-        nans, _nans = range(len(reg)), np.any(np.isnan(reg))
-        if _nans:
-            nans = np.isfinite(reg)
 
         if norm is not None:
             pow = normalize_power(pow, norm, bline, _fbl)
@@ -74,7 +179,7 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
         all_freqs = pow.freqs.values
 
         pow = pow.to_array().values.transpose(1, 0, 2, 3)
-        pow = pow[nans, :, :, :]
+        # pow = pow[nans, :, :, :]
 
         if avg_freq:
             pow = pow.mean(2)
@@ -92,40 +197,33 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
 
         all_pow.append(pow)
 
-        # xls = pd.read_excel(r, index_col=0)
-        # reg = xls[reg_name].values
+    all_reg, all_con = {}, {}
+    for rn, cn in zip(reg_name, cond):
+        _reg, _con = [], []
+        for r, lb, eb in zip(regresors, l_bad, e_bad):
 
-        # reg = np.delete(reg, nans, axis=0)
-        reg = reg[nans]
-        all_reg.append(reg)
+            xls = pd.read_excel(r, index_col=0)
+            reg = xls[rn].values
 
-        assert pow.shape[0] == reg.shape[0]
-        # print(pow.shape[0], reg.shape[0])
-
-        if cond is not None:
-            if all_con is None:
-                all_con = []
-
-            if isinstance(cond, str):
-                con = xls[cond].values
-            else:
-                raise ValueError('cond must be NoneType or a str with the '
-                                 'name of the variable used to condition '
-                                 'your analysis')
             if len(lb) != 0:
-                con = np.delete(con, lb)
+                reg = np.delete(reg, lb)
             if len(eb) != 0:
-                con = np.delete(con, eb)
-            # con = np.delete(con, nans, axis=0)
-            con = con[nans]
-            all_con.append(con)
+                reg = np.delete(reg, eb)
+            _reg.append(reg)
 
-            assert pow.shape[0] == con.shape[0]
+            if cn is not None:
+                con = xls[cn].values
+                if len(lb) != 0:
+                    con = np.delete(con, lb)
+                if len(eb) != 0:
+                    con = np.delete(con, eb)
+                _con.append(con)
 
-    # all_pow = np.concatenate(all_pow, axis=0)
-    # all_reg = np.hstack(tuple(all_reg))
-    # if all_con is not None:
-    #     all_con = np.hstack(tuple(all_con))
+        all_reg[rn] = _reg
+        if len(_con) > 0:
+            all_con[rn] = _con
+        else:
+            all_con[rn] = None
 
     return all_pow, all_reg, all_con, all_times, all_freqs
 
