@@ -126,7 +126,7 @@ if __name__ == '__main__':
                 #  '1142', '1143', '1144']
     # files = ['0832', '0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir)[:10]:
+    for d in os.listdir(power_dir):
         if d in rej_files:
             continue
         if op.isdir(op.join(power_dir, d)):
