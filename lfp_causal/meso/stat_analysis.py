@@ -8,7 +8,7 @@ from research.get_dirs import get_dirs
 from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 from lfp_causal.compute_stats import prepare_data
-os.system("taskset -p 0xff %d" % os.getpid())
+# os.system("taskset -p 0xff %d" % os.getpid())
 
 
 def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
@@ -23,10 +23,12 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
                                     norm=norm, bline=(-.55, -0.05),
-                                    fbl='cue_on_pow_5_120.nc')
+                                    fbl='cue_on_pow_8_120_sl.nc')
 
     mi_results = {}
     pv_results = {}
+    conj_ss_results = {}
+    conj_results = {}
     for _r, _c, _mt, _inf in zip(regressor, conditional, mi_type, inference):
         if _mt == 'cc':
             regr[_r] = [r.astype('float64') for r in regr[_r]]
@@ -41,6 +43,8 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
         wf = WfMi(mi_type=_mt, inference=_inf)
         mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
+        if _inf == 'rfx':
+            conj_ss, conj = wf.conjunction_analysis(ds_ephy)
 
         if not avg_freq:
             mi.assign_coords({'freqs': freqs})
@@ -48,11 +52,18 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
         mi_results[_r] = mi
         pv_results[_r] = pval
+        if _inf == 'rfx':
+            conj_ss_results[_r] = conj_ss
+            conj_results[_r] = conj
 
     ds_mi = xr.Dataset(mi_results)
     ds_pv = xr.Dataset(pv_results)
-
-    return ds_mi, ds_pv # wf, mi, pval
+    if len(conj_ss_results) == len(conj_results) == 0:
+        return ds_mi, ds_pv
+    else:
+        ds_conj_ss = xr.Dataset(conj_ss_results)
+        ds_conj = xr.Dataset(conj_results)
+        return ds_mi, ds_pv, ds_conj_ss, ds_conj
 
 
 if __name__ == '__main__':
@@ -62,11 +73,12 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
-    norm = 'fbline_zs'
-    n_power = '{0}_pow_5_120.nc'.format(event)
+    norm = 'fbline_tt_zs'
+    n_power = '{0}_pow_8_120_sl.nc'.format(event)
     times = [(-1.5, 1.3)]
     # freqs = [(5, 120)]
-    freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
     avg_frq = True
     t_resample = None #1400
     f_resample = None #80
@@ -122,7 +134,8 @@ if __name__ == '__main__':
     bad_epo = []
     rej_files = ['0845', '0847', '0873', '0939', '0945', '1038', '1204',
                  '1217'] + \
-                ['0944']
+                ['0944', '0967', '0969', '0967', '0970', '0971', '1139',
+                 '1145', '1515', '1701']
                 # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
                 #  '1142', '1143', '1144']
     # files = ['0832', '0822', '1043', '1191']
@@ -159,11 +172,11 @@ if __name__ == '__main__':
 
         if avg_frq:
             save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
-                               '{0}_{1}'.format(f[0], f[1]))
+                               '{0}_{1}_sl'.format(f[0], f[1]))
 
         elif not avg_frq:
             save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
-                               '{0}_{1}_tf'.format(f[0], f[1]))
+                               '{0}_{1}_tf_sl'.format(f[0], f[1]))
 
         os.makedirs(save_dir, exist_ok=True)
 

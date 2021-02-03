@@ -6,11 +6,12 @@ import os
 import os.path as op
 import matplotlib.pyplot as plt
 from lfp_causal.tf_analysis import epochs_tf_analysis
+from lfp_causal.aslt import parallel_aslt
 from lfp_causal.IO import read_sector
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo
 
 
-def compute_power(epoch, session, event, crop=None, freqs=None):
+def compute_power_morlet(epoch, session, event, crop=None, freqs=None):
     csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \
               'lfp_causal/{0}/{1}/t_events'
 
@@ -68,6 +69,65 @@ def compute_power(epoch, session, event, crop=None, freqs=None):
     if not op.exists(p_dir):
         os.makedirs(p_dir)
     d_tfr.to_netcdf(p_fname)
+
+    return
+
+
+def compute_power_superlets(epoch, session, event, freqs,
+                            n_cycles=None, crop=None, cut=.15):
+    csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \
+              'lfp_causal/{0}/{1}/t_events'
+
+    # for epo, ses in zip(epochs, sessions):
+    if isinstance(epoch, str):
+        epoch = mne.read_epochs(epoch, preload=True)
+
+    monkey = epoch.filename.split('/')[-4]
+    condition = epoch.filename.split('/')[-3]
+    csv_dir = csv_dir.format(monkey, condition)
+    csv = pd.read_csv(op.join(csv_dir, '{0}.csv'.format(session)))
+
+    if crop is not None:
+        assert isinstance(crop, tuple), \
+            AssertionError('frequencies should be expressed as a '
+                           'tuple(tmin, tmax)')
+        epoch.crop(crop[0], crop[1])
+
+    bads = get_ch_bad_epo(monkey, condition, session)
+    _b = []
+    for i, d in enumerate(epoch.drop_log):
+        if d != ():
+            _b.append(i)
+
+    movements = csv['mov_on'].values
+    movements = np.delete(movements, _b)
+    if 'mov_on' not in epoch.filename:
+        epoch = epoch[np.isfinite(movements)]
+
+    epoch.drop(bads)
+    epoch.drop_channels(epoch.info['bads'])
+
+    if n_cycles is None:
+        n_cycles = freqs / 2.
+    elif isinstance(n_cycles, (int, float)):
+        n_cycles = np.full_like(freqs, n_cycles)
+    times = epoch.times
+
+    print('Computing power for session {0}.....'.format(session))
+    sl_pow = parallel_aslt(epoch.get_data().squeeze(), epoch.info['sfreq'],
+                           freqs, n_cycles, times,
+                           order=[1, 30], mult=True, n_jobs=-1)
+    tmin, tmax = sl_pow.times[0] + cut, sl_pow.times[-1] - cut
+    sl_pow = sl_pow.loc[dict(times=slice(tmin, tmax))]
+    print('Done.\n')
+
+    f_range = '{0}_{1}'.format(freqs[0].astype(int), freqs[-1].astype(int))
+    p_dir = epoch.filename.replace(epoch.filename.split('/')[-1], '') \
+        .replace('epo', 'pow/{0}'.format(session))
+    p_fname = op.join(p_dir, '{0}_pow_{1}_sl.nc'.format(event, f_range))
+    if not op.exists(p_dir):
+        os.makedirs(p_dir)
+    sl_pow.to_netcdf(p_fname)
 
     return
 
@@ -176,7 +236,7 @@ if __name__ == '__main__':
 
     monkey = 'freddie'
     condition = 'hard'
-    event = 'cue_on'
+    event = 'trig_off'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -203,5 +263,14 @@ if __name__ == '__main__':
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))
                 if op.exists(fname_epo):
-                    compute_power(fname_epo, file, event,
-                                  freqs=(5, 120), crop=(-.75, .15))
+                    # compute_power_morlet(fname_epo, file, event,
+                    #                      freqs=(5, 120), crop=(-.75, .15))
+
+                    compute_power_superlets(fname_epo, file, event,
+                                            freqs=np.linspace(8, 120, 80),
+                                            n_cycles=None,
+                                            crop=(-2, 1.5))
+                    # compute_power_superlets(fname_epo, file, event,
+                    #                         freqs=np.linspace(8, 120, 80),
+                    #                         n_cycles=None,
+                    #                         crop=(-.75, .15))

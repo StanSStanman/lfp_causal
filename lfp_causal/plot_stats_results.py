@@ -79,7 +79,7 @@ if __name__ == '__main__':
     monkey = 'freddie'
     condition = 'easy'
     event = 'trig_off'
-    norm = 'fbline_tt_zs'
+    norm = 'fbline_zs'
 
     stats_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/',
                         monkey, condition, event, norm, '{0}_{1}')
