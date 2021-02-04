@@ -9,6 +9,9 @@ from lfp_causal.IO import read_session
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo, get_log_bad_epo
 from lfp_causal.compute_stats import prepare_data
 # os.system("taskset -p 0xff %d" % os.getpid())
+from lfp_causal.profiling import (RepeatedTimer, memory_usage, cpu_usage)
+import time
+import json
 
 
 def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
@@ -24,6 +27,11 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
                                     norm=norm, bline=(-.55, -0.05),
                                     fbl='cue_on_pow_8_120_sl.nc')
+
+    ###########################################################################
+    mu = RepeatedTimer(1, memory_usage)
+    cu = RepeatedTimer(1, cpu_usage)
+    ###########################################################################
 
     mi_results = {}
     pv_results = {}
@@ -43,6 +51,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
         wf = WfMi(mi_type=_mt, inference=_inf)
         mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
+
         if _inf == 'rfx':
             conj_ss, conj = wf.conjunction_analysis(ds_ephy)
 
@@ -55,6 +64,20 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
         if _inf == 'rfx':
             conj_ss_results[_r] = conj_ss
             conj_results[_r] = conj
+
+    ###########################################################################
+    mu.stop()
+    cu.stop()
+    ftm = time.strftime('%d%m%y%H%M%S', time.localtime())
+    m_out_file = op.join('/home', 'rbasanisi', 'profiling', 'memory',
+                         'memory_test_{0}.json'.format(ftm))
+    c_out_file = op.join('/home', 'rbasanisi', 'profiling', 'cpu',
+                         'cpu_test_{0}.json'.format(ftm))
+    for jfn, td in zip([m_out_file, c_out_file],
+                       [memory_usage(), cpu_usage()]):
+        with open(jfn, 'w') as jf:
+            json.dump(td, jf)
+    ###########################################################################
 
     ds_mi = xr.Dataset(mi_results)
     ds_pv = xr.Dataset(pv_results)
@@ -71,7 +94,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
     norm = 'fbline_tt_zs'
     n_power = '{0}_pow_8_120_sl.nc'.format(event)
@@ -124,6 +147,10 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc', 'cc',
                'cc', 'cc']
+
+    # regressors = ['Correct']
+    # conditionals = [None]
+    # mi_type = ['cd']
 
     inference = ['ffx' for r in regressors]
 

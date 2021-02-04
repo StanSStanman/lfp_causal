@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from research.get_dirs import get_dirs
 from lfp_causal.compute_power import normalize_power
 from lfp_causal.IO import read_sector
+from lfp_causal.profiling import (RepeatedTimer, memory_usage, cpu_usage)
+
 
 def plot_avg_tf(powers, blines=None):
     avg_pow = None
@@ -55,14 +57,23 @@ if __name__ == '__main__':
 
         all_files = []
         all_bline = []
-        for fs in fid['file']:
+        for fs in fid['file'][:5]:
             fname = op.join(directory, fs, file)
             bname = op.join(directory, fs, bline)
             if op.exists(fname) and fs not in rej_files:
                 all_files.append(fname)
                 all_bline.append(bname)
 
+        mu = RepeatedTimer(1, memory_usage)
+        cu = RepeatedTimer(1, cpu_usage)
+        import time
+        time.sleep(5)
         plot_avg_tf(all_files, all_bline)
+        mu.stop()
+        cu.stop()
+        print(cpu_usage())
+
+        print('done')
 
 
 
