@@ -94,7 +94,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_off'
     norm = 'fbline_tt_zs'
     n_power = '{0}_pow_8_120_sl.nc'.format(event)
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     # freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
-    avg_frq = True
+    avg_frq = False
     t_resample = None #1400
     f_resample = None #80
 
