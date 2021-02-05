@@ -29,8 +29,8 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     fbl='cue_on_pow_8_120_sl.nc')
 
     ###########################################################################
-    mu = RepeatedTimer(1, memory_usage)
-    cu = RepeatedTimer(1, cpu_usage)
+    # mu = RepeatedTimer(1, memory_usage)
+    # cu = RepeatedTimer(1, cpu_usage)
     ###########################################################################
 
     mi_results = {}
@@ -66,17 +66,17 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
             conj_results[_r] = conj
 
     ###########################################################################
-    mu.stop()
-    cu.stop()
-    ftm = time.strftime('%d%m%y%H%M%S', time.localtime())
-    m_out_file = op.join('/home', 'rbasanisi', 'profiling', 'memory',
-                         'memory_test_{0}.json'.format(ftm))
-    c_out_file = op.join('/home', 'rbasanisi', 'profiling', 'cpu',
-                         'cpu_test_{0}.json'.format(ftm))
-    for jfn, td in zip([m_out_file, c_out_file],
-                       [memory_usage(), cpu_usage()]):
-        with open(jfn, 'w') as jf:
-            json.dump(td, jf)
+    # mu.stop()
+    # cu.stop()
+    # ftm = time.strftime('%d%m%y%H%M%S', time.localtime())
+    # m_out_file = op.join('/home', 'rbasanisi', 'profiling', 'memory',
+    #                      'memory_test_{0}.json'.format(ftm))
+    # c_out_file = op.join('/home', 'rbasanisi', 'profiling', 'cpu',
+    #                      'cpu_test_{0}.json'.format(ftm))
+    # for jfn, td in zip([m_out_file, c_out_file],
+    #                    [memory_usage(), cpu_usage()]):
+    #     with open(jfn, 'w') as jf:
+    #         json.dump(td, jf)
     ###########################################################################
 
     ds_mi = xr.Dataset(mi_results)
