@@ -77,16 +77,17 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
-    norm = 'fbline_zs'
+    norm = 'fbline_tt_zs'
 
     stats_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/',
-                        monkey, condition, event, norm, '{0}_{1}')
+                        monkey, condition, event, norm, '{0}_{1}_sl')
     fig_dir = op.join('/media/jerry/TOSHIBA EXT/data/plots',
                       monkey, condition, event, norm)
 
     freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
+    freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
     # freqs = [(5, 120)]
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
