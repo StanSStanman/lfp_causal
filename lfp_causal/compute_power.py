@@ -132,6 +132,81 @@ def compute_power_superlets(epoch, session, event, freqs,
     return
 
 
+def compute_power_multitaper(epoch, session, event, crop=None):
+    csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \
+              'lfp_causal/{0}/{1}/t_events'
+    freqs = [11., 25., 55., 95.]
+    n_cycles = [6., 7., 16., 28.]
+    t_bandwidth = [4., 6., 8., 14.]
+
+    # for epo, ses in zip(epochs, sessions):
+    if isinstance(epoch, str):
+        epoch = mne.read_epochs(epoch, preload=True)
+
+    monkey = epoch.filename.split('/')[-4]
+    condition = epoch.filename.split('/')[-3]
+    csv_dir = csv_dir.format(monkey, condition)
+    csv = pd.read_csv(op.join(csv_dir, '{0}.csv'.format(session)))
+
+    if crop is not None:
+        assert isinstance(crop, tuple), \
+            AssertionError('frequencies should be expressed as a '
+                           'tuple(tmin, tmax)')
+        epoch.crop(crop[0], crop[1])
+
+    # if freqs is not None:
+    #     assert isinstance(freqs, tuple), \
+    #         AssertionError('frequencies should be expressed as a '
+    #                        'tuple(fmin, fmax)')
+    #     epoch.filter(freqs[0], freqs[1])
+
+    bads = get_ch_bad_epo(monkey, condition, session)
+    _b = []
+    for i, d in enumerate(epoch.drop_log):
+        if d != ():
+            _b.append(i)
+
+    movements = csv['mov_on'].values
+    movements = np.delete(movements, _b)
+    if 'mov_on' not in epoch.filename:
+        epoch = epoch[np.isfinite(movements)]
+
+    epoch.drop(bads)
+
+    data = []
+    for _f, _nc, _tb in zip(freqs, n_cycles, t_bandwidth):
+        d_tfr = mne.time_frequency.tfr_multitaper(epoch, freqs=[_f],
+                                                  n_cycles=[_nc],
+                                                  time_bandwidth=_tb,
+                                                  use_fft=True,
+                                                  return_itc=False,
+                                                  average=False, n_jobs=-1)
+        data.append(d_tfr.data)
+    data = np.concatenate(data, axis=1)
+
+    # d_tfr, _, _ = epochs_tf_analysis(epoch, t_win=crop, freqs=freqs,
+    #                                  avg=False, show=False,
+    #                                  baseline=(-2., -1.7))
+    # plt.close('all')
+    f_range = '8_120'
+
+    d_tfr = xr.DataArray(data.squeeze(),
+                         coords=[range(d_tfr.__len__()),
+                                 freqs,
+                                 d_tfr.times],
+                         dims=['trials', 'freqs', 'times'],
+                         name=session)
+
+    p_dir = epoch.filename.replace(epoch.filename.split('/')[-1], '') \
+        .replace('epo', 'pow/{0}'.format(session))
+    p_fname = op.join(p_dir, '{0}_pow_{1}_mt.nc'.format(event, f_range))
+    if not op.exists(p_dir):
+        os.makedirs(p_dir)
+    d_tfr.to_netcdf(p_fname)
+
+    return
+
+
 def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 
     if norm.startswith('fbline'):
@@ -205,7 +280,7 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
         # b = xr.load_dataset(file)
         # b = b.loc[dict(times=slice(bline[0], bline[1]))]
         # b = np.array(b.to_array()).squeeze()
-        data = data / b.mean(2, keepdims=True)
+        data = (data - b.mean(2, keepdims=True)) / b.mean(2, keepdims=True)
 
     elif norm == 'fbline_zs':
         # b = xr.load_dataset(file)
@@ -235,8 +310,8 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 if __name__ == '__main__':
 
     monkey = 'freddie'
-    condition = 'hard'
-    event = 'trig_off'
+    condition = 'easy'
+    event = 'cue_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -258,7 +333,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            # file = '0854'
+            # file = '0906'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))
@@ -266,11 +341,17 @@ if __name__ == '__main__':
                     # compute_power_morlet(fname_epo, file, event,
                     #                      freqs=(5, 120), crop=(-.75, .15))
 
-                    compute_power_superlets(fname_epo, file, event,
-                                            freqs=np.linspace(8, 120, 80),
-                                            n_cycles=None,
-                                            crop=(-2, 1.5))
+                    # compute_power_superlets(fname_epo, file, event,
+                    #                         freqs=np.linspace(8, 120, 80),
+                    #                         n_cycles=None,
+                    #                         crop=(-2, 1.5))
                     # compute_power_superlets(fname_epo, file, event,
                     #                         freqs=np.linspace(8, 120, 80),
                     #                         n_cycles=None,
                     #                         crop=(-.75, .15))
+
+
+                    # compute_power_multitaper(fname_epo, file, event,
+                    #                         crop=(-2, 1.5))
+                    compute_power_multitaper(fname_epo, file, event,
+                                            crop=(-.75, .15))
