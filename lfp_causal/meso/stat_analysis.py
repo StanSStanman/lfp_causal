@@ -46,8 +46,6 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
             regr[_r] = [r.astype('float64') for r in regr[_r]]
             cond[_r] = [c.astype('int64') for c in cond[_r]]
 
-        # a = power.copy()
-
         ds_ephy = DatasetEphy(x=power.copy(), y=regr[_r], roi=rois,
                               z=cond[_r], times=times)
 
@@ -71,10 +69,13 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     mu.stop()
     cu.stop()
     ftm = time.strftime('%d%m%y%H%M%S', time.localtime())
-    m_out_file = op.join('/home', 'rbasanisi', 'profiling', 'memory',
-                         'memory_test_{0}.json'.format(ftm))
-    c_out_file = op.join('/home', 'rbasanisi', 'profiling', 'cpu',
-                         'cpu_test_{0}.json'.format(ftm))
+    running = 'fts0_fr_ea'
+    m_out_dir = op.join('/home', 'rbasanisi', 'profiling', 'memory', running)
+    c_out_dir = op.join('/home', 'rbasanisi', 'profiling', 'cpu', running)
+    for d in [m_out_dir, c_out_dir]:
+        os.makedirs(d, exist_ok=True)
+    m_out_file = op.join(m_out_dir, 'memory_test_{0}.json'.format(ftm))
+    c_out_file = op.join(c_out_dir, 'cpu_test_{0}.json'.format(ftm))
     for jfn, td in zip([m_out_file, c_out_file],
                        [memory_usage(), cpu_usage()]):
         with open(jfn, 'w') as jf:
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_off'
     norm = 'fbline_tt_zs'
     n_power = '{0}_pow_8_120_sl.nc'.format(event)
@@ -104,7 +105,7 @@ if __name__ == '__main__':
     # freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
-    avg_frq = False
+    avg_frq = True
     t_resample = None #1400
     f_resample = None #80
 
@@ -169,7 +170,7 @@ if __name__ == '__main__':
                 #  '1142', '1143', '1144']
     # files = ['0832', '0822', '1043', '1191']
     # for d in files:
-    for d in os.listdir(power_dir):
+    for d in os.listdir(power_dir)[:3]:
         if d in rej_files:
             continue
         if op.isdir(op.join(power_dir, d)):
