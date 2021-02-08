@@ -26,11 +26,11 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
                                     norm=norm, bline=(-.55, -0.05),
-                                    fbl='cue_on_pow_8_120_sl.nc')
+                                    fbl='cue_on_pow_8_120_mt.nc')
 
     ###########################################################################
-    mu = RepeatedTimer(1, memory_usage)
-    cu = RepeatedTimer(1, cpu_usage)
+    # mu = RepeatedTimer(1, memory_usage)
+    # cu = RepeatedTimer(1, cpu_usage)
     ###########################################################################
 
     mi_results = {}
@@ -66,20 +66,20 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
             conj_results[_r] = conj
 
     ###########################################################################
-    mu.stop()
-    cu.stop()
-    ftm = time.strftime('%d%m%y%H%M%S', time.localtime())
-    running = 'fts0_fr_ea'
-    m_out_dir = op.join('/home', 'rbasanisi', 'profiling', 'memory', running)
-    c_out_dir = op.join('/home', 'rbasanisi', 'profiling', 'cpu', running)
-    for d in [m_out_dir, c_out_dir]:
-        os.makedirs(d, exist_ok=True)
-    m_out_file = op.join(m_out_dir, 'memory_test_{0}.json'.format(ftm))
-    c_out_file = op.join(c_out_dir, 'cpu_test_{0}.json'.format(ftm))
-    for jfn, td in zip([m_out_file, c_out_file],
-                       [memory_usage(), cpu_usage()]):
-        with open(jfn, 'w') as jf:
-            json.dump(td, jf)
+    # mu.stop()
+    # cu.stop()
+    # ftm = time.strftime('%d%m%y%H%M%S', time.localtime())
+    # running = 'fts0_fr_ea'
+    # m_out_dir = op.join('/home', 'rbasanisi', 'profiling', 'memory', running)
+    # c_out_dir = op.join('/home', 'rbasanisi', 'profiling', 'cpu', running)
+    # for d in [m_out_dir, c_out_dir]:
+    #     os.makedirs(d, exist_ok=True)
+    # m_out_file = op.join(m_out_dir, 'memory_test_{0}.json'.format(ftm))
+    # c_out_file = op.join(c_out_dir, 'cpu_test_{0}.json'.format(ftm))
+    # for jfn, td in zip([m_out_file, c_out_file],
+    #                    [memory_usage(), cpu_usage()]):
+    #     with open(jfn, 'w') as jf:
+    #         json.dump(td, jf)
     ###########################################################################
 
     ds_mi = xr.Dataset(mi_results)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     condition = 'easy'
     event = 'trig_off'
     norm = 'fbline_tt_zs'
-    n_power = '{0}_pow_8_120_sl.nc'.format(event)
+    n_power = '{0}_pow_8_120_mt.nc'.format(event)
     times = [(-1.5, 1.3)]
     # freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
@@ -202,11 +202,11 @@ if __name__ == '__main__':
 
         if avg_frq:
             save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
-                               '{0}_{1}_sl'.format(f[0], f[1]))
+                               '{0}_{1}_mt'.format(f[0], f[1]))
 
         elif not avg_frq:
             save_dir = op.join(dirs['st_prj'], monkey, condition, event, norm,
-                               '{0}_{1}_tf_sl'.format(f[0], f[1]))
+                               '{0}_{1}_tf_mt'.format(f[0], f[1]))
 
         os.makedirs(save_dir, exist_ok=True)
 
