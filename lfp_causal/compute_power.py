@@ -301,6 +301,9 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
         data = (data - b.mean(2, keepdims=True).mean(0, keepdims=True)) / \
             b.std(2, keepdims=True).mean(0, keepdims=True)
 
+    elif norm == 'fbline_realchange':
+        data = (data - b.mean(2, keepdims=True)) / b.mean(2, keepdims=True)
+
     power = xr.DataArray(data, coords=[trials, freqs, times],
                          dims=['trials', 'freqs', 'times'],
                          name=name).to_dataset()
