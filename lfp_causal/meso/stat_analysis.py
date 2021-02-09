@@ -1,6 +1,7 @@
 import os
 import os.path as op
 import xarray as xr
+import numpy as np
 from frites.dataset import DatasetEphy
 from frites.workflow import WfMi
 from itertools import product
@@ -49,7 +50,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
         ds_ephy = DatasetEphy(x=power.copy(), y=regr[_r], roi=rois,
                               z=cond[_r], times=times)
 
-        wf = WfMi(mi_type=_mt, inference=_inf)
+        wf = WfMi(mi_type=_mt, inference=_inf, kernel=np.hanning(20))
         mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
 
         if _inf == 'rfx':
@@ -97,9 +98,9 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_off'
-    norm = 'fbline_tt_zs'
+    norm = 'fbline_realchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
     times = [(-1.5, 1.3)]
     # freqs = [(5, 120)]
