@@ -1,6 +1,8 @@
 import numpy as np
 import mne
 import pandas as pd
+import os.path as op
+from lfp_causal.IO import read_sector
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo
 
 
@@ -45,11 +47,13 @@ def create_epochs(fname_raw, fname_eve, event, tmin, tmax, bline, fname_out,
     # raw.info['bads'] = ['spikes1', 'spikes2']
     if ch_drop == 'manual':
         raw.plot(scalings={'seeg': 0.9}, block=True)
-        raw.drop_channels(raw.info['bads'])
+        # raw.drop_channels(raw.info['bads'])
     elif isinstance(ch_drop, list):
-        raw.drop_channels(ch_drop)
+        raw.info['bads'] = raw.info['bads'] + ch_drop
     else:
+        print('Only spikes channels rejected')
         pass
+    raw.drop_channels(raw.info['bads'])
     # raw.save(raw.filenames[0], overwrite=True)
     raw.notch_filter(np.arange(50, 251, 50),
                      notch_widths=np.arange(50, 251, 50) / 200)
@@ -85,38 +89,40 @@ def visualize_epochs(epochs, bads=None, picks=None, block=True, show=True):
     if bads is not None:
         epochs.drop(bads)
 
-    data = epochs.get_data(picks=picks)
-    data = data.mean(1)
+    edata = epochs.get_data(picks=picks)
+    # data = data.mean(1)
+    for d in range(edata.shape[1]):
+        data = edata[:, d, :].squeeze()
 
-    times = epochs.times
-    n_epo = range(data.shape[0])
+        times = epochs.times
+        n_epo = range(data.shape[0])
 
-    vmin = np.percentile(data, .05)
-    vmax = np.percentile(data, 99.95)
+        vmin = np.percentile(data, .05)
+        vmax = np.percentile(data, 99.95)
 
-    fig, axs = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]})
-    pcm = axs[0].pcolormesh(times, n_epo, data,
-                            vmin=vmin, vmax=vmax,
-                            cmap='RdBu_r')
-    pcm_vline = axs[0].axvline(0., n_epo[0], n_epo[-1],
-                               color='k', linestyle='--',
-                               linewidth=0.8)
-    cbar = DraggableColorbar(fig.colorbar(pcm, ax=axs[0]), pcm)
+        fig, axs = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]})
+        pcm = axs[0].pcolormesh(times, n_epo, data,
+                                vmin=vmin, vmax=vmax,
+                                cmap='RdBu_r')
+        pcm_vline = axs[0].axvline(0., n_epo[0], n_epo[-1],
+                                   color='k', linestyle='--',
+                                   linewidth=0.8)
+        cbar = DraggableColorbar(fig.colorbar(pcm, ax=axs[0]), pcm)
 
-    epo_avg = data.mean(0)
-    epo_err = sem(data, axis=0)
-    lpl = axs[1].plot(times, epo_avg, color='k', linewidth=0.8)
-    fbt = axs[1].fill_between(times, epo_avg - epo_err, epo_avg + epo_err,
-                              color='k', alpha=0.4)
-    lpl_vline = axs[1].axvline(x=0., ymin=-0., ymax=1.,
-                               color='k', linestyle='--',
-                               linewidth=0.8)
+        epo_avg = data.mean(0)
+        epo_err = sem(data, axis=0)
+        lpl = axs[1].plot(times, epo_avg, color='k', linewidth=0.8)
+        fbt = axs[1].fill_between(times, epo_avg - epo_err, epo_avg + epo_err,
+                                  color='k', alpha=0.4)
+        lpl_vline = axs[1].axvline(x=0., ymin=-0., ymax=1.,
+                                   color='k', linestyle='--',
+                                   linewidth=0.8)
 
-    axs[1].set_xlim([times[0], times[-1]])
-    plt.tight_layout()
+        axs[1].set_xlim([times[0], times[-1]])
+        plt.tight_layout()
 
-    if show:
-        plt.show(block=block)
+        if show:
+            plt.show(block=block)
 
     return fig
 
@@ -211,70 +217,79 @@ def adjust_epochs_number(epo1, epo2):
 
 
 if __name__ == '__main__':
-    import os
-
-    monkey = 'freddie'
-    condition = 'hard'
-    event = 'trig_off'
-
-    raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
-    eve_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/eve'.format(monkey, condition)
-    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-               '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-
-    files = []
-    for file in os.listdir(raw_dir):
-        # file = '1217_raw.fif'
-        if file.endswith('.fif'):
-            session = file.replace('_raw.fif', '')
-            fname_raw = os.path.join(raw_dir, file)
-            fname_eve = os.path.join(eve_dir, file.replace('raw', 'eve'))
-            fname_epo = os.path.join(epo_dir,
-                                     file.replace('raw',
-                                                  '{0}_epo'.format(event)))
-
-            bad_ch = auto_drop_chans(rec_info, session)
-
-            # epo = create_epochs(fname_raw, fname_eve,
-            #                     event, -.8, .3,
-            #                     None, fname_epo,
-            #                     ch_drop=bad_ch)
-
-            # epo = create_epochs(fname_raw, fname_eve,
-            #                     event, -2.5, 1.5,
-            #                     None, fname_epo,
-            #                     ch_drop=bad_ch)
-
-            # bad_epochs = get_ch_bad_epo(monkey, condition, session)
-            # visualize_epochs(fname_epo, bads=bad_epochs, block=True)
-            visualize_epochs(fname_epo)
-            # visualize_epochs(fname_epo, ['LFP2'])
-
-###############################################################################
-# ADJUST NUMBER OF EPOCHS
-###############################################################################
     # import os
     #
     # monkey = 'freddie'
     # condition = 'easy'
-    # event1 = 'trig_off'
-    # event2 = 'cue_on'
+    # event = 'trig_off'
     #
     # raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
+    # eve_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+    #           'lfp_causal/{0}/{1}/eve'.format(monkey, condition)
     # epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    #
     # files = []
     # for file in os.listdir(raw_dir):
-    #     # file = '0975_raw.fif'
+    #     # file = '0963_raw.fif'
     #     if file.endswith('.fif'):
     #         session = file.replace('_raw.fif', '')
-    #         fname_epo1 = os.path.join(epo_dir,
-    #                                  '{0}_{1}_epo.fif'.format(session, event1))
-    #         fname_epo2 = os.path.join(epo_dir,
-    #                                  '{0}_{1}_epo.fif'.format(session, event2))
-    #         adjust_epochs_number(fname_epo1, fname_epo2)
+    #         fname_raw = os.path.join(raw_dir, file)
+    #         fname_eve = os.path.join(eve_dir, file.replace('raw', 'eve'))
+    #         fname_epo = os.path.join(epo_dir,
+    #                                  file.replace('raw',
+    #                                               '{0}_epo'.format(event)))
+    #
+    #         bad_ch = auto_drop_chans(rec_info, session)
+    #         print(bad_ch)
+    #
+    #         # epo = create_epochs(fname_raw, fname_eve,
+    #         #                     event, -.8, .3,
+    #         #                     None, fname_epo,
+    #         #                     ch_drop=bad_ch)
+    #
+    #         epo = create_epochs(fname_raw, fname_eve,
+    #                             event, -1.8, 1.5,
+    #                             None, fname_epo,
+    #                             ch_drop=bad_ch)
+    #
+    #         # bad_epochs = get_ch_bad_epo(monkey, condition, session)
+    #         # visualize_epochs(fname_epo, bads=bad_epochs, block=True)
+    #         # visualize_epochs(fname_epo)
+    #         # visualize_epochs(fname_epo, ['LFP2'])
+    #
+    # # sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
+    # # sectors = ['limbic striatum']
+    # # for sect in sectors:
+    # #     fid = read_sector(rec_info, sect)
+    # #     for fs in fid['file']:
+    # #         fname_epo = op.join(epo_dir, '{0}_{1}_epo.fif'.format(fs, event))
+    # #         visualize_epochs(fname_epo)
+
+###############################################################################
+# ADJUST NUMBER OF EPOCHS
+###############################################################################
+    import os
+
+    monkey = 'freddie'
+    condition = 'easy'
+    event1 = 'trig_off'
+    event2 = 'cue_on'
+
+    raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+              'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
+    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+    files = []
+    for file in os.listdir(raw_dir):
+        # file = '0975_raw.fif'
+        if file.endswith('.fif'):
+            session = file.replace('_raw.fif', '')
+            fname_epo1 = os.path.join(epo_dir,
+                                     '{0}_{1}_epo.fif'.format(session, event1))
+            fname_epo2 = os.path.join(epo_dir,
+                                     '{0}_{1}_epo.fif'.format(session, event2))
+            adjust_epochs_number(fname_epo1, fname_epo2)

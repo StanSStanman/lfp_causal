@@ -143,6 +143,11 @@ def find_events_txt(fname_in, fname_out, fname_txt):
                 warnings.warn('Trigger offset value out of matrix')
                 trigger_offset[i] = t_off[i]
 
+        test_tr_off = cue_onset + ((cue_length + trig_delay +
+                                    react_time + cont_time) / 1000)
+        assert np.all(np.isclose(trigger_offset, test_tr_off, atol=0.001)), \
+            AssertionError('Triggers are not correctly aligned.')
+
         # Defining reward vector from txt's codes
         reward = np.zeros(len(cue_onset))
         reward[code_events == 0] = 1
@@ -253,14 +258,14 @@ if __name__ == '__main__':
     import os
 
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
     label = 'fneu'
 
     files = []
     for file in os.listdir('/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/'
                            '{0}/{1}/smr'.format(monkey, condition)):
 
-        # file = 'fneu1194.smr'
+        file = 'fneu1378.smr'
         if file.endswith('.smr'):
             fname_in = os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
                                     'lfp_causal/'

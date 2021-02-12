@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from research.get_dirs import get_dirs
 from lfp_causal.IO import read_txt
 
-def reaction_times(fnames, bins=30):
+def reaction_times(fnames, bins=30, bads=None):
 
     rt = []
     for fn in fnames:
@@ -27,7 +27,7 @@ def reaction_times(fnames, bins=30):
     return
 
 
-def movement_duration(fnames, bins=30):
+def movement_duration(fnames, bins=30, bads=None):
 
     md = []
     for fn in fnames:
@@ -60,6 +60,10 @@ if __name__ == '__main__':
     for mk in monkeys:
         for cd in conditions:
             info_dir = directories['inf'].format(mk, cd)
+            rec_info = op.join(directories['ep_cnds'].format(mk, cd),
+                               'files_info.xlsx')
+            epo_dir = directories['epo'].format(mk, cd)
+
             for f in os.listdir(info_dir):
                 if f.endswith('.txt'):
                     fnames_txt.append(op.join(info_dir, f))

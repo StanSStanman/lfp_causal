@@ -117,6 +117,7 @@ def compute_power_superlets(epoch, session, event, freqs,
     sl_pow = parallel_aslt(epoch.get_data().squeeze(), epoch.info['sfreq'],
                            freqs, n_cycles, times,
                            order=[1, 30], mult=True, n_jobs=-1)
+    sl_pow = sl_pow.rename(session)
     tmin, tmax = sl_pow.times[0] + cut, sl_pow.times[-1] - cut
     sl_pow = sl_pow.loc[dict(times=slice(tmin, tmax))]
     print('Done.\n')
@@ -301,7 +302,7 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
         data = (data - b.mean(2, keepdims=True).mean(0, keepdims=True)) / \
             b.std(2, keepdims=True).mean(0, keepdims=True)
 
-    elif norm == 'fbline_realchange':
+    elif norm == 'fbline_relchange':
         data = (data - b.mean(2, keepdims=True)) / b.mean(2, keepdims=True)
 
     power = xr.DataArray(data, coords=[trials, freqs, times],
@@ -314,7 +315,7 @@ if __name__ == '__main__':
 
     monkey = 'freddie'
     condition = 'easy'
-    event = 'cue_on'
+    event = 'trig_off'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -336,7 +337,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            # file = '0906'
+            # file = '0963'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))
@@ -344,10 +345,10 @@ if __name__ == '__main__':
                     # compute_power_morlet(fname_epo, file, event,
                     #                      freqs=(5, 120), crop=(-.75, .15))
 
-                    # compute_power_superlets(fname_epo, file, event,
-                    #                         freqs=np.linspace(8, 120, 80),
-                    #                         n_cycles=None,
-                    #                         crop=(-2, 1.5))
+                    compute_power_superlets(fname_epo, file, event,
+                                            freqs=np.linspace(8, 120, 80),
+                                            n_cycles=None,
+                                            crop=(-1.8, 1.5))
                     # compute_power_superlets(fname_epo, file, event,
                     #                         freqs=np.linspace(8, 120, 80),
                     #                         n_cycles=None,
@@ -355,6 +356,6 @@ if __name__ == '__main__':
 
 
                     # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-2, 1.5))
-                    compute_power_multitaper(fname_epo, file, event,
-                                            crop=(-.75, .15))
+                    #                         crop=(-1.8, 1.45))
+                    # compute_power_multitaper(fname_epo, file, event,
+                    #                         crop=(-.75, .15))

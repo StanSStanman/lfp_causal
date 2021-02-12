@@ -28,6 +28,7 @@ def plot_avg_stat_res(stats_dir, regressors, treshold=0.05):
         fig, ax = plt.subplots(1, 1)
         fig.suptitle(r)
         for m, p, l, i in zip(mi_data, pv_data, labels, range(len(labels))):
+            m = np.convolve(m, np.hanning(50), mode='same')
             _p = m.copy()
             _p[p > treshold] = np.nan
             ax.plot(times, m, label=l, color='C%i' % i, linestyle='--')
@@ -77,12 +78,12 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_off'
-    norm = 'fbline_tt_zs'
+    norm = 'fbline_realchange'
 
     stats_dir = op.join('/media/jerry/TOSHIBA EXT/data/stats/lfp_causal/',
-                        monkey, condition, event, norm, '{0}_{1}_sl')
+                        monkey, condition, event, norm, '{0}_{1}_mt')
     fig_dir = op.join('/media/jerry/TOSHIBA EXT/data/plots',
                       monkey, condition, event, norm)
 

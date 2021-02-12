@@ -56,7 +56,8 @@ def read_bad_epochs(monkey, condition, session):
 
 def read_sector(fname, sector):
     xls = pd.read_excel(fname, dtype={'file': str, 'sector': str})
-    sect_fid = xls[['file', 'sector']][xls['sector'] == sector]
+    sect_fid = xls[['file', 'sector', 'quality', 'neuron_type']]  \
+    [xls['sector'] == sector]
     # sect_fid = sect_fid.astype(str)
 
     return sect_fid
