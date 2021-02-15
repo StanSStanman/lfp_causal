@@ -314,7 +314,7 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 if __name__ == '__main__':
 
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
@@ -337,7 +337,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            # file = '0963'
+            file = '1701'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))
@@ -348,14 +348,14 @@ if __name__ == '__main__':
                     compute_power_superlets(fname_epo, file, event,
                                             freqs=np.linspace(8, 120, 80),
                                             n_cycles=None,
-                                            crop=(-1.8, 1.5))
+                                            crop=(-1.8, 1.45))
                     # compute_power_superlets(fname_epo, file, event,
                     #                         freqs=np.linspace(8, 120, 80),
                     #                         n_cycles=None,
                     #                         crop=(-.75, .15))
 
 
-                    # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-1.8, 1.45))
+                    compute_power_multitaper(fname_epo, file, event,
+                                            crop=(-1.8, 1.45))
                     # compute_power_multitaper(fname_epo, file, event,
                     #                         crop=(-.75, .15))

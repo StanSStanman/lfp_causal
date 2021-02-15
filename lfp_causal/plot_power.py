@@ -82,11 +82,12 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
         # data = data.isel(freqs=np.arange(0, len(data.freqs), 4))
         # plt.pcolormesh(data.mean('freqs'), vmin=np.percentile(data, 5),
         #                vmax=np.percentile(data, 95))
-        # ff = 1
-        # plt.pcolormesh(data[:, ff, :])#, vmin=np.percentile(data[:, ff, :], 5),
-        #                # vmax=np.percentile(data[:, ff, :], 95))
-        # plt.colorbar()
-        # plt.show()
+        # for ff in range(data.shape[1]):
+        #     plt.pcolormesh(data[:, ff, :])#, vmin=np.percentile(data[:, ff, :], 5),
+        #                    # vmax=np.percentile(data[:, ff, :], 95))
+        #     plt.colorbar()
+        #     plt.show()
+        # plt.close()
         for _iu, _u in enumerate(uni):
             _idx = np.where(br == _u)
             b_data[_iu].append(data[_idx])
@@ -141,13 +142,13 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
     norm = 'fbline_relchange'
     file = 'trig_off_pow_8_120_mt.nc'
     bline = 'cue_on_pow_8_120_mt.nc'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
-    # sectors = ['motor striatum']
+    # sectors = ['associative striatum']
 
     dirs = get_dirs('local', 'lfp_causal')
     directory = dirs['pow'].format(monkey, condition)
@@ -164,13 +165,11 @@ if __name__ == '__main__':
     #             ['0814', '0831', '0850', '0866', '0923', '0941', '1135',
     #              '1138', '1234', '1235', '1248', '1299', '1302', '1397',
     #              '1398', '1514', '1699', '1283']
-    # acc_files = ['0945',
-    #              '0948',
-    #              '0951',
-    #              '0956']
-    rej_files = ['1204', '1217', '1231',
+    acc_files = ['0947', '0949', '0952']
+    rej_files = ['1204', '1217', '1231', '0944',
                  '0845', '0847', '0939', '0946', '0963', '1036', '1231',
-                 '1233', '1234', '1514', '1699']
+                 '1233', '1234', '1514', '1699',
+                 ]
 
     for sect in sectors:
         fid = read_sector(rec_info, sect)
