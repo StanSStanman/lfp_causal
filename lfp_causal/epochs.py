@@ -221,7 +221,7 @@ if __name__ == '__main__':
 
     monkey = 'freddie'
     condition = 'hard'
-    event = 'trig_off'
+    event = 'trig_on'
 
     raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
               'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
@@ -245,14 +245,19 @@ if __name__ == '__main__':
 
             bad_ch = auto_drop_chans(rec_info, session)
             print(bad_ch)
-
+            ## CUE ONSET
             # epo = create_epochs(fname_raw, fname_eve,
             #                     event, -.8, .3,
             #                     None, fname_epo,
             #                     ch_drop=bad_ch)
-
+            ## TRIGGER OFFSET
+            # epo = create_epochs(fname_raw, fname_eve,
+            #                     event, -1.8, 1.5,
+            #                     None, fname_epo,
+            #                     ch_drop=bad_ch)
+            ## TRIGGER ONSET
             epo = create_epochs(fname_raw, fname_eve,
-                                event, -1.8, 1.5,
+                                event, -1.7, 2.,
                                 None, fname_epo,
                                 ch_drop=bad_ch)
 
@@ -277,7 +282,7 @@ if __name__ == '__main__':
     # monkey = 'freddie'
     # condition = 'hard'
     # event1 = 'trig_off'
-    # event2 = 'cue_on'
+    # event2 = 'trig_on'
     #
     # raw_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
     #           'lfp_causal/{0}/{1}/raw'.format(monkey, condition)
@@ -285,7 +290,7 @@ if __name__ == '__main__':
     #           'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
     # files = []
     # for file in os.listdir(raw_dir):
-    #     # file = '0975_raw.fif'
+    #     file = '0949_raw.fif'
     #     if file.endswith('.fif'):
     #         session = file.replace('_raw.fif', '')
     #         fname_epo1 = os.path.join(epo_dir,

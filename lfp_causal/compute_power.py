@@ -315,7 +315,7 @@ if __name__ == '__main__':
 
     monkey = 'freddie'
     condition = 'hard'
-    event = 'trig_off'
+    event = 'trig_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -337,7 +337,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            file = '1701'
+            # file = '0949'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))
@@ -345,17 +345,28 @@ if __name__ == '__main__':
                     # compute_power_morlet(fname_epo, file, event,
                     #                      freqs=(5, 120), crop=(-.75, .15))
 
-                    compute_power_superlets(fname_epo, file, event,
-                                            freqs=np.linspace(8, 120, 80),
-                                            n_cycles=None,
-                                            crop=(-1.8, 1.45))
+                    ## TRIGGER OFFSET
+                    # compute_power_superlets(fname_epo, file, event,
+                    #                         freqs=np.linspace(8, 120, 80),
+                    #                         n_cycles=None,
+                    #                         crop=(-1.8, 1.45))
+                    ## CUE ONSET
                     # compute_power_superlets(fname_epo, file, event,
                     #                         freqs=np.linspace(8, 120, 80),
                     #                         n_cycles=None,
                     #                         crop=(-.75, .15))
+                    ## TRIGGER ONSET
+                    # compute_power_superlets(fname_epo, file, event,
+                    #                         freqs=np.linspace(8, 120, 80),
+                    #                         n_cycles=None,
+                    #                         crop=(-1.5, 1.5))
 
-
-                    compute_power_multitaper(fname_epo, file, event,
-                                            crop=(-1.8, 1.45))
+                    ## TRIGGER OFFSET
+                    # compute_power_multitaper(fname_epo, file, event,
+                    #                         crop=(-1.8, 1.45))
+                    ## CUE ONSET
                     # compute_power_multitaper(fname_epo, file, event,
                     #                         crop=(-.75, .15))
+                    ## TRIGGER ONSET
+                    compute_power_multitaper(fname_epo, file, event,
+                                            crop=(-1.7, 1.85))

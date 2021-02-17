@@ -78,7 +78,7 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'hard'
+    condition = '2cond'
     event = 'trig_off'
     norm = 'fbline_relchange'
 
@@ -101,6 +101,7 @@ if __name__ == '__main__':
                   'q_pcorr', 'q_pincorr', 'q_dP',
                   'q_entropy', 'q_rpe', 'q_absrpe',
                   'q_shann_surp', 'q_bayes_surp']
+    regressors = ['q_shann_surp']
 
     # for f in freqs:
     #     # plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)

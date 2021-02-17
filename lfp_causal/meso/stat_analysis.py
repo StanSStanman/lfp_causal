@@ -98,11 +98,12 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'hard'
-    event = 'trig_off'
+    condition = 'easy'
+    event = 'trig_on'
     norm = 'fbline_relchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
-    times = [(-1.5, 1.3)]
+    # times = [(-1.5, 1.3)]
+    times = [(-1.5, 1.7)]
     # freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]

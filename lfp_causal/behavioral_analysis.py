@@ -3,14 +3,17 @@ import os
 import os.path as op
 import matplotlib.pyplot as plt
 from research.get_dirs import get_dirs
-from lfp_causal.IO import read_txt
+from lfp_causal.IO import read_txt, read_session
 
 def reaction_times(fnames, bins=30, bads=None):
 
     rt = []
     for fn in fnames:
         txt_info = read_txt(fn)
+        codes = np.array(txt_info['code'])
+        bad_tr = np.logical_and(codes != '0', codes != '5700')
         react_time = np.array(txt_info['TR']).astype(float)
+        react_time = np.delete(react_time, np.where(bad_tr))
         rt.append(react_time)
     rt = np.concatenate(rt)
     rt = np.delete(rt, np.where(rt == 1000))
@@ -32,11 +35,14 @@ def movement_duration(fnames, bins=30, bads=None):
     md = []
     for fn in fnames:
         txt_info = read_txt(fn)
+        codes = np.array(txt_info['code'])
+        bad_tr = np.logical_and(codes != '0', codes != '5700')
         mov_dur = np.array(txt_info['TM']).astype(float)
-        md.append(mov_dur)
+        mov_dur = np.delete(mov_dur, np.where(bad_tr))
+        md.append(0 - mov_dur)
     md = np.concatenate(md)
-    md = np.delete(md, np.where(md == 0))
-    md = np.delete(md, np.where(md == 1000))
+    # md = np.delete(md, np.where(md == 0))
+    # md = np.delete(md, np.where(md == 1000))
     md /= 1000.
     p05 = np.percentile(md, 5)
     p95 = np.percentile(md, 95)
@@ -55,6 +61,7 @@ if __name__ == '__main__':
 
     monkeys = ['freddie']
     conditions = ['easy', 'hard']
+    # conditions = ['hard']
 
     fnames_txt = []
     for mk in monkeys:
@@ -66,6 +73,17 @@ if __name__ == '__main__':
 
             for f in os.listdir(info_dir):
                 if f.endswith('.txt'):
-                    fnames_txt.append(op.join(info_dir, f))
-    reaction_times(fnames_txt, bins=500)
-    movement_duration(fnames_txt, bins=500)
+                    if mk == 'freddie':
+                        session = f.replace('fneu', '')
+                    elif mk == 'teddy':
+                        session = f.replace('tneu', '')
+                    session = session.replace('.txt', '')
+                    try:
+                        info = read_session(rec_info, session)
+                        if info['quality'].values <= 3:
+                            fnames_txt.append(op.join(info_dir, f))
+                    except:
+                        continue
+
+    reaction_times(fnames_txt, bins=300)
+    movement_duration(fnames_txt, bins=300)

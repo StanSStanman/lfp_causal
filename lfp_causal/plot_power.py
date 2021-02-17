@@ -142,13 +142,13 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = 'hard'
-    event = 'trig_off'
+    condition = 'easy'
+    event = 'trig_on'
     norm = 'fbline_relchange'
-    file = 'trig_off_pow_8_120_mt.nc'
+    file = '{0}_pow_8_120_mt.nc'.format(event)
     bline = 'cue_on_pow_8_120_mt.nc'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
-    # sectors = ['associative striatum']
+    # sectors = ['limbic striatum']
 
     dirs = get_dirs('local', 'lfp_causal')
     directory = dirs['pow'].format(monkey, condition)
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
         # plot_avg_tf(all_files, all_bline)
         plot_pow_cond(all_files, all_conds, 'Reward', log_bads, bad_epo, norm,
-                      (-.51, -.01), all_bline, c_type='d', bins=2, diff=True,
+                      (-.52, -.02), all_bline, c_type='d', bins=2, diff=True,
                       plot='linear')
 
         # mu.stop()
