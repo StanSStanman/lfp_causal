@@ -98,7 +98,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_on'
     norm = 'fbline_relchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
