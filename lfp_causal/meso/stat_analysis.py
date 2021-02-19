@@ -98,7 +98,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_on'
     norm = 'fbline_relchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
@@ -182,7 +182,7 @@ if __name__ == '__main__':
             continue
         if op.isdir(op.join(power_dir, d)):
             fname_power = op.join(power_dir, d, n_power)
-            fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
+            fname_regr = op.join(regr_dir, '{0}_act.xlsx'.format(d))
             fname_epo = op.join(epo_dir, '{0}_{1}_epo.fif'.format(d, event))
 
             fn_pow_list.append(fname_power)
