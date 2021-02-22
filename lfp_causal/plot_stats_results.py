@@ -78,7 +78,7 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
 
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = '2cond'
+    condition = 'easy'
     event = 'trig_on'
     norm = 'fbline_relchange'
 
