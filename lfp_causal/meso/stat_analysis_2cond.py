@@ -112,7 +112,7 @@ if __name__ == '__main__':
                     None, None, None,
                     None, None, None,
                     None, None]
-    conditionals = ['Condition' for r in regressors]
+    # conditionals = ['Condition' for r in regressors]
 
     mi_type = ['cd', 'cd',
                'cd', 'cd', 'cd', 'cd',
@@ -125,7 +125,7 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc', 'cc',
                'cc', 'cc']
-    mi_type = ['ccd' for r in regressors]
+    # mi_type = ['ccd' for r in regressors]
 
     # regressors = ['Correct']
     # conditionals = [None]
@@ -157,7 +157,7 @@ if __name__ == '__main__':
                     continue
                 if op.isdir(op.join(power_dir, d)):
                     fname_power = op.join(power_dir, d, n_power)
-                    fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
+                    fname_regr = op.join(regr_dir, '{0}_act.xlsx'.format(d))
                     fname_epo = op.join(epo_dir,
                                         '{0}_{1}_epo.fif'.format(d, event))
 
@@ -184,7 +184,7 @@ if __name__ == '__main__':
                                           norm)
 
         mk = 'freddie'
-        cd = '2cond'
+        cd = '2cond_nc'
 
         if avg_frq:
             save_dir = op.join(dirs['st_prj'], mk, cd, event, norm,
