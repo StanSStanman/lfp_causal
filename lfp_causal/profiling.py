@@ -95,8 +95,9 @@ if __name__ == '__main__':
     import os.path as op
     import json
 
-    mu = RepeatedTimer(0.1, memory_usage)
-    cu = RepeatedTimer(0.1, cpu_usage)
+    dt = 0.5
+    mu = RepeatedTimer(dt, memory_usage)
+    cu = RepeatedTimer(dt, cpu_usage)
 
     for i in np.arange(0, 501, 10):
         arr = np.random.uniform(-10., 10., (i, i, i))
@@ -109,27 +110,25 @@ if __name__ == '__main__':
     md = memory_usage().copy()
     cd = cpu_usage().copy()
 
-    t = np.array(range(len(md['perc']))) / (1 / 0.1)
-
+    mt = np.array(range(len(md['perc']))) / (1 / dt)
     mfig, (max1, max2) = plt.subplots(1, 2)
-    ml1, = max1.plot(t, np.array(md['used']) / (1024 ** 2), label='used RAM (MB)')
-    ml1, = max1.plot(t, np.array(md['free']) / (1024 ** 2), label='free RAM (MB)')
+    ml1, = max1.plot(mt, np.array(md['used']) / (1024 ** 2), label='used RAM (MB)')
+    ml1, = max1.plot(mt, np.array(md['free']) / (1024 ** 2), label='free RAM (MB)')
     max1.legend()
-    ml2, = max2.plot(t, np.array(md['perc']), label='percentage of used RAM')
+    ml2, = max2.plot(mt, np.array(md['perc']), label='percentage of used RAM')
     max2.legend()
     plt.show()
 
+    ct = np.array(range(len(cd['mean']))) / (1 / dt)
     cfig, (cax1, cax2) = plt.subplots(1, 2)
-    cl1, = cax1.plot(t, np.array(cd['mean']), label='mean CPU usage')
+    cl1, = cax1.plot(ct, np.array(cd['mean']), label='mean CPU usage')
     cax1.legend()
     for k in cd.keys():
         if k.startswith('CPU'):
-            cl2, = cax2.plot(t, np.array(cd[k]), label=k)
+            cl2, = cax2.plot(ct, np.array(cd[k]), label=k)
     cax2.legend()
     plt.show()
 
-
-    print('ciao')
     # ftm = time.strftime('%d%m%y%H%M%S', time.localtime())
     # running = 'fts0_fr_ea'
     # m_out_dir = op.join('/home', 'rbasanisi', 'profiling', 'memory', running)
