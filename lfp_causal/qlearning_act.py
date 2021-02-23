@@ -65,7 +65,7 @@ def fit_qlearning(states, actions, rewards, uniq_s, uniq_a):
     #         best_regs = regs
 
     from joblib import Parallel, delayed
-    regs = Parallel(n_jobs=-1, verbose=0) \
+    regs = Parallel(n_jobs=-1, verbose=1) \
         (delayed(qlearning)(states, actions, rewards, uniq_s, uniq_a, a, b, q)
          for a, b, q in product(alpha, beta, q0))
 
@@ -129,6 +129,9 @@ def qlearning(s, a, r, uni_s, uni_a, alpha=0.5, beta=1.0, q0=0.5):
 
     # Init Q-values
     Q = q0 * np.ones(shape=(n_s, n_a))
+
+    # Add the to values
+    P = softmax(Q, 1 / beta, ax=1)
 
     for i in range(n_t):
 
