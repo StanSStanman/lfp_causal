@@ -46,7 +46,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
             'learn_5t', 'learn_2t', 'early_late_cons',
             'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
             'dP', 'log_dP', 'delta_dP',
-            'surprise', 'surprise_bayes', 'rpe',
+            'surprise', 'surprise_bayes', 'act_surp_bayes', 'rpe',
             'q_pcorr', 'q_pincorr', 'q_dP',
             'q_entropy', 'q_rpe', 'q_absrpe',
             'q_shann_surp', 'q_bayes_surp']
@@ -119,6 +119,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
 
     # Bayesian surprise
     data['surprise_bayes'] = beh_bayes_surprise(data['#R'], data['#nR'])
+    data['act_surp_bayes'] = beh_bayes_surp_act(actions, data['Reward'])
 
     data['rpe'] = np.diff(np.r_[0.5, data['P(R|C)']])
 
@@ -221,6 +222,21 @@ def learning_phases(correct_actions, nt=[5]):
 
 
 def prob_rew_act(actions, rewards):
+    """Action dependent probability
+
+    Parameters
+    ----------
+    actions : array_like
+        Array of the actions
+    rewards : array_like
+        Array of the reward
+
+    Returns
+    -------
+    probs : array_like
+        Array of the probability of receive a reward given an action
+
+    """
     unique, indices = np.unique(actions, return_inverse=True)
     probs = np.zeros_like(rewards, dtype=float)
     for i, u in enumerate(unique):
@@ -366,6 +382,26 @@ def beh_bayes_surprise(n_win, n_lose):
     return surprise
 
 
+def beh_bayes_surp_act(actions, rewards):
+    unique, indices = np.unique(actions, return_inverse=True)
+    act_kl_dist = np.zeros_like(rewards, dtype=float)
+    for i, u in enumerate(unique):
+        is_r = rewards[actions == u]
+        is_nr = 1 - is_r
+        _r, _nr = bincumsum(is_r), bincumsum(is_nr)
+        klds = np.zeros_like(_r, dtype=float)
+        for ti, (tr, tnr) in enumerate(zip(_r, _nr)):
+            if ti == 0:
+                _prior = (1.1, 1.1)
+            else:
+                _prior = (_r[ti - 1], _nr[ti - 1])
+            prior = pdf(*_prior)
+            posterior = pdf(tr, tnr)
+            klds[ti] = stats.entropy(prior, posterior, base=10)
+        act_kl_dist[indices == i] = klds
+    return act_kl_dist
+
+
 def pdf(a, b, n_pts=1000):
     """Generate a beta distribution from float two inputs.
 
@@ -393,20 +429,22 @@ def pdf(a, b, n_pts=1000):
 
 
 if __name__ == '__main__':
+    from lfp_causal import MCH, PRJ
+    from research.get_dirs import get_dirs
+    dirs = get_dirs(MCH, PRJ)
+
     monkey = 'freddie'
-    condition = 'hard'
+    condition = 'easy'
 
     print('Calculating regressors for %s, %s' % (monkey, condition))
 
-    csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
-              '{0}/{1}/t_events'.format(monkey, condition)
+    csv_dir = dirs['tev'].format(monkey, condition)
 
     for file in os.listdir(csv_dir):
-        # file = '0814.csv'
+        # file = '0816.csv'
         if file.endswith('.csv'):
             session = file.replace('.csv', '')
-            beh_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \
-                      'lfp_causal/{0}/{1}/regressors'.format(monkey, condition)
+            beh_dir = dirs['reg'].format(monkey, condition)
             os.makedirs(beh_dir, exist_ok=True)
             fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
             print('Processing session %s' % session)

@@ -34,22 +34,38 @@ def fit_qlearning(states, actions, rewards, uniq_s, uniq_a):
     # Prior on Q values
     q0 = [0.33, 0.5]
 
-    # Grid search
-    for a, b, q in product(alpha, beta, q0):
-        # Run Q-learning
-        regs = qlearning(states, actions, rewards, uniq_s, uniq_a,
-                         alpha=a, beta=b, q0=q)
+    # # Grid search
+    # for a, b, q in product(alpha, beta, q0):
+    #     # Run Q-learning
+    #     regs = qlearning(states, actions, rewards, uniq_s, uniq_a,
+    #                      alpha=a, beta=b, q0=q)
+    #
+    #     # Store maximum log-likelohood
+    #     if regs['log_likelihood'] > log_likelihood:
+    #         # Add fields
+    #         regs['alpha_fit'] = a
+    #         regs['beta_fit'] = b
+    #         regs['q0_fit'] = q
+    #         # Update Log-Likelihood
+    #         log_likelihood = regs['log_likelihood']
+    #         # Output best fitting regressors
+    #         best_regs = regs
 
-        # Store maximum log-likelohood
-        if regs['log_likelihood'] > log_likelihood:
+    from joblib import Parallel, delayed
+    regs = Parallel(n_jobs=-1, verbose=1) \
+        (delayed(qlearning)(states, actions, rewards, uniq_s, uniq_a, a, b, q)
+         for a, b, q in product(alpha, beta, q0))
+
+    for _rg in regs:
+        if _rg['log_likelihood'] > log_likelihood:
             # Add fields
-            regs['alpha_fit'] = a
-            regs['beta_fit'] = b
-            regs['q0_fit'] = q
+            # _rg['alpha_fit'] = a
+            # _rg['beta_fit'] = b
+            # _rg['q0_fit'] = q
             # Update Log-Likelihood
-            log_likelihood = regs['log_likelihood']
+            log_likelihood = _rg['log_likelihood']
             # Output best fitting regressors
-            best_regs = regs
+            best_regs = _rg
 
     print('Model fitted at', best_regs['log_likelihood'])
 
