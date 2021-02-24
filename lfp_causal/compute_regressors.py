@@ -20,10 +20,14 @@ def get_outcomes(fname):
 
 
 def get_behaviour(monkey, condition, session, save_as=None):
-    fname_csv = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
-                '{0}/{1}/t_events/{2}.csv'.format(monkey, condition, session)
-    fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-                 '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    # fname_csv = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
+    #             '{0}/{1}/t_events/{2}.csv'.format(monkey, condition, session)
+    # fname_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #              '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    fname_csv = op.join(dirs['tev'], '{2}.csv').format(monkey, condition,
+                                                       session)
+    fname_info = op.join(dirs['ep_cnds'], 'files_info.xlsx').format(monkey,
+                                                                    condition)
 
     actions = get_actions(fname_csv)
     outcomes = get_outcomes(fname_csv)
