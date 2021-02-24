@@ -438,7 +438,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'freddie'
-    condition = 'easy'
+    condition = 'hard'
 
     print('Calculating regressors for %s, %s' % (monkey, condition))
 
