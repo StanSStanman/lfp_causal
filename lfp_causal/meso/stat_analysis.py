@@ -112,7 +112,7 @@ if __name__ == '__main__':
     avg_frq = True
     t_resample = None #1400
     f_resample = None #80
-    overwrite = False
+    overwrite = True
 
     for condition in conditions: # Try to compute multiple conditions
 
@@ -221,26 +221,16 @@ if __name__ == '__main__':
                 save_dir = op.join(dirs['st_prj'], monkey, condition, event,
                                    norm, '{0}_{1}_tf_mt'.format(f[0], f[1]))
 
-            if overwrite:
-                os.makedirs(save_dir, exist_ok=True)
+            os.makedirs(save_dir, exist_ok=True)
+            fname_mi = op.join(save_dir, 'mi_results.nc'.format(f[0], f[1]))
+            fname_pv = op.join(save_dir, 'pv_results.nc'.format(f[0], f[1]))
 
-                ds_mi.to_netcdf(op.join(save_dir,
-                                        'mi_results.nc'.format(f[0], f[1])))
-                ds_pv.to_netcdf(op.join(save_dir,
-                                        'pv_results.nc'.format(f[0], f[1])))
-
-            elif not overwrite:
-                fname_mi = op.join(save_dir,
-                                   'mi_results.nc'.format(f[0], f[1]))
-                fname_pv = op.join(save_dir,
-                                   'pv_results.nc'.format(f[0], f[1]))
-
+            if not overwrite and op.exists(fname_mi):
                 mi = xr.load_dataset(fname_mi)
                 pv = xr.load_dataset(fname_pv)
 
-                for k in ds_mi.keys():
-                    mi[k] = ds_mi[k]
-                    pv[k] = ds_pv[k]
+                ds_mi = xr.merge([mi, ds_mi])
+                ds_pv = xr.merge([pv, ds_pv])
 
-                mi.to_netcdf(fname_mi)
-                pv.to_netcdf(fname_pv)
+            ds_mi.to_netcdf(fname_mi)
+            ds_pv.to_netcdf(fname_pv)
