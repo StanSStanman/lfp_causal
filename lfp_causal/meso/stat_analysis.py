@@ -40,18 +40,20 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     conj_results = {}
     for _r, _c, _mt, _inf in zip(regressor, conditional, mi_type, inference):
         if _mt == 'cc':
-            regr[_r] = [r.astype('float64') for r in regr[_r]]
+            regr[_r] = [r.astype('float32') for r in regr[_r]]
         elif _mt == 'cd':
-            regr[_r] = [r.astype('int64') for r in regr[_r]]
+            regr[_r] = [r.astype('int32') for r in regr[_r]]
         elif _mt == 'ccd':
-            regr[_r] = [r.astype('float64') for r in regr[_r]]
-            cond[_r] = [c.astype('int64') for c in cond[_r]]
+            regr[_r] = [r.astype('float32') for r in regr[_r]]
+            cond[_r] = [c.astype('int32') for c in cond[_r]]
 
         ds_ephy = DatasetEphy(x=power.copy(), y=regr[_r], roi=rois,
                               z=cond[_r], times=times)
 
         wf = WfMi(mi_type=_mt, inference=_inf, kernel=np.hanning(20))
         mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
+        mi['times'] = times
+        pval['times'] = times
 
         if _inf == 'rfx':
             conj_ss, conj = wf.conjunction_analysis(ds_ephy)
@@ -127,7 +129,7 @@ if __name__ == '__main__':
                       'learn_5t', 'learn_2t', 'early_late_cons',
                       'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
                       'dP', 'log_dP', 'delta_dP',
-                      'surprise', 'surprise_bayes', 'rpe',
+                      'surprise', 'surprise_bayes', 'act_surp_bayes', 'rpe',
                       'q_pcorr', 'q_pincorr', 'q_dP',
                       'q_entropy', 'q_rpe', 'q_absrpe',
                       'q_shann_surp', 'q_bayes_surp']
@@ -139,7 +141,7 @@ if __name__ == '__main__':
                         None, None, None,
                         None, None, None, None,
                         None, None, None,
-                        None, None, None,
+                        None, None, None, None,
                         None, None, None,
                         None, None, None,
                         None, None]
@@ -151,14 +153,14 @@ if __name__ == '__main__':
                    'cd', 'cd', 'cd',
                    'cc', 'cc', 'cc', 'cc',
                    'cc', 'cc', 'cc',
-                   'cc', 'cc', 'cc',
+                   'cc', 'cc', 'cc', 'cc',
                    'cc', 'cc', 'cc',
                    'cc', 'cc', 'cc',
                    'cc', 'cc']
 
-        # regressors = ['Correct']
+        # regressors = ['act_surp_bayes']
         # conditionals = [None]
-        # mi_type = ['cd']
+        # mi_type = ['cc']
 
         inference = ['ffx' for r in regressors]
 
