@@ -99,7 +99,7 @@ if __name__ == '__main__':
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkeys = ['freddie', 'teddy']
+    monkeys = ['teddy']
     conditions = ['easy', 'hard']
     event = 'trig_off'
     norm = 'fbline_relchange'
@@ -175,8 +175,12 @@ if __name__ == '__main__':
                       '1233', '1234', '1514', '1699',
                       '0940', '0944', '0964', '0967', '0969', '0970', '0971',
                       '0977', '0985', '1280']
-        rej_files += ['0415', '0449', '0450',
-                      '0416']
+        rej_files += ['0210', '0226', '0227', '0230', '0362', '0365', '0393',
+                      '0415', '0447', '0449', '0450', '0456', '0541', '0573',
+                      '0622', '0628', '0643', '0653', '0660', '0706', '0713',
+                      '0726', '0732',
+                      '0296', '0363', '0416', '0438', '0448', '0521', '0705',
+                      '0707', '0712', '0731' ]
         # files = ['0832', '0822', '1043', '1191']
         # for d in files:
         for monkey in monkeys:
@@ -218,8 +222,8 @@ if __name__ == '__main__':
                                               t_resample, f_resample,
                                               norm)
             ##################
-            if len(monkeys) > 1:
-                monkey = 'freted'
+            # if len(monkeys) > 1:
+            #     monkey = 'freted'
             ##################
 
             if avg_frq:
