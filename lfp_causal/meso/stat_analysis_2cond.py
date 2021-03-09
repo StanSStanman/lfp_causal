@@ -77,17 +77,18 @@ if __name__ == '__main__':
 
     monkeys = ['freddie']
     conditions = ['easy', 'hard']
-    event = 'trig_on'
+    event = 'trig_off'
     norm = 'fbline_relchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
-    # times = [(-1.5, 1.3)]
-    times = [(-1.5, 1.7)]
+    times = [(-1.5, 1.3)]
+    # times = [(-1.5, 1.7)]
     # freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
     avg_frq = True
     t_resample = None #1400
     f_resample = None #80
+    overwrite = False
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -112,7 +113,7 @@ if __name__ == '__main__':
                     None, None, None,
                     None, None, None,
                     None, None]
-    conditionals = ['Condition' for r in regressors]
+    # conditionals = ['Condition' for r in regressors]
 
     mi_type = ['cd', 'cd',
                'cd', 'cd', 'cd', 'cd',
@@ -125,11 +126,11 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc', 'cc',
                'cc', 'cc']
-    mi_type = ['ccd' for r in regressors]
+    # mi_type = ['ccd' for r in regressors]
 
-    # regressors = ['Correct']
-    # conditionals = [None]
-    # mi_type = ['cd']
+    regressors = ['act_surp_bayes']
+    conditionals = [None]
+    mi_type = ['cc']
 
     inference = ['ffx' for r in regressors]
 
@@ -157,7 +158,7 @@ if __name__ == '__main__':
                     continue
                 if op.isdir(op.join(power_dir, d)):
                     fname_power = op.join(power_dir, d, n_power)
-                    fname_regr = op.join(regr_dir, '{0}_act.xlsx'.format(d))
+                    fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
                     fname_epo = op.join(epo_dir,
                                         '{0}_{1}_epo.fif'.format(d, event))
 
@@ -184,7 +185,7 @@ if __name__ == '__main__':
                                           norm)
 
         mk = 'freddie'
-        cd = '2cond'
+        cd = '2cond_nc'
 
         if avg_frq:
             save_dir = op.join(dirs['st_prj'], mk, cd, event, norm,
@@ -195,8 +196,18 @@ if __name__ == '__main__':
                                '{0}_{1}_tf_mt'.format(f[0], f[1]))
 
         os.makedirs(save_dir, exist_ok=True)
+        fname_mi = op.join(save_dir, 'mi_results.nc'.format(f[0], f[1]))
+        fname_pv = op.join(save_dir, 'pv_results.nc'.format(f[0], f[1]))
 
-        ds_mi.to_netcdf(op.join(save_dir,
-                                'mi_results.nc'.format(f[0], f[1])))
-        ds_pv.to_netcdf(op.join(save_dir,
-                                'pv_results.nc'.format(f[0], f[1])))
+        if not overwrite and op.exists(fname_mi):
+            mi = xr.load_dataset(fname_mi)
+            pv = xr.load_dataset(fname_pv)
+
+            ds_mi['times'] = mi['times']
+            ds_pv['times'] = pv['times']
+
+            ds_mi = xr.merge([mi, ds_mi])
+            ds_pv = xr.merge([pv, ds_pv])
+
+        ds_mi.to_netcdf(fname_mi)
+        ds_pv.to_netcdf(fname_pv)

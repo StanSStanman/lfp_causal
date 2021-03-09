@@ -115,18 +115,20 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     conj_results = {}
     for _r, _mt, _inf in zip(regr, mi_type, inference):
         if _mt == 'cc':
-            regr[_r] = [r.astype('float64') for r in regr[_r]]
+            regr[_r] = [r.astype('float32') for r in regr[_r]]
         elif _mt == 'cd':
-            regr[_r] = [r.astype('int64') for r in regr[_r]]
+            regr[_r] = [r.astype('int32') for r in regr[_r]]
         elif _mt == 'ccd':
-            regr[_r] = [r.astype('float64') for r in regr[_r]]
-            cond[_r] = [c.astype('int64') for c in cond[_r]]
+            regr[_r] = [r.astype('float32') for r in regr[_r]]
+            cond[_r] = [c.astype('int32') for c in cond[_r]]
 
         ds_ephy = DatasetEphy(x=power.copy(), y=regr[_r], roi=rois,
                               z=None, times=times)
 
         wf = WfMi(mi_type=_mt, inference=_inf, kernel=np.hanning(20))
         mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
+        mi['times'] = times
+        pval['times'] = times
 
         if _inf == 'rfx':
             conj_ss, conj = wf.conjunction_analysis(ds_ephy)
@@ -157,7 +159,7 @@ if __name__ == '__main__':
 
     monkeys = ['freddie']
     conditions = ['easy', 'hard']
-    event = 'trig_off'
+    event = 'trig_on'
     norm = 'fbline_relchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
     times = [(-1.5, 1.3)]

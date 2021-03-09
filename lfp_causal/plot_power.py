@@ -21,8 +21,8 @@ def plot_avg_tf(powers, blines=None):
         if isinstance(b, (int, float)):
             pow = normalize_power(pow, 'relchange', (-1.8, -1.3))
         elif isinstance(b, str):
-            pow = normalize_power(pow, 'fbline_tt_zs', (-.51, -.01), file=b)
-        pow = pow.loc[dict(times=slice(-.15, .8))]
+            pow = normalize_power(pow, 'fbline_relchange', (-.51, -.01), file=b)
+        pow = pow.loc[dict(times=slice(-1., 1.5))]
         # pow = pow.loc[dict(freqs=slice(70, 120))]
         pow = pow.to_array().squeeze().mean('trials')
 
@@ -31,8 +31,9 @@ def plot_avg_tf(powers, blines=None):
         else:
             avg_pow = (avg_pow + pow) / 2
 
-    avg_pow.plot(cmap='viridis')
-    # fig, ax = plt.subplots(1, 1)
+    # avg_pow.plot(cmap='viridis')
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(avg_pow.times, avg_pow.T)
     # cm = ax.pcolormesh(avg_pow.times, avg_pow.freqs, avg_pow)
     # plt.colorbar(cm)
     plt.show()
@@ -82,6 +83,8 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
         # data = data.isel(freqs=np.arange(0, len(data.freqs), 4))
         # plt.pcolormesh(data.mean('freqs'), vmin=np.percentile(data, 5),
         #                vmax=np.percentile(data, 95))
+        # plt.colorbar()
+        # plt.show()
         # for ff in range(data.shape[1]):
         #     plt.pcolormesh(data[:, ff, :])#, vmin=np.percentile(data[:, ff, :], 5),
         #                    # vmax=np.percentile(data[:, ff, :], 95))
@@ -97,9 +100,9 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
     n_axs = len(b_data)
 
     if diff is True:
-        fig, axs = plt.subplots(1, n_axs + 1)
+        fig, axs = plt.subplots(1, n_axs + 1, figsize=(20, 5))
     else:
-        fig, axs = plt.subplots(1, n_axs)
+        fig, axs = plt.subplots(1, n_axs, figsize=(20, 5))
 
     if plot == 'linear':
         for ax in range(n_axs):
@@ -141,8 +144,8 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
 
 
 if __name__ == '__main__':
-    monkey = 'freddie'
-    condition = 'easy'
+    monkey = 'teddy'
+    condition = 'hard'
     event = 'trig_off'
     norm = 'fbline_relchange'
     file = '{0}_pow_8_120_mt.nc'.format(event)
@@ -166,10 +169,15 @@ if __name__ == '__main__':
     #              '1138', '1234', '1235', '1248', '1299', '1302', '1397',
     #              '1398', '1514', '1699', '1283']
     acc_files = ['0947', '0949', '0952']
-    rej_files = ['1204', '1217', '1231', '0944',
+    ## FREDDIE
+    rej_files = ['1204', '1217', '1231', '0944', # Bad sessions
                  '0845', '0847', '0939', '0946', '0963', '1036', '1231',
                  '1233', '1234', '1514', '1699',
-                 ]
+                 '0940', '0944', '0964', '0967', '0969', '0970', '0971',
+                 '0977', '0985', '1280']
+    ## TEDDY
+    rej_files = ['0415', '0449', '0450',
+                 '0416']
 
     for sect in sectors:
         fid = read_sector(rec_info, sect)

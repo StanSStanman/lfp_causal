@@ -313,9 +313,9 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 
 if __name__ == '__main__':
 
-    monkey = 'freddie'
-    condition = 'hard'
-    event = 'trig_on'
+    monkey = 'teddy'
+    condition = 'easy'
+    event = 'cue_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -337,7 +337,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            # file = '0949'
+            file = '0591'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))
@@ -365,8 +365,8 @@ if __name__ == '__main__':
                     # compute_power_multitaper(fname_epo, file, event,
                     #                         crop=(-1.8, 1.45))
                     ## CUE ONSET
-                    # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-.75, .15))
-                    ## TRIGGER ONSET
                     compute_power_multitaper(fname_epo, file, event,
-                                            crop=(-1.7, 1.85))
+                                            crop=(-.75, .15))
+                    ## TRIGGER ONSET
+                    # compute_power_multitaper(fname_epo, file, event,
+                    #                         crop=(-1.7, 1.85))

@@ -39,7 +39,7 @@ def movement_duration(fnames, bins=30, bads=None):
         bad_tr = np.logical_and(codes != '0', codes != '5700')
         mov_dur = np.array(txt_info['TM']).astype(float)
         mov_dur = np.delete(mov_dur, np.where(bad_tr))
-        md.append(0 - mov_dur)
+        md.append(mov_dur)
     md = np.concatenate(md)
     # md = np.delete(md, np.where(md == 0))
     # md = np.delete(md, np.where(md == 1000))
@@ -63,6 +63,12 @@ if __name__ == '__main__':
     conditions = ['easy', 'hard']
     # conditions = ['hard']
 
+    rej_files = ['1204', '1217', '1231', '0944',  # Bad sessions
+                 '0845', '0847', '0939', '0946', '0963', '1036', '1231',
+                 '1233', '1234', '1514', '1699',
+                 '0940', '0944', '0964', '0967', '0969', '0970', '0971',
+                 '0977', '0985', '1280']
+
     fnames_txt = []
     for mk in monkeys:
         for cd in conditions:
@@ -80,7 +86,8 @@ if __name__ == '__main__':
                     session = session.replace('.txt', '')
                     try:
                         info = read_session(rec_info, session)
-                        if info['quality'].values <= 3:
+                        if info['quality'].values <= 3 and \
+                                session not in rej_files:
                             fnames_txt.append(op.join(info_dir, f))
                     except:
                         continue

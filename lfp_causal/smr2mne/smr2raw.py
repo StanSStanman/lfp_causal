@@ -66,7 +66,7 @@ def smr_to_raw(fname):
 if __name__ == '__main__':
     import os
 
-    monkey = 'freddie'
+    monkey = 'teddy'
     condition = 'hard'
 
     smr_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \

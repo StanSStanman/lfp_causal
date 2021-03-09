@@ -76,9 +76,61 @@ def plot_tf_stat_res(stats_dir, regressors, treshold=0.05):
     return figures
 
 
+def plot_band_stat_res(stats_dirs, regressors, treshold=0.05):
+    plt.close('all')
+    assert isinstance(stats_dirs, list)
+    assert isinstance(regressors, list), \
+        AssertionError('regressors must be a list of str')
+    print('Directories:', stats_dirs)
+
+    mis = []
+    pvs = []
+    for stats_dir in stats_dirs:
+        mi = xr.open_dataset(op.join(stats_dir, 'mi_results.nc'))
+        pv = xr.open_dataset(op.join(stats_dir, 'pv_results.nc'))
+
+        mi = mi.sortby('roi')
+        pv = pv.sortby('roi')
+
+        mis.append(mi)
+        pvs.append(pv)
+
+    mis = xr.concat(mis, dim='roi')
+    pvs = xr.concat(pvs, dim='roi')
+
+    rois = ['associative striatum', 'limbic striatum', 'motor striatum']
+    fr_names = ['alpha', 'beta', 'gamma', 'hga']
+
+    figures = []
+    for r in regressors:
+        times = mi.times.values
+        # labels = mi.roi.values
+        # mi_data = mi[r].values.T
+        # pv_data = pv[r].values.T
+
+        fig, ax = plt.subplots(1, 3, figsize=(25, 5))
+        fig.suptitle(r)
+        for _ax, _roi in enumerate(rois):
+            mi_data = mis[r].loc[:, _roi].values.T
+            pv_data = pvs[r].loc[:, _roi].values.T
+            for i, (m, p, fn) in enumerate(zip(mi_data, pv_data, fr_names)):
+                m = np.convolve(m, np.hanning(150), mode='same')
+                _p = m.copy()
+                _p[p > treshold] = np.nan
+                ax[_ax].plot(times, m, label=fn, color='C%i' % i,
+                             linestyle='--')
+                ax[_ax].plot(times, _p, color='C%i' % i, linewidth=2.5)
+            ax[_ax].axvline(0, -1, 1, color='k', linestyle='--')
+            ax[_ax].set_title(_roi)
+            ax[_ax].legend()
+        figures.append(fig)
+        plt.show()
+    return figures
+
+
 if __name__ == '__main__':
     monkey = 'freddie'
-    condition = '2cond_nrd'
+    condition = '2cond_nc'
     event = 'trig_off'
     norm = 'fbline_relchange'
 
@@ -97,19 +149,20 @@ if __name__ == '__main__':
                   'learn_5t', 'learn_2t', 'early_late_cons',
                   'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
                   'dP', 'log_dP', 'delta_dP',
-                  'surprise', 'surprise_bayes', 'rpe',
+                  'surprise', 'surprise_bayes', 'act_surp_bayes', 'rpe',
                   'q_pcorr', 'q_pincorr', 'q_dP',
                   'q_entropy', 'q_rpe', 'q_absrpe',
                   'q_shann_surp', 'q_bayes_surp']
-    regressors = ['Reward_0']
+    # regressors = ['act_surp_bayes']
+    # regressors = ['Reward_1']
 
     # for f in freqs:
     #     # plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
     #     plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
 
-    for r in regressors:
-        for f in freqs:
-            figs = plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
+    # for r in regressors:
+    #     for f in freqs:
+    #         figs = plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
             # plot_tf_stat_res(stats_dir.format(f[0], f[1]), [r])
             # figdir = op.join(fig_dir, r.replace('|', '_'))
             # os.makedirs(figdir, exist_ok=True)
@@ -127,3 +180,9 @@ if __name__ == '__main__':
     # freqs = [(5, 120)]
     # for f in freqs:
     #     plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
+
+    for r in regressors:
+        stats_dirs = []
+        for f in freqs:
+            stats_dirs.append(stats_dir.format(f[0], f[1]))
+        plot_band_stat_res(stats_dirs, [r])

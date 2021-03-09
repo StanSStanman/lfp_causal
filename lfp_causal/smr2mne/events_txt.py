@@ -138,15 +138,18 @@ def find_events_txt(fname_in, fname_out, fname_txt):
             t = np.where(np.logical_and(t_off[i] - 3e-3 <= trigger,
                                         trigger <= t_off[i] + 3e-3))
             if trigger[t].size != 0:
-                trigger_offset[i] = trigger[t]
+                trigger_offset[i] = trigger[t].mean()
             else:
                 warnings.warn('Trigger offset value out of matrix')
                 trigger_offset[i] = t_off[i]
 
         test_tr_off = cue_onset + ((cue_length + trig_delay +
                                     react_time + cont_time) / 1000)
-        assert np.all(np.isclose(trigger_offset, test_tr_off, atol=0.001)), \
-            AssertionError('Triggers are not correctly aligned.')
+        if not np.all(np.isclose(trigger_offset, test_tr_off, atol=0.001)):
+            assert np.all(np.isclose((trigger_offset - trigger_onset),
+                                     ((react_time + cont_time) / 1000.),
+                                     atol=0.001)), \
+                AssertionError('Triggers are not correctly aligned.')
 
         # Defining reward vector from txt's codes
         reward = np.zeros(len(cue_onset))
@@ -168,7 +171,7 @@ def find_events_txt(fname_in, fname_out, fname_txt):
                                             movements <= m_on[i] + 1e-3))
                 if movements[m].size != 0:
                     # print(movements[m])
-                    movement_onset[i] = movements[m]
+                    movement_onset[i] = movements[m].mean()
                 elif movements[m].size == 0 and i == len(movement_onset) - 1:
                     warnings.warn('Movement onset value out of matrix')
                     movement_onset[i] = m_on[i]
@@ -257,15 +260,19 @@ def create_event_matrix(csv_fname, raw_fname, eve_dir):
 if __name__ == '__main__':
     import os
 
-    monkey = 'freddie'
-    condition = 'easy'
-    label = 'fneu'
+    monkey = 'teddy'
+    condition = 'hard'
+    label = 'tneu'
+
+    rej = ['tneu0458.smr', 'tneu0460.smr', 'tneu0539.smr']
 
     files = []
     for file in os.listdir('/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/'
                            '{0}/{1}/smr'.format(monkey, condition)):
+        if file in rej:
+            continue
 
-        file = 'fneu1378.smr'
+        # file = 'tneu0622.smr'
         if file.endswith('.smr'):
             fname_in = os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
                                     'lfp_causal/'

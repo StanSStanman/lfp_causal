@@ -99,7 +99,7 @@ if __name__ == '__main__':
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkey = 'freddie'
+    monkeys = ['freddie', 'teddy']
     conditions = ['easy', 'hard']
     event = 'trig_off'
     norm = 'fbline_relchange'
@@ -112,15 +112,9 @@ if __name__ == '__main__':
     avg_frq = True
     t_resample = None #1400
     f_resample = None #80
-    overwrite = True
+    overwrite = False
 
     for condition in conditions: # Try to compute multiple conditions
-
-        epo_dir = dirs['epo'].format(monkey, condition)
-        power_dir = dirs['pow'].format(monkey, condition)
-        regr_dir = dirs['reg'].format(monkey, condition)
-        fname_info = op.join(dirs['ep_cnds'].format(monkey, condition),
-                             'files_info.xlsx')
 
         regressors = ['Correct', 'Reward',
                       'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -158,9 +152,9 @@ if __name__ == '__main__':
                    'cc', 'cc', 'cc',
                    'cc', 'cc']
 
-        # regressors = ['act_surp_bayes']
-        # conditionals = [None]
-        # mi_type = ['cc']
+        regressors = ['act_surp_bayes']
+        conditionals = [None]
+        mi_type = ['cc']
 
         inference = ['ffx' for r in regressors]
 
@@ -175,32 +169,43 @@ if __name__ == '__main__':
         #              '1145', '1515', '1701']
                     # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
                     #  '1142', '1143', '1144']
-        rej_files = ['1204', '1217', '1231', '0944', # Bad sessions
-                     '0845', '0847', '0939', '0946', '0963', '1036', '1231',
-                     '1233', '1234', '1514', '1699',
-                     '0940', '0944', '0964', '0967', '0969', '0970', '0971',
-                     '0977', '0985', '1280']
+        rej_files = []
+        rej_files += ['1204', '1217', '1231', '0944', # Bad sessions
+                      '0845', '0847', '0939', '0946', '0963', '1036', '1231',
+                      '1233', '1234', '1514', '1699',
+                      '0940', '0944', '0964', '0967', '0969', '0970', '0971',
+                      '0977', '0985', '1280']
+        rej_files += ['0415', '0449', '0450',
+                      '0416']
         # files = ['0832', '0822', '1043', '1191']
         # for d in files:
-        for d in os.listdir(power_dir):
-            if d in rej_files:
-                continue
-            if op.isdir(op.join(power_dir, d)):
-                fname_power = op.join(power_dir, d, n_power)
-                fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
-                fname_epo = op.join(epo_dir, '{0}_{1}_epo.fif'.format(d,
-                                                                      event))
+        for monkey in monkeys:
 
-                fn_pow_list.append(fname_power)
-                fn_reg_list.append(fname_regr)
-                rois.append(read_session(fname_info, d)['sector'].values)
+            epo_dir = dirs['epo'].format(monkey, condition)
+            power_dir = dirs['pow'].format(monkey, condition)
+            regr_dir = dirs['reg'].format(monkey, condition)
+            fname_info = op.join(dirs['ep_cnds'].format(monkey, condition),
+                                 'files_info.xlsx')
 
-                lb = get_log_bad_epo(fname_epo)
-                log_bads.append(lb)
+            for d in os.listdir(power_dir):
+                if d in rej_files:
+                    continue
+                if op.isdir(op.join(power_dir, d)):
+                    fname_power = op.join(power_dir, d, n_power)
+                    fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
+                    fname_epo = op.join(epo_dir, '{0}_{1}_epo.fif'.format(d,
+                                                                          event))
 
-                be = get_ch_bad_epo(monkey, condition, d,
-                                    fname_info=fname_info)
-                bad_epo.append(be)
+                    fn_pow_list.append(fname_power)
+                    fn_reg_list.append(fname_regr)
+                    rois.append(read_session(fname_info, d)['sector'].values)
+
+                    lb = get_log_bad_epo(fname_epo)
+                    log_bads.append(lb)
+
+                    be = get_ch_bad_epo(monkey, condition, d,
+                                        fname_info=fname_info)
+                    bad_epo.append(be)
 
         mi_results = {}
         pv_results = {}
@@ -228,6 +233,9 @@ if __name__ == '__main__':
             if not overwrite and op.exists(fname_mi):
                 mi = xr.load_dataset(fname_mi)
                 pv = xr.load_dataset(fname_pv)
+
+                ds_mi['times'] = mi['times']
+                ds_pv['times'] = pv['times']
 
                 ds_mi = xr.merge([mi, ds_mi])
                 ds_pv = xr.merge([pv, ds_pv])
