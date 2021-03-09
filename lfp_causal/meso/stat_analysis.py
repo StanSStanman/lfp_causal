@@ -112,7 +112,7 @@ if __name__ == '__main__':
     avg_frq = True
     t_resample = None #1400
     f_resample = None #80
-    overwrite = False
+    overwrite = True
 
     for condition in conditions: # Try to compute multiple conditions
 
