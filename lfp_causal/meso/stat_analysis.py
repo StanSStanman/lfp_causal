@@ -152,9 +152,9 @@ if __name__ == '__main__':
                    'cc', 'cc', 'cc',
                    'cc', 'cc']
 
-        regressors = ['act_surp_bayes']
-        conditionals = [None]
-        mi_type = ['cc']
+        # regressors = ['act_surp_bayes']
+        # conditionals = [None]
+        # mi_type = ['cc']
 
         inference = ['ffx' for r in regressors]
 
