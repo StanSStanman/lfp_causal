@@ -314,7 +314,7 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 if __name__ == '__main__':
 
     monkey = 'teddy'
-    condition = 'easy'
+    condition = 'hard'
     event = 'cue_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
@@ -337,7 +337,7 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            file = '0591'
+            # file = '0314'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))

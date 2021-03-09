@@ -129,8 +129,8 @@ def plot_band_stat_res(stats_dirs, regressors, treshold=0.05):
 
 
 if __name__ == '__main__':
-    monkey = 'freddie'
-    condition = '2cond_nc'
+    monkey = 'teddy'
+    condition = 'easy'
     event = 'trig_off'
     norm = 'fbline_relchange'
 
@@ -153,16 +153,16 @@ if __name__ == '__main__':
                   'q_pcorr', 'q_pincorr', 'q_dP',
                   'q_entropy', 'q_rpe', 'q_absrpe',
                   'q_shann_surp', 'q_bayes_surp']
-    # regressors = ['act_surp_bayes']
+    regressors = ['q_rpe']
     # regressors = ['Reward_1']
 
     # for f in freqs:
-    #     # plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
-    #     plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
+    #     plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)
+    #     # plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
 
-    # for r in regressors:
-    #     for f in freqs:
-    #         figs = plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
+    for r in regressors:
+        for f in freqs:
+            figs = plot_avg_stat_res(stats_dir.format(f[0], f[1]), [r])
             # plot_tf_stat_res(stats_dir.format(f[0], f[1]), [r])
             # figdir = op.join(fig_dir, r.replace('|', '_'))
             # os.makedirs(figdir, exist_ok=True)
@@ -181,8 +181,8 @@ if __name__ == '__main__':
     # for f in freqs:
     #     plot_tf_stat_res(stats_dir.format(f[0], f[1]), regressors)
 
-    for r in regressors:
-        stats_dirs = []
-        for f in freqs:
-            stats_dirs.append(stats_dir.format(f[0], f[1]))
-        plot_band_stat_res(stats_dirs, [r])
+    # for r in regressors:
+    #     stats_dirs = []
+    #     for f in freqs:
+    #         stats_dirs.append(stats_dir.format(f[0], f[1]))
+    #     plot_band_stat_res(stats_dirs, [r])

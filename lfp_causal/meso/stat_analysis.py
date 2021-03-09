@@ -99,7 +99,7 @@ if __name__ == '__main__':
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkeys = ['teddy']
+    monkeys = ['freddie', 'teddy']
     conditions = ['easy', 'hard']
     event = 'trig_off'
     norm = 'fbline_relchange'
@@ -217,6 +217,10 @@ if __name__ == '__main__':
                                               t, f, avg_frq,
                                               t_resample, f_resample,
                                               norm)
+            ##################
+            if len(monkeys) > 1:
+                monkey = 'freted'
+            ##################
 
             if avg_frq:
                 save_dir = op.join(dirs['st_prj'], monkey, condition, event,
