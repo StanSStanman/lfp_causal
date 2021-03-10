@@ -129,8 +129,8 @@ def plot_band_stat_res(stats_dirs, regressors, treshold=0.05):
 
 
 if __name__ == '__main__':
-    monkey = 'freddie'
-    condition = 'hard'
+    monkey = 'freted'
+    condition = 'easy'
     event = 'trig_off'
     norm = 'fbline_relchange'
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
                   'q_pcorr', 'q_pincorr', 'q_dP',
                   'q_entropy', 'q_rpe', 'q_absrpe',
                   'q_shann_surp', 'q_bayes_surp']
-    regressors = ['learn_5t']
+    # regressors = ['learn_5t']
     # regressors = ['Reward_1']
 
     # for f in freqs:

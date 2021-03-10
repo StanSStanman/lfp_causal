@@ -145,8 +145,8 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
 
 if __name__ == '__main__':
     monkey = 'teddy'
-    condition = 'hard'
-    event = 'trig_off'
+    condition = 'easy'
+    event = 'trig_on'
     norm = 'fbline_relchange'
     file = '{0}_pow_8_120_mt.nc'.format(event)
     bline = 'cue_on_pow_8_120_mt.nc'

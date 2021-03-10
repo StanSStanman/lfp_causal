@@ -314,8 +314,8 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 if __name__ == '__main__':
 
     monkey = 'teddy'
-    condition = 'hard'
-    event = 'cue_on'
+    condition = 'easy'
+    event = 'trig_off'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -362,11 +362,11 @@ if __name__ == '__main__':
                     #                         crop=(-1.5, 1.5))
 
                     ## TRIGGER OFFSET
-                    # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-1.8, 1.45))
-                    ## CUE ONSET
                     compute_power_multitaper(fname_epo, file, event,
-                                            crop=(-.75, .15))
+                                            crop=(-1.8, 1.45))
+                    ## CUE ONSET
+                    # compute_power_multitaper(fname_epo, file, event,
+                    #                         crop=(-.75, .15))
                     ## TRIGGER ONSET
                     # compute_power_multitaper(fname_epo, file, event,
                     #                         crop=(-1.7, 1.85))
