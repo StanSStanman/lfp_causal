@@ -48,7 +48,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
             'RnR|C', 'RnR|nC',
             '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
             'learn_5t', 'learn_2t', 'early_late_cons',
-            'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
+            'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)', 'pra_mean',
             'dP', 'log_dP', 'delta_dP',
             'surprise', 'surprise_bayes', 'act_surp_bayes', 'rpe',
             'q_pcorr', 'q_pincorr', 'q_dP',
@@ -110,6 +110,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
     data['P(R|Cho)'] = beh_prob_cho(data['P(R|C)'], data['P(R|nC)'],
                                     data['Correct'])
     data['P(R|A)'] = prob_rew_act(actions, data['Reward'])
+    data['pra_mean'] = prob_rew_act(actions, data['Reward'], modality='mean')
 
     # -------------------------------------------------------------------------
     # Contingency
@@ -225,7 +226,7 @@ def learning_phases(correct_actions, nt=[5]):
     return repetitions
 
 
-def prob_rew_act(actions, rewards):
+def prob_rew_act(actions, rewards, modality='mode'):
     """Action dependent probability
 
     Parameters
@@ -247,7 +248,10 @@ def prob_rew_act(actions, rewards):
         is_r = rewards[actions == u]
         is_nr = 1 - is_r
         _r, _nr = bincumsum(is_r), bincumsum(is_nr)
-        p = (_r - 1) / ((_r + _nr) - 2)
+        if modality == 'mode':
+            p = (_r - 1) / ((_r + _nr) - 2)
+        elif modality == 'mean':
+            p = _r / (_r + _nr)
         probs[indices == i] = p
     # probs = np.hstack(tuple(probs))
     # probs = probs[indices]
@@ -440,16 +444,25 @@ if __name__ == '__main__':
     monkey = 'teddy'
     condition = 'hard'
 
+    rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+               '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    xls = pd.read_excel(rec_info, dtype={'file': str})
+    new_files = xls['file']
+    start = np.where(new_files == '0220')[0][0]
+    stop = len(new_files)
+    new_files = new_files[start:stop].to_list()
+
     print('Calculating regressors for %s, %s' % (monkey, condition))
 
     csv_dir = dirs['tev'].format(monkey, condition)
 
     for file in os.listdir(csv_dir):
-        # file = '0816.csv'
+        # file = '0447.csv'
         if file.endswith('.csv'):
             session = file.replace('.csv', '')
-            beh_dir = dirs['reg'].format(monkey, condition)
-            os.makedirs(beh_dir, exist_ok=True)
-            fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
-            print('Processing session %s' % session)
-            get_behaviour(monkey, condition, session, save_as=fname_beh)
+            if session in new_files:   ########################################
+                beh_dir = dirs['reg'].format(monkey, condition)
+                os.makedirs(beh_dir, exist_ok=True)
+                fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
+                print('Processing session %s' % session)
+                get_behaviour(monkey, condition, session, save_as=fname_beh)

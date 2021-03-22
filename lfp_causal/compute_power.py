@@ -314,8 +314,8 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 if __name__ == '__main__':
 
     monkey = 'teddy'
-    condition = 'easy'
-    event = 'trig_off'
+    condition = 'hard'
+    event = 'cue_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -337,13 +337,13 @@ if __name__ == '__main__':
         fid = read_sector(rec_info, sect)
 
         for file in fid['file']:
-            # file = '0314'
+            # file = '0610'
             if file not in rej_ses:
                 fname_epo = op.join(epo_dir,
                                     '{0}_{1}_epo.fif'.format(file, event))
                 if op.exists(fname_epo):
                     # compute_power_morlet(fname_epo, file, event,
-                    #                      freqs=(5, 120), crop=(-.75, .15))
+                    #                      freqs=(5, 120), crop=(-1.8, 1.45))
 
                     ## TRIGGER OFFSET
                     # compute_power_superlets(fname_epo, file, event,
@@ -362,11 +362,11 @@ if __name__ == '__main__':
                     #                         crop=(-1.5, 1.5))
 
                     ## TRIGGER OFFSET
-                    compute_power_multitaper(fname_epo, file, event,
-                                            crop=(-1.8, 1.45))
-                    ## CUE ONSET
                     # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-.75, .15))
+                    #                         crop=(-1.8, 1.45))
+                    ## CUE ONSET
+                    compute_power_multitaper(fname_epo, file, event,
+                                            crop=(-.75, .15))
                     ## TRIGGER ONSET
                     # compute_power_multitaper(fname_epo, file, event,
                     #                         crop=(-1.7, 1.85))

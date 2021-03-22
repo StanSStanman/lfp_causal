@@ -99,7 +99,7 @@ if __name__ == '__main__':
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkeys = ['teddy']
+    monkeys = ['freddie', 'teddy']
     conditions = ['easy', 'hard']
     event = 'trig_off'
     norm = 'fbline_relchange'
@@ -122,6 +122,7 @@ if __name__ == '__main__':
                       '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
                       'learn_5t', 'learn_2t', 'early_late_cons',
                       'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
+                      'pra_mean',
                       'dP', 'log_dP', 'delta_dP',
                       'surprise', 'surprise_bayes', 'act_surp_bayes', 'rpe',
                       'q_pcorr', 'q_pincorr', 'q_dP',
@@ -134,6 +135,7 @@ if __name__ == '__main__':
                         None, None, None, None, None, None,
                         None, None, None,
                         None, None, None, None,
+                        None,
                         None, None, None,
                         None, None, None, None,
                         None, None, None,
@@ -146,44 +148,56 @@ if __name__ == '__main__':
                    'cc', 'cc', 'cc', 'cc', 'cc', 'cc',
                    'cd', 'cd', 'cd',
                    'cc', 'cc', 'cc', 'cc',
+                   'cc',
                    'cc', 'cc', 'cc',
                    'cc', 'cc', 'cc', 'cc',
                    'cc', 'cc', 'cc',
                    'cc', 'cc', 'cc',
                    'cc', 'cc']
 
-        # regressors = ['act_surp_bayes']
+        # regressors = ['pra_mean']
         # conditionals = [None]
         # mi_type = ['cc']
 
         inference = ['ffx' for r in regressors]
 
-        fn_pow_list = []
-        fn_reg_list = []
-        rois = []
-        log_bads = []
-        bad_epo = []
-        # rej_files = ['0845', '0847', '0873', '0939', '0945', '1038', '1204',
-        #              '1217'] + \
-        #             ['0944', '0967', '0969', '0967', '0970', '0971', '1139',
-        #              '1145', '1515', '1701']
-                    # ['0946', '0948', '0951', '0956', '1135', '1138', '1140',
-                    #  '1142', '1143', '1144']
         rej_files = []
         rej_files += ['1204', '1217', '1231', '0944', # Bad sessions
                       '0845', '0847', '0939', '0946', '0963', '1036', '1231',
                       '1233', '1234', '1514', '1699',
+
                       '0940', '0944', '0964', '0967', '0969', '0970', '0971',
-                      '0977', '0985', '1280']
-        rej_files += ['0210', '0226', '0227', '0230', '0362', '0365', '0393',
-                      '0415', '0447', '0449', '0450', '0456', '0541', '0573',
-                      '0622', '0628', '0631', '0643', '0653', '0660', '0706',
-                      '0713', '0726', '0732',
-                      '0296', '0363', '0416', '0438', '0448', '0521', '0705',
-                      '0707', '0712', '0731' ]
+                      '0977', '0985', '1037', '1280']
+        rej_files += ['0210', '0219', '0221', '0225', '0226', '0227', '0230',
+                      '0252', '0268', '0276', '0277', '0279', '0281', '0282',
+                      '0283', '0285', '0288', '0290', '0323', '0362', '0365',
+                      '0393', '0415', '0447', '0449', '0450', '0456', '0541',
+                      '0573', '0622', '0628', '0631', '0643', '0648', '0653',
+                      '0660', '0688', '0689', '0690', '0692', '0697', '0706',
+                      '0710', '0717', '0718', '0719', '0713', '0726', '0732',
+
+                      '0220', '0223', '0271', '0273', '0278', '0280', '0284',
+                      '0289', '0296', '0303', '0363', '0416', '0438', '0448',
+                      '0521', '0618', '0656', '0691', '0693', '0698', '0705',
+                      '0707', '0711', '0712', '0716', '0720', '0731']
         # files = ['0832', '0822', '1043', '1191']
         # for d in files:
+
+        # fn_pow_list = []
+        # fn_reg_list = []
+        # rois = []
+        # log_bads = []
+        # bad_epo = []
+        # for monkey in monkeys:
+
+        ##############################
         for monkey in monkeys:
+            fn_pow_list = []
+            fn_reg_list = []
+            rois = []
+            log_bads = []
+            bad_epo = []
+        ##############################
 
             epo_dir = dirs['epo'].format(monkey, condition)
             power_dir = dirs['pow'].format(monkey, condition)
@@ -197,8 +211,8 @@ if __name__ == '__main__':
                 if op.isdir(op.join(power_dir, d)):
                     fname_power = op.join(power_dir, d, n_power)
                     fname_regr = op.join(regr_dir, '{0}.xlsx'.format(d))
-                    fname_epo = op.join(epo_dir, '{0}_{1}_epo.fif'.format(d,
-                                                                          event))
+                    fname_epo = op.join(epo_dir,
+                                        '{0}_{1}_epo.fif'.format(d, event))
 
                     fn_pow_list.append(fname_power)
                     fn_reg_list.append(fname_regr)
@@ -211,16 +225,16 @@ if __name__ == '__main__':
                                         fname_info=fname_info)
                     bad_epo.append(be)
 
-        mi_results = {}
-        pv_results = {}
-        for t, f in product(times, freqs):
-            ds_mi, ds_pv = compute_stats_meso(fn_pow_list, fn_reg_list, rois,
-                                              log_bads, bad_epo,
-                                              regressors, conditionals,
-                                              mi_type, inference,
-                                              t, f, avg_frq,
-                                              t_resample, f_resample,
-                                              norm)
+            mi_results = {}
+            pv_results = {}
+            for t, f in product(times, freqs):
+                ds_mi, ds_pv = compute_stats_meso(fn_pow_list, fn_reg_list,
+                                                  rois, log_bads, bad_epo,
+                                                  regressors, conditionals,
+                                                  mi_type, inference,
+                                                  t, f, avg_frq,
+                                                  t_resample, f_resample,
+                                                  norm)
             ##################
             # if len(monkeys) > 1:
             #     monkey = 'freted'
@@ -245,8 +259,11 @@ if __name__ == '__main__':
                 ds_mi['times'] = mi['times']
                 ds_pv['times'] = pv['times']
 
-                ds_mi = xr.merge([mi, ds_mi])
-                ds_pv = xr.merge([pv, ds_pv])
+                ds_mi = mi.update(ds_mi)
+                ds_pv = pv.update(ds_pv)
 
             ds_mi.to_netcdf(fname_mi)
             ds_pv.to_netcdf(fname_pv)
+
+            print('Saved', fname_mi)
+            print('Saved', fname_pv)

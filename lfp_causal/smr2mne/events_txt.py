@@ -126,7 +126,7 @@ def find_events_txt(fname_in, fname_out, fname_txt):
             t = np.where(np.logical_and(t_on[i] - 2e-3 <= trigger,
                                         trigger <= t_on[i] + 2e-3))
             if trigger[t].size != 0:
-                trigger_onset[i] = trigger[t]
+                trigger_onset[i] = trigger[t].mean()
             else:
                 warnings.warn('Trigger onset value out of matrix')
                 trigger_onset[i] = t_on[i]
@@ -148,7 +148,7 @@ def find_events_txt(fname_in, fname_out, fname_txt):
         if not np.all(np.isclose(trigger_offset, test_tr_off, atol=0.001)):
             assert np.all(np.isclose((trigger_offset - trigger_onset),
                                      ((react_time + cont_time) / 1000.),
-                                     atol=0.001)), \
+                                     atol=0.003)), \
                 AssertionError('Triggers are not correctly aligned.')
 
         # Defining reward vector from txt's codes
@@ -264,7 +264,15 @@ if __name__ == '__main__':
     condition = 'hard'
     label = 'tneu'
 
-    rej = ['tneu0458.smr', 'tneu0460.smr', 'tneu0539.smr']
+    # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    # xls = pd.read_excel(rec_info, dtype={'file': str})
+    # new_files = xls['file']
+    # start = np.where(new_files == '0219')[0][0]
+    # stop = len(new_files)
+    # new_files = new_files[start:stop].to_list()
+
+    rej = ['tneu0458.smr', 'tneu0460.smr', 'tneu0539.smr',  'tneu0290.smr']
 
     files = []
     for file in os.listdir('/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/'
@@ -272,7 +280,11 @@ if __name__ == '__main__':
         if file in rej:
             continue
 
-        # file = 'tneu0622.smr'
+        # session = file.replace('smr', '').replace(label, '')
+        # if session not in new_files:
+        #     continue
+
+        # file = 'tneu0323.smr'
         if file.endswith('.smr'):
             fname_in = os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
                                     'lfp_causal/'
