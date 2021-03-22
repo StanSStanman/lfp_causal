@@ -235,35 +235,35 @@ if __name__ == '__main__':
                                                   t, f, avg_frq,
                                                   t_resample, f_resample,
                                                   norm)
-            ##################
-            # if len(monkeys) > 1:
-            #     monkey = 'freted'
-            ##################
+                ##################
+                # if len(monkeys) > 1:
+                #     monkey = 'freted'
+                ##################
 
-            if avg_frq:
-                save_dir = op.join(dirs['st_prj'], monkey, condition, event,
-                                   norm, '{0}_{1}_mt'.format(f[0], f[1]))
+                if avg_frq:
+                    save_dir = op.join(dirs['st_prj'], monkey, condition, event,
+                                       norm, '{0}_{1}_mt'.format(f[0], f[1]))
 
-            elif not avg_frq:
-                save_dir = op.join(dirs['st_prj'], monkey, condition, event,
-                                   norm, '{0}_{1}_tf_mt'.format(f[0], f[1]))
+                elif not avg_frq:
+                    save_dir = op.join(dirs['st_prj'], monkey, condition, event,
+                                       norm, '{0}_{1}_tf_mt'.format(f[0], f[1]))
 
-            os.makedirs(save_dir, exist_ok=True)
-            fname_mi = op.join(save_dir, 'mi_results.nc'.format(f[0], f[1]))
-            fname_pv = op.join(save_dir, 'pv_results.nc'.format(f[0], f[1]))
+                os.makedirs(save_dir, exist_ok=True)
+                fname_mi = op.join(save_dir, 'mi_results.nc'.format(f[0], f[1]))
+                fname_pv = op.join(save_dir, 'pv_results.nc'.format(f[0], f[1]))
 
-            if not overwrite and op.exists(fname_mi):
-                mi = xr.load_dataset(fname_mi)
-                pv = xr.load_dataset(fname_pv)
+                if not overwrite and op.exists(fname_mi):
+                    mi = xr.load_dataset(fname_mi)
+                    pv = xr.load_dataset(fname_pv)
 
-                ds_mi['times'] = mi['times']
-                ds_pv['times'] = pv['times']
+                    ds_mi['times'] = mi['times']
+                    ds_pv['times'] = pv['times']
 
-                ds_mi = mi.update(ds_mi)
-                ds_pv = pv.update(ds_pv)
+                    ds_mi = mi.update(ds_mi)
+                    ds_pv = pv.update(ds_pv)
 
-            ds_mi.to_netcdf(fname_mi)
-            ds_pv.to_netcdf(fname_pv)
+                ds_mi.to_netcdf(fname_mi)
+                ds_pv.to_netcdf(fname_pv)
 
-            print('Saved', fname_mi)
-            print('Saved', fname_pv)
+                print('Saved', fname_mi)
+                print('Saved', fname_pv)
