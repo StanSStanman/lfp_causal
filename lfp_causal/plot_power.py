@@ -85,12 +85,12 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
         #                vmax=np.percentile(data, 95))
         # plt.colorbar()
         # plt.show()
-        # for ff in range(data.shape[1]):
-        #     plt.pcolormesh(data[:, ff, :])#, vmin=np.percentile(data[:, ff, :], 5),
-        #                    # vmax=np.percentile(data[:, ff, :], 95))
-        #     plt.colorbar()
-        #     plt.show()
-        # plt.close()
+        for ff in range(data.shape[1]):
+            plt.pcolormesh(data[:, ff, :])#, vmin=np.percentile(data[:, ff, :], 5),
+                           # vmax=np.percentile(data[:, ff, :], 95))
+            plt.colorbar()
+            plt.show()
+        plt.close()
         for _iu, _u in enumerate(uni):
             _idx = np.where(br == _u)
             b_data[_iu].append(data[_idx])
@@ -145,7 +145,7 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
 
 if __name__ == '__main__':
     monkey = 'teddy'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_off'
     norm = 'fbline_relchange'
     file = '{0}_pow_8_120_mt.nc'.format(event)

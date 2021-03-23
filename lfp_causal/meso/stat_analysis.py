@@ -99,7 +99,7 @@ if __name__ == '__main__':
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkeys = ['freddie', 'teddy']
+    monkeys = ['teddy']
     conditions = ['easy', 'hard']
     event = 'trig_off'
     norm = 'fbline_relchange'

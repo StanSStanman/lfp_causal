@@ -315,7 +315,7 @@ if __name__ == '__main__':
 
     monkey = 'teddy'
     condition = 'hard'
-    event = 'cue_on'
+    event = 'trig_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
@@ -365,8 +365,8 @@ if __name__ == '__main__':
                     # compute_power_multitaper(fname_epo, file, event,
                     #                         crop=(-1.8, 1.45))
                     ## CUE ONSET
-                    compute_power_multitaper(fname_epo, file, event,
-                                            crop=(-.75, .15))
-                    ## TRIGGER ONSET
                     # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-1.7, 1.85))
+                    #                         crop=(-.75, .15))
+                    ## TRIGGER ONSET
+                    compute_power_multitaper(fname_epo, file, event,
+                                            crop=(-1.7, 1.85))
