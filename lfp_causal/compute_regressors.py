@@ -464,6 +464,7 @@ if __name__ == '__main__':
     print('Calculating regressors for %s, %s' % (monkey, condition))
 
     csv_dir = dirs['tev'].format(monkey, condition)
+    print(csv_dir)
     print(os.listdir(csv_dir))
 
     for file in os.listdir(csv_dir):
