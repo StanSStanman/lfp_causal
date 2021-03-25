@@ -222,7 +222,7 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     log_bads, bad_epo,
                                     condition=None,
                                     reg_name='q_rpe',
-                                    rew_val=1,
+                                    rew_val=0,
                                     times=times,
                                     freqs=freqs,
                                     avg_freq=avg_freq,
@@ -246,8 +246,8 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
         mi.assign_coords({'freqs': freqs})
         pval.assign_coords({'freqs': freqs})
 
-    mi_results['q_rpe_1'] = mi
-    pv_results['q_rpe_1'] = pval
+    mi_results['q_rpe_0'] = mi
+    pv_results['q_rpe_0'] = pval
 
     # when reg_name='learn_5t'
     # mi_results['expexp'] = mi

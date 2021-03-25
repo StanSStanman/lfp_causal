@@ -130,7 +130,7 @@ def plot_band_stat_res(stats_dirs, regressors, treshold=0.05):
 
 if __name__ == '__main__':
     monkey = 'teddy'
-    condition = 'hard'
+    condition = '2cond_nrd'
     event = 'trig_off'
     norm = 'fbline_relchange'
 
@@ -157,7 +157,7 @@ if __name__ == '__main__':
                   'pra_rew', 'pra_mean', 'evl', 'expexp']
     regressors = ['q_absrpe', 'Reward', 'P(R|A)', 'delta_dP', 'rpe', 'q_rpe',
                   'expexp']
-    regressors = ['q_rpe_1']
+    regressors = ['Reward_0']
 
     # for f in freqs:
     #     plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)

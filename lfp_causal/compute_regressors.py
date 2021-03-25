@@ -451,7 +451,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'teddy'
-    condition = 'easy'
+    condition = 'hard'
 
     # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
     #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
