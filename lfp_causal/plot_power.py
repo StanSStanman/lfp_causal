@@ -21,7 +21,8 @@ def plot_avg_tf(powers, blines=None):
         if isinstance(b, (int, float)):
             pow = normalize_power(pow, 'relchange', (-1.8, -1.3))
         elif isinstance(b, str):
-            pow = normalize_power(pow, 'fbline_relchange', (-.51, -.01), file=b)
+            pow = normalize_power(pow, 'fbline_relchange', (-.51, -.01),
+                                  file=b)
         pow = pow.loc[dict(times=slice(-1., 1.5))]
         # pow = pow.loc[dict(freqs=slice(70, 120))]
         pow = pow.to_array().squeeze().mean('trials')
@@ -145,13 +146,13 @@ def plot_pow_cond(powers, conditions, pick, log_bads, bad_trials, norm, tbline,
 
 if __name__ == '__main__':
     monkey = 'teddy'
-    condition = 'easy'
+    condition = 'hard'
     event = 'trig_off'
     norm = 'fbline_relchange'
     file = '{0}_pow_8_120_mt.nc'.format(event)
     bline = 'cue_on_pow_8_120_mt.nc'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
-    # sectors = ['limbic striatum']
+    sectors = ['motor striatum', 'limbic striatum']
 
     dirs = get_dirs('local', 'lfp_causal')
     directory = dirs['pow'].format(monkey, condition)

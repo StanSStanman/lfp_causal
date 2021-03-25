@@ -43,7 +43,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
         correct_pos = 102.
 
     data = dict()
-    cols = ['Condition', 'Correct', 'Reward',
+    cols = ['Condition', 'Region', 'Correct', 'Reward',
             'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
             'RnR|C', 'RnR|nC',
             '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
@@ -61,6 +61,15 @@ def get_behaviour(monkey, condition, session, save_as=None):
     elif condition == 'hard':
         _cond = 1
     data['Condition'] = np.full(actions.shape, _cond)
+
+    region = infos[infos['file'] == session]['sector'].values[0]
+    if region == 'associative striatum':
+        _reg = 0
+    elif region == 'limbic striatum':
+        _reg = 1
+    elif region == 'motor striatum':
+        _reg = 2
+    data['Region'] = np.full(actions.shape, _reg)
 
     correct_act = actions.copy()
     correct_act[correct_act != correct_pos] = 0
@@ -441,16 +450,16 @@ if __name__ == '__main__':
     from research.get_dirs import get_dirs
     dirs = get_dirs(MCH, PRJ)
 
-    monkey = 'teddy'
-    condition = 'hard'
+    monkey = 'freddie'
+    condition = 'easy'
 
-    rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-               '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-    xls = pd.read_excel(rec_info, dtype={'file': str})
-    new_files = xls['file']
-    start = np.where(new_files == '0220')[0][0]
-    stop = len(new_files)
-    new_files = new_files[start:stop].to_list()
+    # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+    #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+    # xls = pd.read_excel(rec_info, dtype={'file': str})
+    # new_files = xls['file']
+    # start = np.where(new_files == '0220')[0][0]
+    # stop = len(new_files)
+    # new_files = new_files[start:stop].to_list()
 
     print('Calculating regressors for %s, %s' % (monkey, condition))
 
@@ -460,9 +469,11 @@ if __name__ == '__main__':
         # file = '0447.csv'
         if file.endswith('.csv'):
             session = file.replace('.csv', '')
-            if session in new_files:   ########################################
-                beh_dir = dirs['reg'].format(monkey, condition)
-                os.makedirs(beh_dir, exist_ok=True)
-                fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
-                print('Processing session %s' % session)
-                get_behaviour(monkey, condition, session, save_as=fname_beh)
+            # if session in new_files:   ########################################
+            beh_dir = dirs['reg'].format(monkey, condition)
+            os.makedirs(beh_dir, exist_ok=True)
+            fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
+            print('Processing session %s' % session)
+            get_behaviour(monkey, condition, session, save_as=fname_beh)
+
+    print('\a')

@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
     monkeys = ['freddie']
     conditions = ['easy', 'hard']
-    event = 'trig_on'
+    event = 'trig_off'
     norm = 'fbline_relchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
     times = [(-1.5, 1.3)]
@@ -167,18 +167,19 @@ if __name__ == '__main__':
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
     avg_frq = True
+    overwrite = True
 
-    regressors = ['Correct', 'Reward',
-                  'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
-                  'RnR|C', 'RnR|nC',
-                  '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
-                  'learn_5t', 'learn_2t', 'early_late_cons',
-                  'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
-                  'dP', 'log_dP', 'delta_dP',
-                  'surprise', 'surprise_bayes', 'rpe',
-                  'q_pcorr', 'q_pincorr', 'q_dP',
-                  'q_entropy', 'q_rpe', 'q_absrpe',
-                  'q_shann_surp', 'q_bayes_surp']
+    # regressors = ['Correct', 'Reward',
+    #               'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
+    #               'RnR|C', 'RnR|nC',
+    #               '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
+    #               'learn_5t', 'learn_2t', 'early_late_cons',
+    #               'P(R|C)', 'P(R|nC)', 'P(R|Cho)', 'P(R|A)',
+    #               'dP', 'log_dP', 'delta_dP',
+    #               'surprise', 'surprise_bayes', 'rpe',
+    #               'q_pcorr', 'q_pincorr', 'q_dP',
+    #               'q_entropy', 'q_rpe', 'q_absrpe',
+    #               'q_shann_surp', 'q_bayes_surp']
 
     # conditionals = [None, None,
     #                 None, None, None, None,
@@ -193,17 +194,17 @@ if __name__ == '__main__':
     #                 None, None]
     # conditionals = ['Condition' for r in regressors]
 
-    mi_type = ['cd', 'cd',
-               'cd', 'cd', 'cd', 'cd',
-               'cd', 'cd',
-               'cc', 'cc', 'cc', 'cc', 'cc', 'cc',
-               'cd', 'cd', 'cd',
-               'cc', 'cc', 'cc', 'cc',
-               'cc', 'cc', 'cc',
-               'cc', 'cc', 'cc',
-               'cc', 'cc', 'cc',
-               'cc', 'cc', 'cc',
-               'cc', 'cc']
+    # mi_type = ['cd', 'cd',
+    #            'cd', 'cd', 'cd', 'cd',
+    #            'cd', 'cd',
+    #            'cc', 'cc', 'cc', 'cc', 'cc', 'cc',
+    #            'cd', 'cd', 'cd',
+    #            'cc', 'cc', 'cc', 'cc',
+    #            'cc', 'cc', 'cc',
+    #            'cc', 'cc', 'cc',
+    #            'cc', 'cc', 'cc',
+    #            'cc', 'cc', 'cc',
+    #            'cc', 'cc']
     # mi_type = ['ccd' for r in regressors]
 
     regressors = ['Reward']
@@ -220,11 +221,25 @@ if __name__ == '__main__':
     bad_epo = []
     conds = []
 
-    rej_files = ['1204', '1217', '1231', '0944', # Bad sessions
-                 '0845', '0847', '0939', '0946', '0963', '1036', '1231',
-                 '1233', '1234', '1514', '1699',
-                 '0940', '0944', '0964', '0967', '0969', '0970', '0971',
-                 '0977', '0985', '1280']
+    rej_files = []
+    rej_files += ['1204', '1217', '1231', '0944',  # Bad sessions
+                  '0845', '0847', '0939', '0946', '0963', '1036', '1231',
+                  '1233', '1234', '1514', '1699',
+
+                  '0940', '0944', '0964', '0967', '0969', '0970', '0971',
+                  '0977', '0985', '1037', '1280']
+    rej_files += ['0210', '0219', '0221', '0225', '0226', '0227', '0230',
+                  '0252', '0268', '0276', '0277', '0279', '0281', '0282',
+                  '0283', '0285', '0288', '0290', '0323', '0362', '0365',
+                  '0393', '0415', '0447', '0449', '0450', '0456', '0541',
+                  '0573', '0622', '0628', '0631', '0643', '0648', '0653',
+                  '0660', '0688', '0689', '0690', '0692', '0697', '0706',
+                  '0710', '0717', '0718', '0719', '0713', '0726', '0732',
+
+                  '0220', '0223', '0271', '0273', '0278', '0280', '0284',
+                  '0289', '0296', '0303', '0363', '0416', '0438', '0448',
+                  '0521', '0618', '0656', '0691', '0693', '0698', '0705',
+                  '0707', '0711', '0712', '0716', '0720', '0731']
 
     for monkey in monkeys:
         for condition in conditions:
@@ -276,8 +291,18 @@ if __name__ == '__main__':
                                '{0}_{1}_tf_mt'.format(f[0], f[1]))
 
         os.makedirs(save_dir, exist_ok=True)
+        fname_mi = op.join(save_dir, 'mi_results.nc'.format(f[0], f[1]))
+        fname_pv = op.join(save_dir, 'pv_results.nc'.format(f[0], f[1]))
 
-        ds_mi.to_netcdf(op.join(save_dir,
-                                'mi_results.nc'.format(f[0], f[1])))
-        ds_pv.to_netcdf(op.join(save_dir,
-                                'pv_results.nc'.format(f[0], f[1])))
+        if not overwrite and op.exists(fname_mi):
+            mi = xr.load_dataset(fname_mi)
+            pv = xr.load_dataset(fname_pv)
+
+            ds_mi['times'] = mi['times']
+            ds_pv['times'] = pv['times']
+
+            ds_mi = mi.update(ds_mi)
+            ds_pv = pv.update(ds_pv)
+
+        ds_mi.to_netcdf(fname_mi)
+        ds_pv.to_netcdf(fname_pv)

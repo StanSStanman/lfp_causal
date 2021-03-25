@@ -221,8 +221,8 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
     times, freqs = prepare_data_exp(fname_pow, fname_reg,
                                     log_bads, bad_epo,
                                     condition=None,
-                                    reg_name='learn_5t',
-                                    rew_val=1,
+                                    reg_name='P(R|A)',
+                                    rew_val=0,
                                     times=times,
                                     freqs=freqs,
                                     avg_freq=avg_freq,
@@ -246,13 +246,16 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
         mi.assign_coords({'freqs': freqs})
         pval.assign_coords({'freqs': freqs})
 
+    # mi_results['q_rpe_0'] = mi
+    # pv_results['q_rpe_0'] = pval
+
     # when reg_name='learn_5t'
-    mi_results['expexp'] = mi
-    pv_results['expexp'] = pval
+    # mi_results['expexp'] = mi
+    # pv_results['expexp'] = pval
 
     # when reg_name='P(R|A)'
-    # mi_results['pra_rew'] = mi
-    # pv_results['pra_rew'] = pval
+    mi_results['pra_rew'] = mi
+    pv_results['pra_rew'] = pval
 
     ds_mi = xr.Dataset(mi_results)
     ds_pv = xr.Dataset(pv_results)
