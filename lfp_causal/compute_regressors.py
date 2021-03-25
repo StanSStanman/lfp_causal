@@ -450,8 +450,8 @@ if __name__ == '__main__':
     from research.get_dirs import get_dirs
     dirs = get_dirs(MCH, PRJ)
 
-    monkey = 'freddie'
-    condition = 'hard'
+    monkey = 'teddy'
+    condition = 'easy'
 
     # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
     #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
