@@ -451,7 +451,7 @@ if __name__ == '__main__':
     dirs = get_dirs(MCH, PRJ)
 
     monkey = 'teddy'
-    condition = 'hard'
+    condition = 'easy'
 
     # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
     #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
@@ -464,6 +464,7 @@ if __name__ == '__main__':
     print('Calculating regressors for %s, %s' % (monkey, condition))
 
     csv_dir = dirs['tev'].format(monkey, condition)
+    print(os.listdir(csv_dir))
 
     for file in os.listdir(csv_dir):
         # file = '0447.csv'

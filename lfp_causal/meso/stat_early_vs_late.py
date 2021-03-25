@@ -221,8 +221,8 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
     times, freqs = prepare_data_exp(fname_pow, fname_reg,
                                     log_bads, bad_epo,
                                     condition=None,
-                                    reg_name='q_rpe',
-                                    rew_val=0,
+                                    reg_name='Region',
+                                    rew_val=1,
                                     times=times,
                                     freqs=freqs,
                                     avg_freq=avg_freq,
@@ -236,7 +236,7 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
     ds_ephy = DatasetEphy(x=power.copy(), y=regr.copy(), roi=rois,
                           z=cond, times=times)
 
-    wf = WfMi(mi_type='cc', inference='ffx', kernel=np.hanning(20))
+    wf = WfMi(mi_type='cd', inference='ffx', kernel=np.hanning(20))
     mi, pval = wf.fit(ds_ephy, n_perm=1000, n_jobs=-1)
 
     mi['times'] = times
@@ -246,8 +246,8 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
         mi.assign_coords({'freqs': freqs})
         pval.assign_coords({'freqs': freqs})
 
-    mi_results['q_rpe_0'] = mi
-    pv_results['q_rpe_0'] = pval
+    mi_results['Region_r1'] = mi
+    pv_results['Region_r1'] = pval
 
     # when reg_name='learn_5t'
     # mi_results['expexp'] = mi
@@ -334,7 +334,8 @@ if __name__ == '__main__':
 
                     fn_pow_list.append(fname_power)
                     fn_reg_list.append(fname_regr)
-                    rois.append(read_session(fname_info, d)['sector'].values)
+                    rois.append(['unique'])
+                    # rois.append(read_session(fname_info, d)['sector'].values)
 
                     lb = get_log_bad_epo(fname_epo)
                     log_bads.append(lb)
@@ -357,6 +358,7 @@ if __name__ == '__main__':
             # if len(monkeys) > 1:
             #     monkey = 'freted'
             ##################
+            condition = 'rois_diff'
 
             if avg_frq:
                 save_dir = op.join(dirs['st_prj'], monkey, condition, event,
