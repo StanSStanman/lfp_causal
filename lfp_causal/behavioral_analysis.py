@@ -130,10 +130,74 @@ def prob_correct_answer(fnames, bads=None):
     return
 
 
+def prob_wstay_lshift(fnames_xls, n_tr=5):
+    wst = 0
+    lsh = 0
+    trl = 0
+    for fn in fnames_xls:
+        xls = pd.read_excel(fn)
+        rewards = xls['Reward']
+        actions = xls['Actions']
+        for t in range(n_tr):
+            _r = rewards[t]
+            _a = actions[t]
+            if _r == 1 and _a == actions[t + 1]:
+                wst += 1
+            elif _r == 0 and _a != actions[t+1]:
+                lsh += 1
+        trl += n_tr
+
+    return wst, lsh, trl
+
+
+def plot_wst_lsh(fnames_xls):
+    d = {'fr_ea': [],
+         'fr_ha': [],
+         'te_ea': [],
+         'te_ha': []}
+
+    for fn in fnames_xls:
+        if 'freddie' in fn and 'easy' in fn:
+            d['fr_ea'].append(fn)
+        elif 'freddie' in fn and 'hard' in fn:
+            d['fr_ha'].append(fn)
+        elif 'teddy' in fn and 'easy' in fn:
+            d['te_ea'].append(fn)
+        elif 'teddy' in fn and 'hard' in fn:
+            d['te_ha'].append(fn)
+
+    wst, lsh = [], []
+    for k in d.keys():
+        _wst, _lsh, _ = prob_wstay_lshift(d[k])
+        wst.append(_wst)
+        lsh.append(_lsh)
+
+    labels = ['freddie easy', 'freddie hard', 'teddy easy', 'teddy hard']
+    x = np.arange(len(labels))
+    width = 0.35
+
+    fig, ax = plt.subplots()
+    ln_wst = ax.bar(x - width/2, wst, width, label='win-stay')
+    ln_lsh = ax.bar(x + width/2, lsh, width, label='lose-shift')
+
+    ax.set_ylabel('Occurrences')
+    ax.set_title('Number of win-stay and lose-shift')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    ax.bar_label(ln_wst, padding=3)
+    ax.bar_label(ln_lsh, padding=3)
+
+    fig.tight_layout()
+
+    plt.show()
+
+
 if __name__ == '__main__':
     directories = get_dirs('local', 'lfp_causal')
 
-    monkeys = ['teddy']
+    monkeys = ['freddie', 'teddy']
     conditions = ['easy', 'hard']
     # conditions = ['easy']
 
@@ -193,4 +257,5 @@ if __name__ == '__main__':
 
     # reaction_times(fnames_txt, bins=300)
     # movement_duration(fnames_txt, bins=300)
-    prob_correct_answer(fnames_xls)
+    # prob_correct_answer(fnames_xls)
+    plot_wst_lsh(fnames_xls)

@@ -62,8 +62,8 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
             mi.assign_coords({'freqs': freqs})
             pval.assign_coords({'freqs': freqs})
 
-        mi_results[_r] = mi
-        pv_results[_r] = pval
+        mi_results[_r+'_30t'] = mi
+        pv_results[_r+'_30t'] = pval
         if _inf == 'rfx':
             conj_ss_results[_r] = conj_ss
             conj_results[_r] = conj
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     avg_frq = True
     t_resample = None #1400
     f_resample = None #80
-    overwrite = True
+    overwrite = False
 
     for condition in conditions: # Try to compute multiple conditions
 
@@ -155,9 +155,9 @@ if __name__ == '__main__':
                    'cc', 'cc', 'cc',
                    'cc', 'cc']
 
-        # regressors = ['pra_mean']
-        # conditionals = [None]
-        # mi_type = ['cc']
+        regressors = ['Reward', 'q_rpe']
+        conditionals = [None, None]
+        mi_type = ['cd', 'cc']
 
         inference = ['ffx' for r in regressors]
 

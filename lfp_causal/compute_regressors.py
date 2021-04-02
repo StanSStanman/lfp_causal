@@ -43,7 +43,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
         correct_pos = 102.
 
     data = dict()
-    cols = ['Condition', 'Region', 'Correct', 'Reward',
+    cols = ['Condition', 'Region', 'Actions', 'Correct', 'Reward',
             'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
             'RnR|C', 'RnR|nC',
             '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
@@ -70,6 +70,13 @@ def get_behaviour(monkey, condition, session, save_as=None):
     elif region == 'motor striatum':
         _reg = 2
     data['Region'] = np.full(actions.shape, _reg)
+
+    # Actions values: 0 = left; 1 = center; 2 = right
+    actions_int = actions.copy()
+    actions_int[actions_int == 102.] = 0
+    actions_int[actions_int == 103.] = 1
+    actions_int[actions_int == 104.] = 2
+    data['Actions'] = actions_int.astype(int)
 
     correct_act = actions.copy()
     correct_act[correct_act != correct_pos] = 0

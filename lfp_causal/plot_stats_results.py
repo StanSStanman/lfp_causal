@@ -99,6 +99,7 @@ def plot_band_stat_res(stats_dirs, regressors, treshold=0.05):
     pvs = xr.concat(pvs, dim='roi')
 
     rois = ['associative striatum', 'limbic striatum', 'motor striatum']
+    # rois = ['unique']
     fr_names = ['alpha', 'beta', 'gamma', 'hga']
 
     figures = []
@@ -130,7 +131,7 @@ def plot_band_stat_res(stats_dirs, regressors, treshold=0.05):
 
 if __name__ == '__main__':
     monkey = 'teddy'
-    condition = 'hard'
+    condition = 'easy'
     event = 'trig_off'
     norm = 'fbline_relchange'
 
@@ -157,7 +158,7 @@ if __name__ == '__main__':
                   'pra_rew', 'pra_mean', 'evl', 'expexp']
     regressors = ['q_absrpe', 'Reward', 'P(R|A)', 'delta_dP', 'rpe', 'q_rpe',
                   'expexp']
-    regressors = ['q_rpe_1']
+    regressors = ['Reward_30t', 'q_rpe_30t']
 
     # for f in freqs:
     #     plot_avg_stat_res(stats_dir.format(f[0], f[1]), regressors)

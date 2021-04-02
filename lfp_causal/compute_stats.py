@@ -180,6 +180,8 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
 
         pow = pow.to_array().values.transpose(1, 0, 2, 3)
         # pow = pow[nans, :, :, :]
+        # if pow.shape[0] > 30:
+        #     pow = pow[:30, :, :, :]
 
         if avg_freq:
             pow = pow.mean(2)
@@ -209,6 +211,10 @@ def prepare_data(powers, regresors, l_bad, e_bad, reg_name, cond=None,
                 reg = np.delete(reg, lb)
             if len(eb) != 0:
                 reg = np.delete(reg, eb)
+
+            # if reg.shape[0] > 30:
+            #     reg = reg[:30]
+
             _reg.append(reg)
 
             if cn is not None:
