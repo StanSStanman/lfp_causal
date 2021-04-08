@@ -33,6 +33,15 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
     # mu = RepeatedTimer(1, memory_usage)
     # cu = RepeatedTimer(1, cpu_usage)
     ###########################################################################
+    for i, p in enumerate(power):
+        power[i] = p[:25, :, :]
+    for k in regr.keys():
+        for i, r in enumerate(regr[k]):
+            regr[k][i] = r[:25]
+    for k in cond.keys():
+        if cond[k] is not None:
+            for i, c in enumerate(cond[k]):
+                cond[k][i] = c[:25]
 
     mi_results = {}
     pv_results = {}
@@ -62,8 +71,8 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
             mi.assign_coords({'freqs': freqs})
             pval.assign_coords({'freqs': freqs})
 
-        mi_results[_r+'_30t'] = mi
-        pv_results[_r+'_30t'] = pval
+        mi_results[_r] = mi
+        pv_results[_r] = pval
         if _inf == 'rfx':
             conj_ss_results[_r] = conj_ss
             conj_results[_r] = conj
@@ -99,8 +108,9 @@ if __name__ == '__main__':
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkeys = ['teddy']
+    monkeys = ['freddie']
     conditions = ['easy', 'hard']
+    # conditions = ['cued']
     event = 'trig_off'
     norm = 'fbline_relchange'
     n_power = '{0}_pow_8_120_mt.nc'.format(event)
@@ -155,9 +165,9 @@ if __name__ == '__main__':
                    'cc', 'cc', 'cc',
                    'cc', 'cc']
 
-        regressors = ['Reward', 'q_rpe']
-        conditionals = [None, None]
-        mi_type = ['cd', 'cc']
+        # regressors = ['Reward', 'q_rpe']
+        # conditionals = [None, None]
+        # mi_type = ['cd', 'cc']
 
         inference = ['ffx' for r in regressors]
 
@@ -180,6 +190,9 @@ if __name__ == '__main__':
                       '0289', '0296', '0303', '0363', '0416', '0438', '0448',
                       '0521', '0618', '0656', '0691', '0693', '0698', '0705',
                       '0707', '0711', '0712', '0716', '0720', '0731']
+
+        rej_files += ['0900', '1512', '1555', '1682',
+                      '0291', '0368', '0743']
         # files = ['0832', '0822', '1043', '1191']
         # for d in files:
 
@@ -238,6 +251,13 @@ if __name__ == '__main__':
                 ##################
                 # if len(monkeys) > 1:
                 #     monkey = 'freted'
+
+                if 'easy' in condition:
+                    condition = 'easy_25'
+                elif 'hard' in condition:
+                    condition = 'hard_25'
+                elif 'cued' in condition:
+                    condition = 'cued_25'
                 ##################
 
                 if avg_frq:
