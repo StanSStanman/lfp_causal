@@ -167,9 +167,9 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc']
 
-    regressors = ['Reward']
-    conditionals = [None]
-    mi_type = ['cd']
+    regressors = ['Reward', 'q_rpe']
+    conditionals = [None, None]
+    mi_type = ['cd', 'cc']
 
     inference = ['ffx' for r in regressors]
 
@@ -231,9 +231,9 @@ if __name__ == '__main__':
 
                     fn_pow_list.append(fname_power)
                     fn_reg_list.append(fname_regr)
-                    # rois.append(read_session(fname_info, d)['sector'].values)
+                    rois.append(read_session(fname_info, d)['sector'].values)
                     # For noroi condition:
-                    rois.append([str(d)])
+                    # rois.append([str(d)])
 
                     lb = get_log_bad_epo(fname_epo)
                     log_bads.append(lb)
@@ -262,7 +262,7 @@ if __name__ == '__main__':
             #     condition = 'hard_25'
             # elif 'cued' in condition:
             #     condition = 'cued_25'
-            condition = 'eaha_25_noroi'
+            condition = 'eaha_25'
             ##################
 
             if avg_frq:
