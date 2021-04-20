@@ -167,9 +167,9 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc']
 
-    regressors = ['Reward', 'q_rpe']
-    conditionals = [None, None]
-    mi_type = ['cd', 'cc']
+    regressors = ['Reward']
+    conditionals = [None]
+    mi_type = ['cd']
 
     inference = ['ffx' for r in regressors]
 
