@@ -27,7 +27,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
                                     norm=norm, bline=(-.55, -0.05),
-                                    fbl='cue_on_pow_8_120_mt.nc')
+                                    fbl='cue_on_pow_8_120.nc')
 
     ###########################################################################
     # mu = RepeatedTimer(1, memory_usage)
@@ -117,16 +117,16 @@ if __name__ == '__main__':
     # conditions = ['cued']
     event = 'trig_off'
     norm = 'fbline_relchange'
-    n_power = '{0}_pow_8_120_mt.nc'.format(event)
-    times = [(-1.5, 1.3)]
-    # times = [(-1.5, 1.7)]
-    # freqs = [(5, 120)]
+    n_power = '{0}_pow_8_120.nc'.format(event)
+    # times = [(-1.5, 1.3)]
+    times = [(0., .8)]
+    freqs = [(8, 80)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
-    freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
-    avg_frq = True
+    # freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
+    avg_frq = False
     t_resample = None #1400
     f_resample = None #80
-    overwrite = False
+    overwrite = True
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -175,8 +175,8 @@ if __name__ == '__main__':
 
     rej_files = []
     rej_files += ['1204', '1217', '1231', '0944', # Bad sessions
-                  '0845', '0847', '0939', '0946', '0963', '1036', '1231',
-                  '1233', '1234', '1514', '1699',
+                  '0845', '0847', '0911', '0939', '0946', '0963', '0984',
+                  '1036', '1231', '1233', '1234', '1514', '1699',
 
                   '0940', '0944', '0964', '0967', '0969', '0970', '0971',
                   '0977', '0985', '1037', '1280']
@@ -231,9 +231,11 @@ if __name__ == '__main__':
 
                     fn_pow_list.append(fname_power)
                     fn_reg_list.append(fname_regr)
-                    rois.append(read_session(fname_info, d)['sector'].values)
+                    # rois.append(read_session(fname_info, d)['sector'].values)
                     # For noroi condition:
                     # rois.append([str(d)])
+                    # For uniroi condition:
+                    rois.append(['all_rois'])
 
                     lb = get_log_bad_epo(fname_epo)
                     log_bads.append(lb)
@@ -262,7 +264,7 @@ if __name__ == '__main__':
             #     condition = 'hard_25'
             # elif 'cued' in condition:
             #     condition = 'cued_25'
-            condition = 'eaha_25'
+            condition = 'eaha_25_uniroi_tf'
             ##################
 
             if avg_frq:

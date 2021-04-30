@@ -11,7 +11,8 @@ from lfp_causal.IO import read_sector
 from lfp_causal.compute_bad_epochs import get_ch_bad_epo
 
 
-def compute_power_morlet(epoch, session, event, crop=None, freqs=None):
+def compute_power_morlet(epoch, session, event, crop=None, freqs=None,
+                         n_cycles=None):
     csv_dir = '/media/jerry/TOSHIBA EXT/data/db_behaviour/' \
               'lfp_causal/{0}/{1}/t_events'
 
@@ -31,10 +32,10 @@ def compute_power_morlet(epoch, session, event, crop=None, freqs=None):
         epoch.crop(crop[0], crop[1])
 
     if freqs is not None:
-        assert isinstance(freqs, tuple), \
+        assert isinstance(freqs, (tuple, np.ndarray)), \
             AssertionError('frequencies should be expressed as a '
-                           'tuple(fmin, fmax)')
-        epoch.filter(freqs[0], freqs[1])
+                           'tuple(fmin, fmax), or array type')
+        # epoch.filter(freqs[0], freqs[1])
 
     bads = get_ch_bad_epo(monkey, condition, session)
     _b = []
@@ -50,7 +51,7 @@ def compute_power_morlet(epoch, session, event, crop=None, freqs=None):
     epoch.drop(bads)
 
     d_tfr, _, _ = epochs_tf_analysis(epoch, t_win=crop, freqs=freqs,
-                                     avg=False, show=False,
+                                     n_cycles=n_cycles, avg=False, show=False,
                                      baseline=(-2., -1.7))
     plt.close('all')
     f_range = '{0}_{1}'.format(np.round(d_tfr.freqs[0]).astype(int),
@@ -313,60 +314,77 @@ def normalize_power(power, norm, bline=(-.2, 0.), file=None):
 
 if __name__ == '__main__':
 
-    monkey = 'teddy'
-    condition = 'hard'
-    event = 'trig_on'
+    monkeys = ['freddie', 'teddy']
+    conditions = ['easy', 'hard']
+    event = 'cue_on'
     sectors = ['associative striatum', 'motor striatum', 'limbic striatum']
     # sectors = ['motor striatum']
     # sectors = ['associative striatum']
     # sectors = ['limbic striatum']
+    freqs = np.geomspace(8, 120, num=80)
+    n_cycles = freqs / 4 #np.geomspace(3, 12, num=80)
 
-    rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-               '{0}/{1}/files_info.xlsx'.format(monkey, condition)
-    epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
-    eve_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
-              'lfp_causal/{0}/{1}/eve'.format(monkey, condition)
+    for monkey in monkeys:
+        for condition in conditions:
 
-    # rej_ses = ['0831', '0837', '0981', '1043']
-    rej_ses = []
+            rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
+                       '{0}/{1}/files_info.xlsx'.format(monkey, condition)
+            epo_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+                      'lfp_causal/{0}/{1}/epo'.format(monkey, condition)
+            eve_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/' \
+                      'lfp_causal/{0}/{1}/eve'.format(monkey, condition)
 
-    epo_fname = []
-    ses_n = []
-    for sect in sectors:
-        fid = read_sector(rec_info, sect)
+            # rej_ses = ['0831', '0837', '0981', '1043']
+            rej_ses = []
 
-        for file in fid['file']:
-            # file = '0610'
-            if file not in rej_ses:
-                fname_epo = op.join(epo_dir,
-                                    '{0}_{1}_epo.fif'.format(file, event))
-                if op.exists(fname_epo):
-                    # compute_power_morlet(fname_epo, file, event,
-                    #                      freqs=(5, 120), crop=(-1.8, 1.45))
+            epo_fname = []
+            ses_n = []
+            for sect in sectors:
+                fid = read_sector(rec_info, sect)
 
-                    ## TRIGGER OFFSET
-                    # compute_power_superlets(fname_epo, file, event,
-                    #                         freqs=np.linspace(8, 120, 80),
-                    #                         n_cycles=None,
-                    #                         crop=(-1.8, 1.45))
-                    ## CUE ONSET
-                    # compute_power_superlets(fname_epo, file, event,
-                    #                         freqs=np.linspace(8, 120, 80),
-                    #                         n_cycles=None,
-                    #                         crop=(-.75, .15))
-                    ## TRIGGER ONSET
-                    # compute_power_superlets(fname_epo, file, event,
-                    #                         freqs=np.linspace(8, 120, 80),
-                    #                         n_cycles=None,
-                    #                         crop=(-1.5, 1.5))
+                for file in fid['file']:
+                    # file = '0610'
+                    if file not in rej_ses:
+                        # fname_epo = op.join(epo_dir,
+                        #                     '{0}_{1}_epo.fif'.format(file, event))
+                        fname_epo_t = op.join(epo_dir,
+                                            '{0}_{1}_epo.fif'.format(file, 'trig_off'))
+                        fname_epo_c = op.join(epo_dir,
+                                            '{0}_{1}_epo.fif'.format(file, 'cue_on'))
+                        if op.exists(fname_epo_t):
+                            # TRIGGER OFFSET
+                            compute_power_morlet(fname_epo_t, file, 'trig_off',
+                                                 freqs=freqs,
+                                                 n_cycles=n_cycles,
+                                                 crop=(-1.8, 1.45))
+                            # CUE ONSET
+                            compute_power_morlet(fname_epo_c, file, 'cue_on',
+                                                 freqs=freqs,
+                                                 n_cycles=n_cycles,
+                                                 crop=(-.75, .15))
 
-                    ## TRIGGER OFFSET
-                    # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-1.8, 1.45))
-                    ## CUE ONSET
-                    # compute_power_multitaper(fname_epo, file, event,
-                    #                         crop=(-.75, .15))
-                    ## TRIGGER ONSET
-                    compute_power_multitaper(fname_epo, file, event,
-                                            crop=(-1.7, 1.85))
+                            ## TRIGGER OFFSET
+                            # compute_power_superlets(fname_epo, file, event,
+                            #                         freqs=np.linspace(8, 120, 80),
+                            #                         n_cycles=None,
+                            #                         crop=(-1.8, 1.45))
+                            ## CUE ONSET
+                            # compute_power_superlets(fname_epo, file, event,
+                            #                         freqs=np.linspace(8, 120, 80),
+                            #                         n_cycles=None,
+                            #                         crop=(-.75, .15))
+                            ## TRIGGER ONSET
+                            # compute_power_superlets(fname_epo, file, event,
+                            #                         freqs=np.linspace(8, 120, 80),
+                            #                         n_cycles=None,
+                            #                         crop=(-1.5, 1.5))
+
+                            ## TRIGGER OFFSET
+                            # compute_power_multitaper(fname_epo, file, event,
+                            #                         crop=(-1.8, 1.45))
+                            ## CUE ONSET
+                            # compute_power_multitaper(fname_epo, file, event,
+                            #                         crop=(-.75, .15))
+                            ## TRIGGER ONSET
+                            # compute_power_multitaper(fname_epo, file, event,
+                            #                         crop=(-1.7, 1.85))
