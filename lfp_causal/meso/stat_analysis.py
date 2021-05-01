@@ -126,7 +126,7 @@ if __name__ == '__main__':
     avg_frq = False
     t_resample = None #1400
     f_resample = None #80
-    overwrite = True
+    overwrite = False
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
