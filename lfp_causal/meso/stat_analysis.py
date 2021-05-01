@@ -68,8 +68,10 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
             conj_ss, conj = wf.conjunction_analysis(ds_ephy)
 
         if not avg_freq:
-            mi.assign_coords({'freqs': freqs})
-            pval.assign_coords({'freqs': freqs})
+            # mi.assign_coords({'freqs': freqs})
+            # pval.assign_coords({'freqs': freqs})
+            mi.assign_coords({'supp': freqs})
+            pval.assign_coords({'supp': freqs})
 
         mi_results[_r] = mi
         pv_results[_r] = pval
