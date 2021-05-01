@@ -108,8 +108,7 @@ if __name__ == '__main__':
     f_resample = None #80
     overwrite = True
 
-    fname_clus = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
-                 '{0}/clusters_info.xlsx'
+    fname_clus = op.join(dirs['ep_sbjs'], 'clusters_info.xlsx')
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
