@@ -60,7 +60,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                               z=cond[_r], times=times)
 
         wf = WfMi(mi_type=_mt, inference=_inf, kernel=np.hanning(20))
-        mi, pval = wf.fit(ds_ephy, n_perm=1000, cluster_alpha=0.01, n_jobs=10)
+        mi, pval = wf.fit(ds_ephy, n_perm=1000, cluster_alpha=0.005, n_jobs=10)
         mi['times'] = times
         pval['times'] = times
 
