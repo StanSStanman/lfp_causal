@@ -128,7 +128,7 @@ if __name__ == '__main__':
     avg_frq = False
     t_resample = None #1400
     f_resample = None #80
-    overwrite = False
+    overwrite = True
 
     regressors = ['Correct', 'Reward',
                   'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
@@ -197,6 +197,8 @@ if __name__ == '__main__':
 
     rej_files += ['0900', '1512', '1555', '1682',
                   '0291', '0368', '0743']
+
+    rej_files += ['0941', '0855', '0722', '0725']
     # files = ['0832', '0822', '1043', '1191']
     # for d in files:
 
