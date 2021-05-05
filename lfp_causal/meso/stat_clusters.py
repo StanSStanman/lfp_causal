@@ -28,7 +28,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
                                     norm=norm, bline=(-.55, -0.05),
-                                    fbl='cue_on_pow_8_120.nc')
+                                    fbl='cue_on_pow_8_120_mt.nc')
 
     # for i, p in enumerate(power):
     #     power[i] = p[:25, :, :]
@@ -100,13 +100,13 @@ if __name__ == '__main__':
     # conditions = ['cued']
     event = 'trig_off'
     norm = 'fbline_relchange'
-    n_power = '{0}_pow_8_120.nc'.format(event)
+    n_power = '{0}_pow_8_120_mt.nc'.format(event)
     # times = [(-1.5, 1.3)]
     times = [(0., .8)]
     freqs = [(8, 80)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     # freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
-    avg_frq = False
+    avg_frq = True
     t_resample = None #1400
     f_resample = None #80
     overwrite = True
@@ -253,7 +253,7 @@ if __name__ == '__main__':
             #     condition = 'hard_25'
             # elif 'cued' in condition:
             #     condition = 'cued_25'
-            condition = 'eaha_25_clusters_tf'
+            condition = 'eaha_25_clusters_mt'
             ##################
 
             if avg_frq:
