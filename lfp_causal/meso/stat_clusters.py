@@ -106,7 +106,7 @@ if __name__ == '__main__':
     freqs = [(8, 80)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     # freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
-    avg_frq = True
+    avg_frq = False
     t_resample = None #1400
     f_resample = None #80
     overwrite = True
