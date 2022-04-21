@@ -26,8 +26,8 @@ def compute_bad_epo(epoch, xls_bad):
 
 def get_log_bad_epo(epoch):
     if isinstance(epoch, str):
-        dl = mne.read_epochs(epoch, preload=False).drop_log
-    elif isinstance(epoch, mne.Epochs):
+        dl = mne.read_epochs(epoch, preload=False, verbose=0).drop_log
+    elif isinstance(epoch, (mne.Epochs, mne.epochs.EpochsFIF)):
         dl = epoch.drop_log
     _b = []
     for i, d in enumerate(dl):

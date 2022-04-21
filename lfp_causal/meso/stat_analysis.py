@@ -27,7 +27,7 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     freqs=freqs, avg_freq=avg_freq,
                                     t_rsmpl=t_resample, f_rsmpl=f_resample,
                                     norm=norm, bline=(-.55, -0.05),
-                                    fbl='cue_on_pow_8_120.nc')
+                                    fbl='cue_on_pow_beta_mt.nc')
 
     ###########################################################################
     # mu = RepeatedTimer(1, memory_usage)
@@ -119,10 +119,10 @@ if __name__ == '__main__':
     # conditions = ['cued']
     event = 'trig_off'
     norm = 'fbline_relchange'
-    n_power = '{0}_pow_8_120.nc'.format(event)
+    n_power = '{0}_pow_beta_mt.nc'.format(event)
     # times = [(-1.5, 1.3)]
     times = [(0., .8)]
-    freqs = [(8, 80)]
+    freqs = [(15, 35)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     # freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
     avg_frq = False
@@ -169,14 +169,18 @@ if __name__ == '__main__':
                'cc', 'cc', 'cc',
                'cc', 'cc']
 
-    regressors = ['Reward', 'q_rpe']
-    conditionals = [None, None]
-    mi_type = ['cd', 'cc']
+    regressors = ['Reward', 'q_rpe', 'q_absrpe', 'RT', 'MT', 'q_dP', 'Actions']
+    conditionals = [None, None, None, None, None, None, None]
+    mi_type = ['cd', 'cc', 'cc', 'cc', 'cc', 'cc', 'cd']
+
+    regressors = ['q_rpe']
+    conditionals = [None]
+    mi_type = ['cc']
 
     inference = ['ffx' for r in regressors]
 
     rej_files = []
-    rej_files += ['1204', '1217', '1231', '0944', # Bad sessions
+    rej_files += ['1204', '1217', '1231', '0944',  # Bad sessions
                   '0845', '0847', '0911', '0939', '0946', '0963', '0984',
                   '1036', '1231', '1233', '1234', '1514', '1699',
 
@@ -198,25 +202,26 @@ if __name__ == '__main__':
     rej_files += ['0900', '1512', '1555', '1682',
                   '0291', '0368', '0743']
 
-    rej_files += ['0941', '0855', '0722', '0725']
+    rej_files += ['0231', '0272', '0274', '0666', '0941', '0855', '0722',
+                  '0725', '1397', '1398', '1701']
     # files = ['0832', '0822', '1043', '1191']
     # for d in files:
 
     ##############################
     for monkey in monkeys:
-        fn_pow_list = []
-        fn_reg_list = []
-        rois = []
-        log_bads = []
-        bad_epo = []
+        # fn_pow_list = []
+        # fn_reg_list = []
+        # rois = []
+        # log_bads = []
+        # bad_epo = []
     ##############################
 
         for condition in conditions:
-            # fn_pow_list = []
-            # fn_reg_list = []
-            # rois = []
-            # log_bads = []
-            # bad_epo = []
+            fn_pow_list = []
+            fn_reg_list = []
+            rois = []
+            log_bads = []
+            bad_epo = []
 
             epo_dir = dirs['epo'].format(monkey, condition)
             power_dir = dirs['pow'].format(monkey, condition)
@@ -235,11 +240,11 @@ if __name__ == '__main__':
 
                     fn_pow_list.append(fname_power)
                     fn_reg_list.append(fname_regr)
-                    # rois.append(read_session(fname_info, d)['sector'].values)
+                    rois.append(read_session(fname_info, d)['sector'].values)
                     # For noroi condition:
                     # rois.append([str(d)])
                     # For uniroi condition:
-                    rois.append(['all_rois'])
+                    # rois.append(['all_rois'])
 
                     lb = get_log_bad_epo(fname_epo)
                     log_bads.append(lb)
@@ -268,7 +273,7 @@ if __name__ == '__main__':
             #     condition = 'hard_25'
             # elif 'cued' in condition:
             #     condition = 'cued_25'
-            condition = 'eaha_25_uniroi_tf'
+            condition = 'easy'
             ##################
 
             if avg_frq:

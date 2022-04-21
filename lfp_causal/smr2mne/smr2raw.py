@@ -67,7 +67,7 @@ if __name__ == '__main__':
     import os
 
     monkey = 'teddy'
-    condition = 'hard'
+    condition = 'cued'
 
     smr_dir = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
               '{0}/{1}/smr'.format(monkey, condition)

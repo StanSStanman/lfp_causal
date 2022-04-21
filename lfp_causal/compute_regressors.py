@@ -19,6 +19,18 @@ def get_outcomes(fname):
     return outcomes
 
 
+def get_rt_mt(fname):
+    csv = pd.read_csv(fname)
+    trig_on = csv['trig_on'].values.copy()
+    mov_on = csv['mov_on'].values.copy()
+    trig_off = csv['trig_off'].values.copy()
+
+    rt = mov_on - trig_on
+    mt = trig_off - mov_on
+
+    return rt, mt
+
+
 def get_behaviour(monkey, condition, session, save_as=None):
     # fname_csv = '/media/jerry/TOSHIBA EXT/data/db_behaviour/lfp_causal/' \
     #             '{0}/{1}/t_events/{2}.csv'.format(monkey, condition, session)
@@ -31,6 +43,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
 
     actions = get_actions(fname_csv)
     outcomes = get_outcomes(fname_csv)
+    rt, mt = get_rt_mt(fname_csv)
 
     infos = pd.read_excel(fname_info.format(monkey, condition),
                           dtype={'file': str, 'sector': str})
@@ -44,6 +57,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
 
     data = dict()
     cols = ['Condition', 'Region', 'Actions', 'Correct', 'Reward',
+            'RT', 'MT',
             'is_R|C', 'is_nR|C', 'is_R|nC', 'is_nR|nC',
             'RnR|C', 'RnR|nC',
             '#R', '#nR', '#R|C', '#nR|C', '#R|nC', '#nR|nC',
@@ -60,6 +74,8 @@ def get_behaviour(monkey, condition, session, save_as=None):
         _cond = 0
     elif condition == 'hard':
         _cond = 1
+    elif condition == 'cued':
+        _cond = 2
     data['Condition'] = np.full(actions.shape, _cond)
 
     region = infos[infos['file'] == session]['sector'].values[0]
@@ -71,7 +87,7 @@ def get_behaviour(monkey, condition, session, save_as=None):
         _reg = 2
     data['Region'] = np.full(actions.shape, _reg)
 
-    # Actions values: 0 = left; 1 = center; 2 = right
+    # Actions values: 0 = right; 1 = center; 2 = left
     actions_int = actions.copy()
     actions_int[actions_int == 102.] = 0
     actions_int[actions_int == 103.] = 1
@@ -79,11 +95,18 @@ def get_behaviour(monkey, condition, session, save_as=None):
     data['Actions'] = actions_int.astype(int)
 
     correct_act = actions.copy()
-    correct_act[correct_act != correct_pos] = 0
-    correct_act[correct_act == correct_pos] = 1
+    if type(correct_pos) == float:
+        correct_act[correct_act != correct_pos] = 0
+        correct_act[correct_act == correct_pos] = 1
+    elif type(correct_pos) == str:
+        if correct_pos == 'all':
+            correct_act = outcomes.copy()
     data['Correct'] = correct_act.copy()
 
     data['Reward'] = outcomes.copy()
+
+    data['RT'] = rt
+    data['MT'] = mt
 
     # -------------------------------------------------------------------------
     _is_RC = np.logical_and(outcomes == 1, correct_act == 1)
@@ -116,13 +139,14 @@ def get_behaviour(monkey, condition, session, save_as=None):
 
     # -------------------------------------------------------------------------
     # Compute P(O|A) and P(O|nA) (Mean of beta distribution)
-    # data['P(R|C)'] = data['#R|C'] / (data['#R|C'] + data['#nR|C'])
-    # data['P(R|nC)'] = data['#R|nC'] / (data['#R|nC'] + data['#nR|nC'])
+    data['P(R|C)'] = data['#R|C'] / (data['#R|C'] + data['#nR|C'])
+    data['P(R|nC)'] = data['#R|nC'] / (data['#R|nC'] + data['#nR|nC'])
 
     # Compute P(O|A) and P(O|nA) (Mode of beta distribution)
-    data['P(R|C)'] = (data['#R|C'] - 1) / ((data['#R|C'] + data['#nR|C']) - 2)
-    data['P(R|nC)'] = (data['#R|nC'] - 1) / \
-                      ((data['#R|nC'] + data['#nR|nC']) - 2)
+    # data['P(R|C)'] = (data['#R|C'] - 1) / ((data['#R|C'] + data['#nR|C']) - 2)
+    # data['P(R|nC)'] = (data['#R|nC'] - 1) / \
+    #                   ((data['#R|nC'] + data['#nR|nC']) - 2)
+
     data['P(R|Cho)'] = beh_prob_cho(data['P(R|C)'], data['P(R|nC)'],
                                     data['Correct'])
     data['P(R|A)'] = prob_rew_act(actions, data['Reward'])
@@ -457,8 +481,8 @@ if __name__ == '__main__':
     from research.get_dirs import get_dirs
     dirs = get_dirs(MCH, PRJ)
 
-    monkey = 'teddy'
-    condition = 'hard'
+    monkeys = ['teddy']
+    conditions = ['hard']
 
     # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
     #            '{0}/{1}/files_info.xlsx'.format(monkey, condition)
@@ -467,22 +491,29 @@ if __name__ == '__main__':
     # start = np.where(new_files == '0220')[0][0]
     # stop = len(new_files)
     # new_files = new_files[start:stop].to_list()
+    for monkey in monkeys:
+        for condition in conditions:
 
-    print('Calculating regressors for %s, %s' % (monkey, condition))
+            print('Calculating regressors for %s, %s' % (monkey, condition))
 
-    csv_dir = dirs['tev'].format(monkey, condition)
-    print(csv_dir)
-    print(os.listdir(csv_dir))
+            csv_dir = dirs['tev'].format(monkey, condition)
+            print(csv_dir)
+            print(os.listdir(csv_dir))
 
-    for file in os.listdir(csv_dir):
-        # file = '0447.csv'
-        if file.endswith('.csv'):
-            session = file.replace('.csv', '')
-            # if session in new_files:   ########################################
-            beh_dir = dirs['reg'].format(monkey, condition)
-            os.makedirs(beh_dir, exist_ok=True)
-            fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
-            print('Processing session %s' % session)
-            get_behaviour(monkey, condition, session, save_as=fname_beh)
+            for file in os.listdir(csv_dir):
+                # file = '0447.csv'
+                if file.endswith('.csv'):
+                    session = file.replace('.csv', '')
+                    # if session in new_files:   ##############################
+                    beh_dir = dirs['reg'].format(monkey, condition)
+                    os.makedirs(beh_dir, exist_ok=True)
+                    fname_beh = op.join(beh_dir, '{0}.xlsx'.format(session))
+                    print('Processing session %s' % session)
+                    try:
+                        get_behaviour(monkey, condition, session,
+                                      save_as=fname_beh)
+                    except:
+                        print('Session {0} not computed'.format(session))
+                        pass
 
-    print('\a')
+            print('\a')

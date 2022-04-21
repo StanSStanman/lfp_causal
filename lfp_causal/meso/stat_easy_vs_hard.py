@@ -81,9 +81,10 @@ def prepare_data(powers, regressors, l_bad, e_bad, conditions, reg_name,
             if len(eb) != 0:
                 reg = np.delete(reg, eb)
 
-            all_pow[_idx] = np.delete(all_pow[_idx], np.where(reg != reg_val),
-                                      axis=0)
-            reg = np.delete(reg, np.where(reg != reg_val))
+            # I actually don't remember why they should be usefull, consider to eliminate them
+            # all_pow[_idx] = np.delete(all_pow[_idx], np.where(reg != reg_val),
+            #                           axis=0)
+            # reg = np.delete(reg, np.where(reg != reg_val))
             if cn == 'easy':
                 reg = np.full_like(reg, 0)
             elif cn == 'hard':
@@ -107,7 +108,19 @@ def compute_stats_meso(fname_pow, fname_reg, rois, log_bads, bad_epo,
                                     times=times, freqs=freqs,
                                     avg_freq=avg_freq,
                                     norm=norm, bline=(-.55, -0.05),
-                                    fbl='cue_on_pow_8_120_mt.nc')
+                                    fbl='cue_on_pow_beta_mt.nc')
+
+    ###########################################################################
+    for i, p in enumerate(power):
+        power[i] = p[:25, :, :]
+    for k in regr.keys():
+        for i, r in enumerate(regr[k]):
+            regr[k][i] = r[:25]
+    # for k in cond.keys():
+    #     if cond[k] is not None:
+    #         for i, c in enumerate(cond[k]):
+    #             cond[k][i] = c[:25]
+    ###########################################################################
 
     mi_results = {}
     pv_results = {}
@@ -157,15 +170,16 @@ if __name__ == '__main__':
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkeys = ['freddie']
+    monkeys = ['teddy']
     conditions = ['easy', 'hard']
     event = 'trig_off'
     norm = 'fbline_relchange'
-    n_power = '{0}_pow_8_120_mt.nc'.format(event)
+    n_power = '{0}_pow_beta_mt.nc'.format(event)
     times = [(-1.5, 1.3)]
     # freqs = [(5, 120)]
     # freqs = [(8, 15), (15, 30), (25, 45), (40, 70), (60, 120)]
     freqs = [(8, 12), (15, 35), (40, 65), (70, 120)]
+    freqs = [(15, 35)]
     avg_frq = True
     overwrite = True
 
@@ -207,10 +221,11 @@ if __name__ == '__main__':
     #            'cc', 'cc']
     # mi_type = ['ccd' for r in regressors]
 
-    regressors = ['Reward']
+    regressors = ['Condition']
+    regressors = ['q_rpe']
     reg_vals = 0
     conditionals = [None]
-    mi_type = ['cd']
+    mi_type = ['cc']
 
     inference = ['ffx' for r in regressors]
 
@@ -259,7 +274,8 @@ if __name__ == '__main__':
 
                     fn_pow_list.append(fname_power)
                     fn_reg_list.append(fname_regr)
-                    rois.append(read_session(fname_info, d)['sector'].values)
+                    # rois.append(read_session(fname_info, d)['sector'].values)
+                    rois.append(np.array(['striatum']))
 
                     lb = get_log_bad_epo(fname_epo)
                     log_bads.append(lb)
@@ -279,8 +295,8 @@ if __name__ == '__main__':
                                           mi_type, inference,
                                           t, f, avg_frq, norm)
 
-        mk = 'freddie'
-        cd = '2cond_nrd'
+        mk = 'teddy'
+        cd = 'easy_hard_rpe_one_roi'
 
         if avg_frq:
             save_dir = op.join(dirs['st_prj'], mk, cd, event, norm,

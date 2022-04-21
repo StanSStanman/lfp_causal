@@ -49,8 +49,10 @@ def find_events_txt(fname_in, fname_out, fname_txt):
         # Extracting cues time series (cue_on, cue_off):
         # If the two time points have a distance of about 0.5s
         # they're considered valid (error = +- 0.001s)
-        cue = np.intersect1d(events['cue L']['times'],
-                             events['cue R']['times'])
+        # cue = np.intersect1d(events['cue L']['times'],
+        #                      events['cue R']['times'])
+        cue = np.unique(np.hstack((events['cue L']['times'],
+                                   events['cue R']['times'])))
         cues = np.array([])
         for c1 in cue:
             for c2 in cue:
@@ -118,8 +120,11 @@ def find_events_txt(fname_in, fname_out, fname_txt):
         #        'in text and smr file'
 
         # Defining trigger onset vector
-        trigger = np.intersect1d(events['trig L']['times'],
-                                 events['trig R']['times'])
+        # trigger = np.intersect1d(events['trig L']['times'],
+        #                          events['trig R']['times'])
+        trigger = np.unique(np.hstack((events['trig L']['times'],
+                                       events['trig R']['times'])))
+
         trigger_onset = np.zeros(len(cue_onset))
         t_on = cue_offset + (trig_delay / 1e3)
         for i in range(len(trigger_onset)):
@@ -261,7 +266,7 @@ if __name__ == '__main__':
     import os
 
     monkey = 'teddy'
-    condition = 'hard'
+    condition = 'cued'
     label = 'tneu'
 
     # rec_info = '/media/jerry/TOSHIBA EXT/data/db_lfp/lfp_causal/' \
@@ -284,7 +289,7 @@ if __name__ == '__main__':
         # if session not in new_files:
         #     continue
 
-        # file = 'tneu0323.smr'
+        # file = 'tneu0743.smr'
         if file.endswith('.smr'):
             fname_in = os.path.join('/media/jerry/TOSHIBA EXT/data/db_lfp/'
                                     'lfp_causal/'

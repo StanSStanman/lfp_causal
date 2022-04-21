@@ -195,6 +195,14 @@ def prepare_data_exp(powers, regressors, l_bad, e_bad, condition, reg_name,
 
         reg = np.delete(reg, np.where(reward != rew_val)[0], axis=0)
         pow = np.delete(pow, np.where(reward != rew_val)[0], axis=0)
+
+        ##########################
+        # if pow.shape[0] > 25:
+        #     pow = pow[:25, :, :]
+        # if reg.shape[0] > 25:
+        #     reg = reg[:25]
+        ##########################
+
         if condition is not None:
             con = xls[condition].values
             if len(lb) != 0:
@@ -221,7 +229,7 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
     times, freqs = prepare_data_exp(fname_pow, fname_reg,
                                     log_bads, bad_epo,
                                     condition=None,
-                                    reg_name='Region',
+                                    reg_name='Correct',
                                     rew_val=1,
                                     times=times,
                                     freqs=freqs,
@@ -246,8 +254,8 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
         mi.assign_coords({'freqs': freqs})
         pval.assign_coords({'freqs': freqs})
 
-    mi_results['Region_r1'] = mi
-    pv_results['Region_r1'] = pval
+    mi_results['corr_r1'] = mi
+    pv_results['corr_r1'] = pval
 
     # when reg_name='learn_5t'
     # mi_results['expexp'] = mi
@@ -264,15 +272,16 @@ def compute_stat_exp(fname_pow, fname_reg, rois, log_bads, bad_epo,
 
 
 if __name__ == '__main__':
-
+    import time
+    # time.sleep(60*15)
     from lfp_causal import MCH, PRJ
     dirs = get_dirs(MCH, PRJ)
 
-    monkeys = ['freddie']
+    monkeys = ['teddy']
     conditions = ['easy', 'hard']
     event = 'trig_off'
     norm = 'fbline_relchange'
-    n_power = '{0}_pow_8_120_mt.nc'.format(event)
+    n_power = '{0}_pow_beta_mt.nc'.format(event)
     times = [(-1.5, 1.3)]
     # times = [(-1.5, 1.7)]
     # freqs = [(5, 120)]
@@ -283,10 +292,20 @@ if __name__ == '__main__':
     f_resample = None #80
     overwrite = False
 
+    # conditionals = [None]
+    # mi_type = ['cd']
+    # inference = ['ffx']
+    #
+    # fn_pow_list = []
+    # fn_reg_list = []
+    # rois = []
+    # log_bads = []
+    # bad_epo = []
+
     for condition in conditions: # Try to compute multiple conditions
 
         conditionals = [None]
-        mi_type = ['cc']
+        mi_type = ['cd']
         inference = ['ffx']
 
         fn_pow_list = []
@@ -315,6 +334,9 @@ if __name__ == '__main__':
                       '0448', '0521', '0618', '0656', '0691', '0693', '0698',
                       '0705', '0707', '0711', '0712', '0716', '0720', '0731']
 
+        rej_files += ['0900', '1512', '1555', '1682',
+                      '0291', '0368', '0743']
+
         for monkey in monkeys:
 
             epo_dir = dirs['epo'].format(monkey, condition)
@@ -334,8 +356,8 @@ if __name__ == '__main__':
 
                     fn_pow_list.append(fname_power)
                     fn_reg_list.append(fname_regr)
-                    rois.append(['unique'])
-                    # rois.append(read_session(fname_info, d)['sector'].values)
+                    # rois.append(['unique'])
+                    rois.append(read_session(fname_info, d)['sector'].values)
 
                     lb = get_log_bad_epo(fname_epo)
                     log_bads.append(lb)
@@ -344,42 +366,50 @@ if __name__ == '__main__':
                                         fname_info=fname_info)
                     bad_epo.append(be)
 
-        mi_results = {}
-        pv_results = {}
-        for t, f in product(times, freqs):
-            # ds_mi, ds_pv = compute_stat_evl(fn_pow_list, rois, t, f,
-            #                                 avg_frq, norm)
-            ds_mi, ds_pv = compute_stat_exp(fn_pow_list, fn_reg_list, rois,
-                                            log_bads, bad_epo,
-                                            times=t, freqs=f,
-                                            avg_freq=True, norm=norm)
+            mi_results = {}
+            pv_results = {}
+            for t, f in product(times, freqs):
+                # ds_mi, ds_pv = compute_stat_evl(fn_pow_list, rois, t, f,
+                #                                 avg_frq, norm)
+                ds_mi, ds_pv = compute_stat_exp(fn_pow_list, fn_reg_list, rois,
+                                                log_bads, bad_epo,
+                                                times=t, freqs=f,
+                                                avg_freq=True, norm=norm)
 
-            ##################
-            # if len(monkeys) > 1:
-            #     monkey = 'freted'
-            ##################
+                ##################
+                # if len(monkeys) > 1:
+                #     monkey = 'freted'
 
-            if avg_frq:
-                save_dir = op.join(dirs['st_prj'], monkey, condition, event,
-                                   norm, '{0}_{1}_mt'.format(f[0], f[1]))
+                # if 'easy' in condition:
+                #     condition = 'easy_25'
+                # elif 'hard' in condition:
+                #     condition = 'hard_25'
+                # elif 'cued' in condition:
+                #     condition = 'cued_25'
+                ##################
+                # condition = 'cued_cond'
 
-            elif not avg_frq:
-                save_dir = op.join(dirs['st_prj'], monkey, condition, event,
-                                   norm, '{0}_{1}_tf_mt'.format(f[0], f[1]))
+                if avg_frq:
+                    save_dir = op.join(dirs['st_prj'], monkey, condition, event,
+                                       norm, '{0}_{1}_mt'.format(f[0], f[1]))
 
-            os.makedirs(save_dir, exist_ok=True)
-            fname_mi = op.join(save_dir, 'mi_results.nc'.format(f[0], f[1]))
-            fname_pv = op.join(save_dir, 'pv_results.nc'.format(f[0], f[1]))
+                elif not avg_frq:
+                    save_dir = op.join(dirs['st_prj'], monkey, condition, event,
+                                       norm, '{0}_{1}_tf_mt'.format(f[0], f[1]))
 
-            if not overwrite and op.exists(fname_mi):
-                mi = xr.load_dataset(fname_mi)
-                pv = xr.load_dataset(fname_pv)
+                os.makedirs(save_dir, exist_ok=True)
+                fname_mi = op.join(save_dir, 'mi_results.nc'.format(f[0], f[1]))
+                fname_pv = op.join(save_dir, 'pv_results.nc'.format(f[0], f[1]))
 
-                ds_mi['times'] = mi['times']
-                ds_pv['times'] = pv['times']
+                if not overwrite and op.exists(fname_mi):
+                    mi = xr.load_dataset(fname_mi)
+                    pv = xr.load_dataset(fname_pv)
 
-                ds_mi = mi.update(ds_mi)
-                ds_pv = pv.update(ds_pv)
+                    ds_mi['times'] = mi['times']
+                    ds_pv['times'] = pv['times']
 
-            ds_mi.to_netcdf(fname_mi)
-            ds_pv.to_netcdf(fname_pv)
+                    ds_mi = mi.update(ds_mi)
+                    ds_pv = pv.update(ds_pv)
+
+                ds_mi.to_netcdf(fname_mi)
+                ds_pv.to_netcdf(fname_pv)

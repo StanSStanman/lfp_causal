@@ -140,8 +140,8 @@ def compute_power_multitaper(epoch, session, event, crop=None):
     freqs = [11., 25., 55., 95.]
     n_cycles = [6., 7., 16., 28.]
     t_bandwidth = [4., 6., 8., 14.]
-    # freqs = [30.]
-    # n_cycles = [30. / 3.]
+    # freqs = [30.] #[25.]
+    # n_cycles = [freqs[0] / 3.]
     # t_bandwidth = [5.]
 
     # for epo, ses in zip(epochs, sessions):
@@ -212,6 +212,7 @@ def compute_power_multitaper(epoch, session, event, crop=None):
     if not op.exists(p_dir):
         os.makedirs(p_dir)
     d_tfr.to_netcdf(p_fname)
+    print('Saved at', p_fname)
 
     return
 
@@ -368,7 +369,7 @@ if __name__ == '__main__':
                             # compute_power_morlet(fname_epo_c, file, 'cue_on',
                             #                      freqs=freqs,
                             #                      n_cycles=n_cycles,
-                            #                      crop=(-.75, .15))
+                            #                      crop=(-.75, -.15))
 
                             ## TRIGGER OFFSET
                             # compute_power_superlets(fname_epo, file, event,
@@ -384,7 +385,7 @@ if __name__ == '__main__':
                             # compute_power_superlets(fname_epo, file, event,
                             #                         freqs=np.linspace(8, 120, 80),
                             #                         n_cycles=None,
-                            #                         crop=(-1.5, 1.5))
+                            #                         crop=(-1.5, -1.5))
 
                             # TRIGGER OFFSET
                             compute_power_multitaper(fname_epo_t, file,
@@ -393,7 +394,7 @@ if __name__ == '__main__':
                             # CUE ONSET
                             compute_power_multitaper(fname_epo_c, file,
                                                      'cue_on',
-                                                     crop=(-.75, .15))
+                                                     crop=(-.75, -.15))
                             ## TRIGGER ONSET
                             # compute_power_multitaper(fname_epo, file, event,
                             #                         crop=(-1.7, 1.85))
